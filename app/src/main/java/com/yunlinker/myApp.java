@@ -219,6 +219,18 @@ public class myApp extends Application {
                         // 登录界面 open.html
                         Log.e("kenshin", "onForceOffline, your are kicked off, please login." );
                         showForceOffLineDialog();
+//                        TIMManager.getInstance().logout(new TIMCallBack() {
+//                            @Override
+//                            public void onError(int code, String desc) {
+//                                Log.e("kenshin", "logout failed code = " + code + ", desc = " + desc);
+//                            }
+//
+//                            @Override
+//                            public void onSuccess() {
+//                                Log.i("kenshin", "logout success");
+//
+//                            }
+//                        });
                     }
 
                     @Override

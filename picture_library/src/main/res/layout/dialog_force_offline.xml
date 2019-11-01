@@ -56,9 +56,9 @@
             <Button
                 android:id="@+id/btn_ok"
                 android:layout_gravity="center"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:background="@drawable/btn_right_bottom_selector"
+                android:background="@color/transparent"
                 android:text="@string/picture_confirm"
                 android:textColor="#529BeA"
                 android:textSize="19sp" />
