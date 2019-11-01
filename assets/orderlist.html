@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>我的订单</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        section {
+            background-color: #F5F5F5;
+        }
+        
+        .main {
+            padding: 20px;
+        }
+        
+        .nav {}
+        
+        .nav>div {
+            position: relative;
+            color: #999;
+        }
+        
+        .nav>div.active {
+            color: #333;
+        }
+        
+        .nav>div.active::after {
+            position: absolute;
+            content: '';
+            bottom: 10px;
+            width: 12px;
+            height: 3px;
+            left: 50%;
+            margin-left: -6px;
+            background-color: #333;
+            border-radius: 2px;
+        }
+        
+        .list {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.07);
+            border-radius: 4px;
+            padding: 20px 10px 20px 20px;
+            position: relative;
+        }
+        
+        .list button {
+            width: 75px;
+            height: 30px;
+            line-height: 28px;
+            font-size: 13px;
+        }
+        
+        .list button.nobg {
+            background-color: #fff;
+            border: 1px solid #D8D8D8;
+        }
+        
+        .cancel {
+            border-radius: 6px 6px 0px 0px;
+            background-color: #fff;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+            padding: 20px;
+            bottom: 0px;
+        }
+        
+        .sku,
+        .pay {
+            border-radius: 6px 6px 0px 0px;
+            background-color: #fff;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+            padding: 20px;
+            bottom: 0px;
+        }
+        
+        .paybut {
+            font-size: 15px;
+            color: #fff;
+            border-radius: 4px;
+            width: 100%;
+        }
+        
+        .paybut.active {
+            background-color: #FFCD1F;
+            color: #333;
+        }
+        
+        .posstatus {
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            line-height: 25px;
+            height: 25px;
+            font-size: 12px;
+            padding: 0px 8px 0px 14px;
+        }
+        
+        .bghui {
+            background-image: url('img/order/bghui.png');
+            color: #fff;
+        }
+        
+        .bgyellow {
+            background-image: url('img/order/bgyellow.png');
+        }
+        
+        .bgback {
+            background-image: url('img/order/bgback.png');
+            color: #fff;
+        }
+        
+        .bgred {
+            background-image: url('img/order/bgred.png');
+            color: #fff;
+        }
+        
+        .reous {
+            border-radius: 6px 6px 0px 0px;
+            background-color: #fff;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+            padding: 20px;
+            bottom: 0px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">我的订单</div>
+        </div>
+        <div class="bg_white lh50 nav dflex">
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main" id="list">
+
+        </div>
+    </section>
+    <footer>
+    </footer>
+
+    <div wtd="payWinTemp" class="pay">
+        <img src="img/sendclose.png" height="30" style="position: absolute;right:10px;top:10px;" class="fr" onclick="Comm.showWindow()" />
+        <div class="center lh30">
+            <span class="f17" style="font-weight:500;">支付方式</span>
+        </div>
+        <div class="mart20">
+            <span class="color666 f15">支付金额</span>
+            <span class="colorprice f15" id="payprice"></span>
+        </div>
+        <div class="borderb mart25 marb25"></div>
+        <div class="flex-between lh30" onclick="model.selpay(this,1)">
+            <div>
+                <img src="img/pay/ic_alipay.png" height="30" />
+                <span class="f15">支付宝支付</span>
+            </div>
+            <div>
+                <img src="img/pay/ic_check_n.png" class="sel" height="20" />
+            </div>
+        </div>
+        <div class="flex-between lh30 mart30" onclick="model.selpay(this,3)">
+            <div>
+                <img src="img/pay/ic_WeChat.png" height="30" />
+                <span class="f15">微信支付</span>
+            </div>
+            <div>
+                <img src="img/pay/ic_check_n.png" class="sel" height="20" />
+            </div>
+        </div>
+        <div class="flex-between lh30 mart30 hide" onclick="model.selpay(this,3)">
+            <div>
+                <img src="img/pay/ic_bank_card.png" height="30" />
+                <span class="f15">银行卡支付</span>
+            </div>
+            <div>
+                <img src="img/pay/ic_check_n.png" class="sel" height="20" />
+            </div>
+        </div>
+        <div class="mart30">
+            <button class="paybut" onclick="model.gopayok()">确认支付</button>
+        </div>
+    </div>
+
+    <div wtd="reousWinTemp" class="reous">
+        <img src="img/sendclose.png" height="30" style="position: absolute;left:10px;" class="fl" onclick="Comm.showWindow()" />
+        <div class="center lh30">
+            <span class="f17" style="font-weight:500;">取消原因</span>
+        </div>
+        <div id="cancelReason"></div>
+        <div class="mart30">
+            <button class="paybut no" style="border-radius: 4px;" onclick="model.cancelok()">确定</button>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    //cancelReason
+    function pageload() {
+        $('header .nav').html(template('navTpl', model));
+        GDict.init(function() {
+            model.cancelResous = GDict.get('cancelReason');
+            $('#cancelReason').html(template('cancelReasonTpl', model.cancelResous));
+            model.search();
+        });
+    }
+
+    function pageresume() {
+        model.search();
+    }
+    var model = {
+        bbk: Comm.query('bbk') ? Comm.query('bbk') : '0',
+        state: Comm.query('state') ? Comm.query('state') : '',
+        evaluate: Comm.query('evaluate') ? Comm.query('evaluate') : '',
+        selnav: function(a, i, state) {
+            if (!$(a).hasClass('active')) {
+                $(a).parent().find('.active').removeClass('active');
+                $(a).addClass('active');
+                if (i == 5) {
+                    model.evaluate = 0;
+                    model.state = '';
+                } else {
+                    model.evaluate = '';
+                    model.state = state;
+                }
+                model.search();
+            }
+        },
+        search: function() {
+            if (!model.mere) {
+                var url = "/api/order/list";
+                if (model.bbk == 1) {
+                    url = "/api/porder/myorderlist";
+                }
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: url,
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+                    state: model.state,
+                    evaluate: model.evaluate
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    d.data.bbk = model.bbk;
+                    var h = template('listTpl', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                model.mere.refreshOption.refreshParm = {
+                    state: model.state,
+                    evaluate: model.evaluate
+                };
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        },
+        orderId: '',
+        cancel: function(a, orderId) {
+            event.stopPropagation();
+            if (model.bbk == 0) {
+
+                Comm.confirm('确认取消该订单?', function(d) {
+                    if (d) {
+                        var url = '/api/order/cancelorder';
+                        AJAX.POST(url, {
+                            orderId: orderId
+                        }, function(d) {
+                            if (d.code == 1) {
+                                $('#oid' + orderId).remove();
+                                Comm.message('取消成功');
+                            } else {
+                                Comm.message(d.msg);
+                            }
+                        })
+                    }
+                })
+            } else {
+                model.selcancelResous = null;
+                Comm.showWindow('reousWinTemp', true);
+                model.orderId = orderId;
+            }
+        },
+        cancelReasoncl: function(a, k) {
+            model.selcancelResous = model.cancelResous[k];
+            $('.reous .paybut').removeClass('no');
+            $(a).parent().parent().find('img.active').attr('src', 'img/pay/ic_check_n.png').removeClass('active');
+            $(a).find('img').attr('src', 'img/pay/ic_check_y.png').addClass('active');
+        },
+        cancelok: function() {
+            if (model.selcancelResous) {
+                Comm.showWindow();
+                var url = '/api/porder/del';
+                AJAX.POST(url, {
+                    orderId: model.orderId,
+                    dictId: model.selcancelResous.dictid
+                }, function(d) {
+                    if (d.code == 1) {
+                        model.search();
+                        Comm.message('取消成功');
+                    } else {
+                        Comm.message(d.msg);
+                    }
+                })
+            } else {
+                Comm.message('请选择原因')
+            }
+        },
+        paymothd: 0,
+        orderId: '',
+        totalPrice: 0,
+        selpay: function(a, paymothd) {
+            model.paymothd = paymothd;
+            $('#WTDBOX img.sel').attr('src', 'img/pay/ic_check_n.png');
+            $(a).find('img.sel').attr('src', 'img/pay/ic_check_y.png');
+            $('#WTDBOX .paybut').addClass('active');
+        },
+        gopay: function(a, orderId, totalPrice) {
+            model.orderId = orderId;
+            model.totalPrice = totalPrice;
+            event.stopPropagation();
+            Comm.showWindow();
+            Comm.showWindow('payWinTemp', true);
+            $('#WTDBOX #payprice').html('￥' + totalPrice / 100);
+        },
+        gopayok: function() {
+            ////支付宝 1  微信 3
+            payM.pay(model.paymothd, model.orderId);
+        },
+        alert: function(orderId) {
+            event.stopPropagation();
+            AJAX.POST('/api/order/alert', {
+                orderId: orderId
+            }, function(d) {
+                if (d.code == 1) {
+                    Comm.message('提醒成功')
+                } else {
+                    Comm.message(d.msg);
+                }
+            });
+        },
+        goorder: function(orderId) {
+            Comm.go('orderdetail.html?id=' + orderId + "&bbk=" + model.bbk);
+        },
+        confirm: function(a, orderId) {
+            event.stopPropagation();
+            Comm.confirm('确认收货?', function(d) {
+                if (d) {
+                    AJAX.POST('/api/order/confirm', {
+                        orderId: orderId
+                    }, function(d) {
+                        if (d.code == 1) {
+                            model.search();
+                            Comm.message('收货成功');
+                        } else {
+                            Comm.message(d.msg);
+                        }
+                    })
+                }
+            })
+        },
+        purchase: function(a, orderId) {
+            event.stopPropagation();
+            Comm.confirm('确认完成采购?', function(d) {
+                if (d) {
+                    AJAX.POST('/api/porder/purchase', {
+                        orderId: orderId
+                    }, function(d) {
+                        if (d.code == 1) {
+                            model.search();
+                            Comm.message('采购成功');
+                        } else {
+                            Comm.message(d.msg);
+                        }
+                    })
+                }
+            })
+        },
+        del: function(a, orderId) {
+            event.stopPropagation();
+            Comm.confirm('确认删除订单?', function(d) {
+                if (d) {
+                    var url = '/api/order/del';
+                    if (model.bbk == 1) {
+                        url = '/api/porder/cancel';
+                    }
+                    AJAX.POST(url, {
+                        orderId: orderId
+                    }, function(d) {
+                        if (d.code == 1) {
+                            Comm.message('删除成功');
+                            $('#oid' + orderId).remove();
+                        } else {
+                            Comm.message(d.msg);
+                        }
+                    })
+                }
+            })
+        }
+
+    };
+    /*
+        CANCEL(0, "取消"),
+        WAITPAY(1, "待支付"),
+        PAYSTART(2, "开始支付"),
+        PAYEND(3, "支付完成"),
+        RECEORDER(4, "已接单"),
+        PURCHASE(5, "已采购"),
+        DELIVER(6, "已发货"),
+        RECEGOODS(7, "交易完成确认收货"),
+        SUCCESS(8, "订单完成无法售后"),
+        AFTESALE(9, "售后申请"),
+        AGRESS(10, "审核同意"),
+        REFUSE(11, "审核不同意")
+        */
+</script>
+
+<script id="listTpl" type="text/html">
+    {{each $data v k}} {{if(v.orderdetail)}}
+    <div class="list marb20" style="{{(v.state==5||v.state==6)&&bbk==0?'padding-top:5px':''}}" id="oid{{v.orderId}}" onclick="model.goorder({{v.orderId}})">
+        {{if(v.state>=4&&bbk==0)}}
+        <div>
+            <img src="{{OSS(v.receiveFace)}}" onerror="app.errorimg(this)" width="20" height="20" style="border-radius:20px;" />
+            <span class="color999 f12">{{v.receiveName}}</span>
+        </div>
+        {{/if}}
+        <div class="flex_wrap mart10 borderb paddb20">
+            <div style="width: 90px;">
+                <img src="{{OSS(v.orderdetail.skuImg)}}" width="90" height="90" onerror="app.errorimg(this)">
+            </div>
+            <div class="marl10" style="width: calc(100% - 100px);">
+                <div class="f15 wordW lh50">{{v.orderdetail.skuName}}</div>
+                <div class="">
+                    <img src="{{OSS(v.orderdetail.countryLogo)}}" class="countryLogo" onerror="app.errorimg(this)" />
+                    <span class="color666 f12">{{v.orderdetail.countryChineseName}}</span>
+                </div>
+                <div class="f13 flex-between lh20 mart10">
+                    <div>
+                        <span class="f13">¥</span>
+                        <span class="f17">{{priceTp(v.orderdetail.sellPrice)}}</span>
+                    </div>
+                    <div class="f12 color666">x{{v.orderdetail.buynum}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="tright lh25 paddt15">
+            <span>共{{v.orderdetail.buynum}}件商品  总额：</span>
+            <span>￥</span>
+            <span class="bold">{{priceTp(v.totalPrice)}}</span>
+        </div>
+        <div class="tright mart15">
+            {{if(v.state==1||v.state==2||v.state==3&&bbk==0||v.state==4&&bbk==1)}}
+            <button class="nobg" onclick="model.cancel(this,{{v.orderId}})">取消订单</button> {{/if}} {{if(v.state==1)}}
+            <button onclick="model.gopay(this,{{v.orderId}},{{v.totalPrice}})">立即支付</button> {{/if}} {{if(bbk==1&&v.state==4)}}
+            <button class="nobg" onclick="model.purchase(this,{{v.orderId}})">完成采购</button> {{/if}} {{if(bbk==1&&v.state==5)}}
+            <button onclick="event.stopPropagation();Comm.go('delivergoods.html?id={{v.orderId}}')">发货</button> {{/if}} {{if(bbk==1&&(v.state==5||v.state==6))}}
+            <button class="nobg"><a style="display:block;" onclick="event.stopPropagation();IM_.IM_ShowContact({{v.customerId}})">联系买家</a></button> {{/if}} {{if(bbk==0&&v.state==5)}}
+            <button onclick="model.alert({{v.orderId}})">提醒发货</button>{{/if}} {{if(bbk==0&&v.state==6)}}
+            <button class="nobg" onclick="model.confirm(this,{{v.orderId}})">确认收货</button> {{/if}} {{if(v.state==6)}}
+            <button class="nobg" onclick="event.stopPropagation();Comm.go('logistics.html?courierid={{v.courierID}}&courierNumber={{v.courierNumber}}')">查看物流</button> {{/if}} {{if(bbk==0&&v.state==7)}}
+            <button class="nobg" onclick="event.stopPropagation();Comm.go('aftersale.html?id={{v.orderId}}')">申请售后</button> {{/if}} {{if(bbk==0&&(v.state==7||v.state==8)&&v.evaluate==0)}}
+            <button onclick="event.stopPropagation();Comm.go('eva.html?id={{v.orderId}}')">评价</button>{{/if}} {{if(v.state==8||v.state==9||v.state==10||v.state==11)}}
+            <button class="nobg">查看详情</button>{{/if}}
+        </div>
+        {{if(v.state==0)}}
+        <div class="posstatus bghui">交易关闭</div>
+        {{else if(v.state==1)}}
+        <div class="posstatus bgyellow">未支付</div>
+        {{else if(v.state==2)}}
+        <div class="posstatus bgyellow">待支付</div>
+        {{else if(v.state==3)}}
+        <div class="posstatus bgback">待承接</div>
+        {{else if(v.state==4)}}
+        <div class="posstatus bgback">待采购</div>
+        {{else if(v.state==5)}}
+        <div class="posstatus bgback">待发货</div>
+        {{else if(v.state==6)}}
+        <div class="posstatus bgback">{{bbk==1?'已发货':'待收货'}}</div>
+        {{else if(v.state==7||v.state==8)}}
+        <div class="posstatus bgred">交易成功</div>
+        {{else if(v.state==9)}}
+        <div class="posstatus bgback" style="padding-left:22px;">售后处理中</div>
+        {{else if(v.state==10)}}
+        <div class="posstatus bgback">退款成功</div>
+        {{else if(v.state==11)}}
+        <div class="posstatus bgback">售后已关闭</div>
+        {{/if}}
+    </div>
+    {{/if}} {{/each}}
+</script>
+
+
+<script id="navTpl" type="text/html">
+    {{if(bbk==1)}}
+    <div class="active" onclick="model.selnav(this,0,'')">全部</div>
+    <div class="" onclick="model.selnav(this,1,'4')">待采购</div>
+    <div class="" onclick="model.selnav(this,2,'5')">待发货</div>
+    <div class="" onclick="model.selnav(this,3,'6')">已发货</div>
+    <div class="" onclick="model.selnav(this,4,'9')">售后</div>
+    {{else}}
+    <div class="{{state==''&&evaluate==''?'active':''}}" onclick="model.selnav(this,0,'')">全部</div>
+    <div class="{{state=='1'?'active':''}}" onclick="model.selnav(this,1,'1')">待付款</div>
+    <div class="{{state=='3'?'active':''}}" onclick="model.selnav(this,2,'3')">待承接</div>
+    <div class="{{state=='5'?'active':''}}" onclick="model.selnav(this,3,'5')">待发货</div>
+    <div class="{{state=='6'?'active':''}}" onclick="model.selnav(this,4,'6')">待收货</div>
+    <div class="{{evaluate=='0'?'active':''}}" onclick="model.selnav(this,5,'0')">待评价</div>
+    {{/if}}
+</script>
+
+<script id="cancelReasonTpl" type="text/html">
+    {{each $data v k}}
+    <div class="flex-between lh30 mart20" onclick="model.cancelReasoncl(this,{{k}})">
+        <div>
+            <span class="f15">{{v.dictname}}</span>
+        </div>
+        <div>
+            <img src="img/pay/ic_check_n.png" height="20" />
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+<!-- CANCEL(0, "取消"),
+WAITPAY(1, "待支付"),
+PAYSTART(2, "开始支付"),
+PAYEND(3, "支付完成"),
+RECEORDER(4, "已接单"),
+PURCHASE(5, "已采购"),
+DELIVER(6, "已发货"),
+RECEGOODS(7, "交易完成确认收货"),
+SUCCESS(8, "订单完成无法售后"),
+AFTESALE(9, "售后申请"),
+AGRESS(10, "审核同意"),
+REFUSE(11, "审核不同意") -->
+
+</html>

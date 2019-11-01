@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>启动页</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        body {
+            background-image: url('img/open/bg.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+        
+        section {}
+        
+        .mart50 {
+            margin-top: 50px;
+        }
+        
+        button {
+            width: calc(100% - 57px);
+        }
+        
+        .reg {
+            background: #fff;
+            border-radius: 4px;
+            color: #333333;
+            font-size: 15px;
+        }
+        
+        .login {
+            background: #FFCD1F;
+            border-radius: 4px;
+            color: #333333;
+            font-size: 15px;
+        }
+        
+        .colorc7 {
+            color: #C7C7C7;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+    </header>
+    <section>
+        <div>
+            <img src="img/closew.png" width="16" class="mart50 marl20" onclick="Comm.gotop('index.html')" />
+        </div>
+        <div class="colorfff f20 center" style="margin-top: 120px;letter-spacing: 2px;font-weight:100;">全球旅行分享购物平台</div>
+        <div style="position:absolute;width: 100%;bottom: 25px;">
+            <div class="dflex">
+                <div><button class="reg marl20" onclick="Comm.go('reg.html')">注册</button></div>
+                <div><button class="login marr20" onclick="Comm.go('login.html')">登录</button></div>
+            </div>
+            <div class="center" style="margin-top: 80px;" onclick="openLogin.login()">
+                <div><img src="img/open/wechat.png" width="30" /></div>
+                <div class="colorc7 f12 mart10">微信快捷登录</div>
+            </div>
+        </div>
+    </section>
+</body>
+<script type="text/javascript " src="inc/z.js "></script>
+<script type="text/javascript " src="inc/g.js "></script>
+<script type="text/javascript " src="inc/comm.js "></script>
+<script type="text/javascript ">
+    function pageload() {
+
+    }
+
+    function androidback() {
+        Comm.gotop('index.html');
+    }
+</script>
+
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>填写物流信息</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #fff;
+        }
+        
+        .main {
+            padding: 20px;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        .courier {
+            border-radius: 6px 6px 0px 0px;
+            background-color: #fff;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+            padding: 20px;
+            bottom: 0px;
+        }
+        
+        .courier {
+            border-radius: 6px 6px 0px 0px;
+            background-color: #fff;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+            padding: 20px;
+            bottom: 0px;
+        }
+        
+        .imgcon {
+            width: 70px;
+            height: 70px;
+            background-color: #F5F5F5;
+            text-align: center;
+            border-radius: 4px;
+            margin-right: 10px;
+            position: relative;
+        }
+        
+        img.posdel {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+        }
+        
+        .visibilityH {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="model.back()"></div>
+            <div class="navTitle">填写物流信息</div>
+        </div>
+    </header>
+    <section>
+    </section>
+    <footer>
+    </footer>
+
+    <div wtd="courierWinTemp" class="courier">
+        <img src="img/sendclose.png" height="30" style="position: absolute;left:10px;" class="fl" onclick="Comm.showWindow()" />
+        <div class="center lh30">
+            <span class="f17" style="font-weight:500;">物流公司</span>
+        </div>
+        <div id="courierList"></div>
+        <div class="mart30">
+            <button class="paybut" style="border-radius: 4px;" onclick="model.okcourier()">确定</button>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script>
+    function pageload() {
+        AJAX.GET('/api/sysconfig/getlist?key=pictureOfshipmentLock', function(d) {
+            if (d.code == 1) {
+                model.pictureOfshipmentLock = d.data.pictureOfshipmentLock ? d.data.pictureOfshipmentLock.sysvalue : 0;
+            }
+            model.init();
+        })
+    }
+
+    function pageresume() {}
+    var model = {
+        id: Comm.query('id'),
+        data: null,
+        pictureOfshipmentLock: 0,
+        init: function() {
+            AJAX.GET('/api/order/orderDetail?orderId=' + model.id, function(d) {
+                if (d.code == 1) {
+                    model.data = d.data;
+                    model.data.pictureOfshipmentLock = model.pictureOfshipmentLock
+                    $("section").html(template('mainTpl', d.data));
+                    model.upimg();
+                    model.getExpressInfo();
+                }
+            });
+        },
+        counimg: 0,
+        upimg: function() {
+            model.upimg = new imgUploader('box', 3, "upimg");
+            model.upimg.success = function() {
+                $('#box').html(template('upimgTpl', this.imgList));
+                model.counimg = this.imgList.length;
+                debugger
+                if (model.counimg >= 3) {
+                    $('#upimg').addClass('visibilityH');
+                }
+            }
+        },
+        delimg: function(a, k) {
+            model.upimg.imgList = model.upimg.imgList.del(k);
+            $(a).parent().remove();
+            $('#upimg').removeClass('visibilityH');
+        },
+        suer: function() {
+            var courierNumber = $("#courierNumber").val();
+            if (!courierNumber) {
+                Comm.message('请填写物流单号');
+                return
+            }
+
+            if (!model.selcourier) {
+                Comm.message('无法识别物流单号');
+                return
+            }
+
+            if (model.pictureOfshipmentLock == "1" && model.upimg.imgList.length == 0) {
+                Comm.message('请上传商品图');
+                return
+            }
+
+            Comm.confirm('确认发货物流信息吗？', function(d) {
+                if (d) {
+                    AJAX.POST('/api/porder/deliver', {
+                        courierNumber: courierNumber,
+                        courierId: model.selcourier.comid,
+                        orderId: model.id,
+                        pic: model.upimg.imgList.join(','),
+                    }, function(d) {
+                        if (d.code == 1) {
+                            Comm.message('发货成功')
+                            Comm.go('logistics.html?cl=2&courierid=' + model.selcourier.comid + "&courierNumber=" + courierNumber);
+                        } else {
+                            Comm.message(d.msg);
+                        }
+                    })
+                }
+            })
+        },
+        back: function() {
+            Comm.confirm('您发货的物流信息尚未提交，确定退出吗？', function(d) {
+                if (d) {
+                    Comm.close();
+                }
+            })
+        },
+        scanf: function() {
+            Comm.scanf(function(d) {
+                $("#courierNumber").val(d);
+                model.getExpressInfo();
+            })
+        },
+        getExpressInfo: function() {
+            var v = $("#courierNumber").val();
+            if (!v) {
+                return
+            }
+            AJAX.GET('/api/express/getExpressInfo?num=' + $("#courierNumber").val(), function(d) {
+                if (d.code == 1) {
+                    model.Express = d.data;
+                    if (d.data && d.data.length > 0) {
+                        model.selcourier = d.data[0];
+                        $('#longame').html(d.data[0].com);
+                    } else {
+                        Comm.message('无法识别物流单号');
+                    }
+                } else {
+                    //Comm.message('无法识别物流单号');
+                }
+            });
+        },
+        sellog: function() {
+            Comm.showWindow('courierWinTemp', true);
+            model.Express.kk = model.k;
+            $('#WTDBOX #courierList').html(template('courierListTpl', model.Express));
+        },
+        selcourier: null,
+        k: 0,
+        couriercl: function(a, k) {
+            model.k = k;
+            $(a).parent().parent().find('img.active').attr('src', 'img/pay/ic_check_n.png').removeClass('active');
+            $(a).find('img').attr('src', 'img/pay/ic_check_y.png').addClass('active');
+        },
+        okcourier: function() {
+            model.selcourier = model.Express[model.k];
+            $('#longame').html(model.selcourier.com);
+            Comm.showWindow();
+        },
+        copyText: function() {
+            Comm.copyText(model.data.consignee + " " + model.data.consigneePhone + " " + model.data.consigneeAddress);
+            Comm.message('复制成功');
+        },
+        blur: function() {
+            window.scrollTo(0, 0);
+        },
+
+    }
+
+    function androidback() {
+        model.back();
+    }
+</script>
+
+<script id="mainTpl" type="text/html">
+    <div class="main">
+        <div>
+            <span class="f17">买家地址信息</span>
+            <span class="f13 color999 hide">（鉴定商品必须寄往平台鉴定机构）</span>
+        </div>
+        <div class="mart20" style="background-color: #F9F9F9; padding: 20px;">
+            <div>
+                <span class="f17" style="font-weight:500;">{{consignee}}</span>
+                <span class="f19" style="font-weight:500;">{{consigneePhone}}</span>
+            </div>
+            <div class="f13 color6666 lh20 mart10">
+                {{consigneeAddress}}
+            </div>
+            <div class="tright" onclick="model.copyText()">
+                <span class="f12 inblock border paddl5 paddr5" style="border-radius: 20px;border-color: #999;">复制</span>
+            </div>
+        </div>
+        <div class="f13 color6666 mart30">请正确填写物流信息，以免影响您的进度</div>
+        <div class="mart25">
+            <span class="f17">物流单号</span>
+            <span class="f15 colorprice">（必填）</span>
+        </div>
+        <div class="lh50 flex-between borderb mart10">
+            <div class="f15">
+                <input value="" style="width:250px;" type="text" name="courierNumber" id="courierNumber" onblur="model.blur()" oninput="model.getExpressInfo(this)" />
+            </div>
+            <div onclick="model.scanf()">
+                <img src="img/my/ic_scan.png" height="20" />
+            </div>
+        </div>
+        <div class="mart25">
+            <span class="f17">物流公司</span>
+            <span class="f15 colorprice">（必填）</span>
+        </div>
+        <div class="lh50 flex-between borderb mart10" onclick="model.sellog()">
+            <div class="f15" id="longame" style="height:50px;"></div>
+            <div><img src="img/need/ic_drop_down.png" height="12" /></div>
+        </div>
+        <div class="mart25 {{pictureOfshipmentLock=='1'? '': 'hide'}}">
+            <span class="f17">上传商品图</span>
+            <span class="f15 colorprice">（必填）</span>
+        </div>
+        <div class="flex_wrap mart20 {{pictureOfshipmentLock=='1'? '': 'hide'}}">
+            <div class="flex_wrap" id="box"></div>
+            <div>
+                <div class="imgcon" id="upimg">
+                    <img src='img/my/ic_add.png' height="20" class="mart15" />
+                    <div class="f12 mart5 color999 center">上传</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="paddl20 paddr20 center mart30">
+        <button class="marb10" style="border-radius: 4px;width: 100%;" onclick="model.suer()">确认发货</button>
+    </div>
+</script>
+
+
+<script id="courierListTpl" type="text/html">
+    {{each $data v k}}
+    <div class="flex-between lh30 mart20" onclick="model.couriercl(this,{{k}})">
+        <div>
+            <span class="f15">{{v.com}}</span>
+        </div>
+        <div>
+            {{if(kk==k)}}
+            <img src="img/pay/ic_check_y.png" class="active" height="20" /> {{else}}
+            <img src="img/pay/ic_check_n.png" height="20" /> {{/if}}
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+
+<script id="upimgTpl" type="text/html">
+    {{each $data v k}}
+    <div class="imgcon marb10">
+        <img src='{{OSS(v)}}' width="100%" height="100%" class="uprimg" data="{{v}}" />
+        <img src="img/my/ic_delete.png" height="20" class="posdel" onclick="model.delimg(this,{{k}})" />
+    </div>
+    {{/each}}
+</script>
+
+</html>

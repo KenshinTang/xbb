@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        .navItemIcon.hasNew {
+            background-image: url('img/index/ic_news.png');
+            background-size: auto 32px;
+        }
+        
+        .navItemIcon.search {
+            background-image: url('img/bbk/ic_search.png');
+            background-size: auto 32px;
+        }
+        
+        .navItemIcon.my {
+            background-image: url('img/bbk/ic_my.png');
+            background-size: auto 32px;
+        }
+        
+        .navBack {
+            background: #FFF7DA;
+            border-radius: 14px;
+            width: 125px;
+            height: 28px;
+            line-height: 28px;
+            margin-top: 8px;
+            margin-left: 15px;
+            text-align: left;
+        }
+        
+        .nav {
+            overflow: hidden;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+        
+        .nav>div {
+            padding: 0 10px;
+            position: relative;
+            color: #999;
+        }
+        
+        .nav>div.active {
+            color: #333;
+        }
+        
+        .nav>div.active::after {
+            position: absolute;
+            content: '';
+            bottom: 10px;
+            width: 12px;
+            height: 3px;
+            left: 50%;
+            margin-left: -6px;
+            background-color: #333;
+            border-radius: 2px;
+        }
+        
+        section {
+            padding: 15px 20px 20px 20px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 14px 0px rgba(231, 231, 231, 1);
+            border-radius: 23px;
+            line-height: 45px;
+            height: 45px;
+        }
+        
+        .list {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 14px 0px rgba(231, 231, 231, 1);
+            border-radius: 6px;
+            padding: 15px 10px 10px 10px;
+        }
+        
+        button.lookbut {
+            width: 80px;
+            padding-right: 10px;
+            border: 1px solid #C7C7C7;
+            height: 25px;
+            line-height: 23px;
+            font-size: 12px;
+            background-color: #fff;
+            background-image: url('img/bbk/ic_more.png');
+            background-size: auto 11px;
+            background-repeat: no-repeat;
+            background-position: 90% center;
+        }
+        
+        .send {
+            position: fixed;
+            bottom: 35px;
+            left: 50%;
+            width: 150px;
+            line-height: 44px;
+            height: 44px;
+            text-align: center;
+            margin-left: -75px;
+            background-color: #FFCD1F;
+            box-shadow: 0px 2px 14px 0px rgba(231, 231, 231, 1);
+            border-radius: 25px;
+            z-index: 10;
+        }
+        
+        .winmy {
+            position: absolute;
+            height: 100%;
+            width: 250px;
+            top: 0px;
+            left: 0px;
+            bottom: 0px;
+            background-color: #fff;
+        }
+        
+        .mart35 {
+            margin-top: 35px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar bottomShadow" style="padding: 0;box-shadow: none;">
+            <div class="navBack paddl5" onclick="Comm.gotop('index.html')">
+                <img src="img/index/ic_switch.png" height="22" />
+                <span class="f12">切换买家模式</span>
+            </div>
+            <div class="navItemIcon marr10 my hide" onclick="Comm.showWindow('winmyWinTemp', true)"></div>
+            <div class="navItemIcon marr10 hasNew hide" onclick="Comm.IM_ConversationList('msg.html')">
+                <span class="msgred hide"></span>
+            </div>
+            <div class="navItemIcon marr10 search" onclick="Comm.go('searchxc.html')">
+            </div>
+        </div>
+        <div class="flex-between">
+            <div style="width: calc(100%);">
+                <div class="bg_white lh50 nav flex_wrap" id="nav">
+                </div>
+            </div>
+            <div style="width: 50px;" class="center bg_white lh50 hide">
+                <img src="img/need/ic_drop_down.png" height="13" />
+            </div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="card flex-between hide" id="xcts">
+            <div class="paddl15" onclick="model.gotr()">
+                <img src="img/ic_news.png" height="24">
+                <span class="f13 color666">请尽快上传您的登机牌，以免行程失效。</span>
+            </div>
+            <div class="paddr15" onclick="$(this).parent().remove();">
+                <img src="img/cl.png" height="20">
+            </div>
+        </div>
+        <div class="main" id="list"></div>
+    </section>
+    <footer></footer>
+    <div class="send" onclick="model.gosend()">
+        <img src="img/pay/ic_add_trip.png" height="14" />
+        <span class="f15">发行程</span>
+    </div>
+
+    <div wtd="winmyWinTemp" class="winmy">
+        <div class="center" style="margin-top: 50px;" onclick="model.gohomepage()">
+            <img src="img/bbk/error.png" onerror="app.herrorimg(this)" id="headimg" height="60" width="60" style="border-radius: 60px;" />
+        </div>
+        <div class="center f17 mart20" id="name"></div>
+        <div style="margin-top: 50px;">
+            <div class="tleft paddl30" onclick="Comm.go('orderlist.html?bbk=1')">
+                <img src="img/bbk/ic_personal_dingdan.png" height="25" />
+                <span class="f15">我的订单</span>
+            </div>
+            <div class="tleft paddl30 mart35" onclick="Comm.go('myxc.html')">
+                <img src="img/bbk/ic_personal_xingcheng.png" height="25" />
+                <span class="f15">我的行程</span>
+            </div>
+            <div class="tleft paddl30 mart35" onclick="Comm.go('wallet.html')">
+                <img src="img/bbk/ic_personal_wallet.png" height="25" />
+                <span class="f15">我的钱包</span>
+            </div>
+            <div class="tleft paddl30 mart35" onclick="Comm.go('safe.html?bbk=1')">
+                <img src="img/bbk/ic_personal_setting.png" height="25" />
+                <span class="f15">管理</span>
+            </div>
+        </div>
+        <div style="bottom: 50px;width: 100%;position: absolute;" class="center">
+            <img src="img/bbk/img_yunyingwei.png" height="75" />
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script>
+    function pageload() {
+        //Comm.showWindow('winmyWinTemp', true);
+        model.listByHot();
+        model.search();
+
+        if (app.isLogin()) {
+            model.unauthorize();
+            //刷新用户信息
+            AJAX.POST('/api/customer/info', {}, function(a) { //精选内容
+                if (a.code == 1) {
+                    Comm.db('userinfo', a.data);
+                }
+                model.init();
+            });
+            //消息
+            MyMessg.count(function(d) {
+                if (d > 0) {
+                    $('.msgred').removeClass('hide')
+                } else {
+                    $('.msgred').addClass('hide')
+                }
+            });
+        }
+    }
+
+    function pageresume() {
+        if (app.isLogin()) {
+            //刷新用户信息
+            AJAX.POST('/api/customer/info', {}, function(a) { //精选内容
+                if (a.code == 1) {
+                    Comm.db('userinfo', a.data);
+                }
+                model.init();
+            });
+            //消息
+            MyMessg.count(function(d) {
+                if (d > 0) {
+                    $('.msgred').removeClass('hide')
+                } else {
+                    $('.msgred').addClass('hide')
+                }
+            });
+        }
+    }
+
+    var model = {
+        user: Comm.db('userinfo'),
+        countryId: Comm.query('countryId') ? Comm.query('countryId') : '',
+        labels: Comm.query('labels') ? Comm.query('labels') : '',
+        init: function() {
+            //usertype 1 普通用户，2背包客
+            //status 1：未实名2：已实名3：未实名护照4：护照实名通过5：护照实名未通过6：护照实名审核中
+            var tauth = app.auth();
+            if (tauth.usertype == 2) {
+                $('.navItemIcon.my').removeClass('hide');
+                $('.navItemIcon.hasNew').removeClass('hide');
+                $('#headimg').attr('src', Comm.OSS.getImgUrl(model.user.face, 's'));
+                $('#name').html(model.user.nickName);
+            }
+        },
+        unauthorize: function() {
+            AJAX.GET('/api/ptravel/unauthorize', function(d) {
+                if (d.code == 1 && d.data) {
+                    model.trid = d.data;
+                    $('#xcts').removeClass('hide');
+                }
+            })
+        },
+        gotr: function() {
+            Comm.go('tripdetail.html?id=' + model.trid + '&bbk=1')
+        },
+        listByHot: function() {
+            AJAX.GET('/api/country/listByHot?pageno=1&pagesize=20', function(d) {
+                if (d.code == 1) {
+                    d.data.countryId = model.countryId;
+                    $('#nav').html(template('navTpl', d.data))
+                }
+            })
+        },
+        selnav: function(a, id) {
+            if (!$(a).hasClass('active')) {
+                $(a).parent().find('.active').removeClass('active');
+                $(a).addClass('active');
+                model.countryId = id;
+                model.search();
+            }
+        },
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/porder/list',
+                    refreshTypeGet: true
+                });
+                model.mere.refreshOption.refreshParm = {
+                    countryId: model.countryId,
+                    labels: model.labels
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('needList', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                model.mere.refreshOption.refreshParm = {
+                    countryId: model.countryId
+                };
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        },
+        gosend: function() {
+            if (!app.isLogin()) {
+                app.gologin();
+                return
+            }
+            //usertype 1 普通用户，2背包客
+            //status 1：未实名2：已实名3：未实名护照4：护照实名通过5：护照实名未通过6：护照实名审核中
+            var tauth = app.auth();
+
+            if (tauth.usertype == 1) {
+                if (tauth.status == 1) {
+                    Comm.go('authbbk.html');
+                } else if (tauth.hzstatus == 5) {
+                    Comm.go('certificationsucc1.html?');
+                } else if (tauth.hzstatus == 6) {
+                    Comm.go('certificationsucc1.html?succ=1');
+                } else if (tauth.status == 2 || tauth.hzstatus == 3) {
+                    Comm.go('authbbk.html');
+                }
+                return;
+            } else if (tauth.usertype == 2) {
+                Comm.go('sendxc.html');
+            }
+        },
+        gohomepage: function() {
+            Comm.go('homepage.html?bbk=1&id=' + model.user.customerId);
+        }
+    }
+</script>
+
+<script id="navTpl" type="text/html">
+    <div class="{{countryId==''?'active':''}}" onclick="model.selnav(this,'')">全部</div>
+    {{each $data v k}}
+    <div class="{{countryId==v.country_id?'active':''}}" onclick="model.selnav(this,'{{v.country_id}}')">{{v.chinese_name}}</div>
+    {{/each}}
+</script>
+
+<script id="needList" type="text/html">
+    {{each $data v k }}
+    <div class="list mart25" onclick="Comm.go('needdetail.html?bbk=1&orderDetailId={{v.orderDetailId}}')">
+        <div class="lh25 mart5">
+            <img src="{{OSS(v.countryLogo)}}" onerror="app.errorimg(this)" class="countryLogo" />
+            <span class="color666 f12">{{v.countryChineseName}}{{v.mallName}}</span>
+        </div>
+        <div class="flex-between mart10">
+            <div style="width: 105px">
+                <img src="{{OSS(v.skuImg)}}" height="105" width="105" onerror="app.errorimg(this)" />
+            </div>
+            <div class="marl10" style="width: calc(100% - 115px);">
+                <div class="f15 wordW3 lh20" style="height: 60px;">{{v.skuName}}</div>
+                <div class="flex-between mart5">
+                    <div>
+                        <span class="f13 colorred">￥</span>
+                        <span class="f19 colorred">{{priceTp(v.sellPrice)}}</span>
+                    </div>
+                    <div>
+                        <button class="lookbut">查看需求</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

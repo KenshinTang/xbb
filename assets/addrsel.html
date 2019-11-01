@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>选择收货地址</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link href="css/g.css" type="text/css" rel="stylesheet">
+    <link href="css/comm.css" type="text/css" rel="stylesheet">
+    <style>
+        section {
+            background: #F5F5F5;
+        }
+        
+        .mr {
+            display: inline-block;
+            padding: 1px 3px;
+            border-radius: 2px;
+            border: 1px solid #FF5B1F;
+            color: #FF5B1F;
+            line-height: 12px;
+            height: 16px;
+            margin-left: 3px;
+        }
+        
+        footer {}
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar bottomShadow">
+            <div class="navBackIcon" onclick="model.back()"></div>
+            <div class="navItem f13 color666" onclick="model.manager(this)">管理</div>
+            <div class="navTitle">选择收货地址</div>
+        </div>
+    </header>
+    <section>
+
+
+    </section>
+    <footer class="center">
+        <button onclick="Comm.go('addressup.html')" style="border-radius: initial;width: 100%;">添加新地址</button>
+    </footer>
+</body>
+
+<script type="text/html" id="mainTpl">
+    {{each $data v k}}
+    <div class="bg_white paddt10" id="{{v.cusAddrId}}" onclick="model.gosel({{k}})">
+        <div class="flex_wrap lh40  paddr20 paddl20">
+            <div class="f17 marr15" style="font-weight: 500;">{{v.concatName}}</div>
+            <div class="f19">{{v.concatPhone}}</div>
+            <div>
+                {{if(v.isDefault)}}
+                <span class="mr f10">默认</span> {{/if}}
+            </div>
+        </div>
+        <div class="f13 lh40 paddr20 paddl20">{{v.cusAddressInfo}}</div>
+        <div class="flex-between paddr20 paddl20 lh40 bordert hide">
+            <div onclick="model.setDefault(this,{{k}})" class="setDefault">
+                {{if(v.isDefault)}}
+                <img src="img/pay/ic_check_y.png" height="15" /> {{else}}
+                <img src="img/pay/ic_check_n.png" height="15" /> {{/if}}
+                <span class="f13 color999">默认地址</span>
+            </div>
+            <div>
+                <img src="img/addr/ic_edit.png" height="15" onclick="event.stopPropagation();Comm.go('addressup.html?id={{v.cusAddrId}}')" />
+                <span class="f13 color999" onclick="event.stopPropagation();Comm.go('addressup.html?id={{v.cusAddrId}}')">编辑</span>
+                <img src="img/addr/ic_delete.png" height="15" class="marl25" onclick="model.del(this,{{v.cusAddrId}})" />
+                <span class="f13 color999" onclick="model.del(this,{{v.cusAddrId}})">删除</span>
+            </div>
+        </div>
+    </div>
+    <div style="height: 10px;background-color: #F5F5F5;"></div>
+    {{/each}}
+</script>
+<script src="inc/g.js"></script>
+<script src="inc/z.js"></script>
+<script src="inc/comm.js"></script>
+<script src="inc/art-template.js"></script>
+<script type="text/javascript">
+    function pageload() {
+        model.getList();
+    }
+
+    function pageresume() {
+        model.getList();
+        $(".bordert").addClass('hide');
+        $('.navItem').html('管理');
+    }
+    var model = {}
+
+    var model = {
+        s: Comm.query('s') ? Comm.query('s') : 0,
+        userinfo: Comm.db('userinfo'),
+        Data: [],
+        getList: function() {
+            //用户收货地址
+            AJAX.POST('/api/customer/address/list', {
+                pageno: 1,
+                pagesize: 1000
+            }, function(a) { //精选内容
+                if (a.code == 1) {
+                    $('section').html(template('mainTpl', a.data));
+                    model.Data = a.data;
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        manager: function(a) {
+            if ($(".bordert").hasClass('hide')) {
+                $(".bordert").removeClass('hide');
+                $(a).html('取消');
+            } else {
+                $(".bordert").addClass('hide');
+                $(a).html('管理');
+            }
+        },
+        setDefault: function(a, i) {
+            event.stopPropagation();
+            var cur = model.Data[i];
+            model.Data[i].isDefault = model.Data[i].isDefault ? 0 : 1;
+            AJAX.POST('/api/customer/address/edit', cur, function(d) {
+                if (d.code == 1) {
+                    Comm.message('设置成功!');
+                    if (model.Data[i].isDefault) {
+                        $('.setDefault img').each(function(i, e) {
+                            $(e).attr('src', 'img/pay/ic_check_n.png');
+                        });
+                        $(a).find('img').attr('src', 'img/pay/ic_check_y.png');
+                    } else {
+                        $(a).find('img').attr('src', 'img/pay/ic_check_n.png');
+                    }
+                } else {
+                    Comm.message(d.msg);
+                }
+            });
+        },
+        del: function(a, id) {
+            event.stopPropagation();
+            Comm.confirm('确认删除？', function(d) {
+                if (d) {
+                    AJAX.POST('/api/customer/address/del', {
+                        addrId: id
+                    }, function(d) {
+                        if (d.code == 1) {
+                            Comm.message('删除成功!');
+                            $('#' + id).remove();
+                            var isDefault = Comm.db('isDefault');
+                            if (isDefault && isDefault.cusAddrId == id) {
+                                Comm.db('isDefault', '');
+                            }
+                        } else {
+                            Comm.message(d.msg);
+                        }
+                    });
+                }
+            })
+
+        },
+        gosel: function(i) {
+            event.stopPropagation();
+            if (model.s == 1) {
+                Comm.db('isDefault', model.Data[i]);
+                Comm.close();
+            } else {
+                Comm.go('addressup.html?id=' + model.Data[i].cusAddrId);
+            }
+        },
+        back: function() {
+            Comm.close();
+        }
+    }
+</script>
+
+</html>

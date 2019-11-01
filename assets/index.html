@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="css/side.css" />
+    <style>
+        .navItemIcon {
+            background-image: url('img/index/ic_news.png');
+            background-size: auto 32px;
+        }
+        
+        .navBack {
+            background: #FFF7DA;
+            border-radius: 14px;
+            width: 125px;
+            height: 28px;
+            line-height: 28px;
+            margin-top: 8px;
+            margin-left: 15px;
+            text-align: left;
+        }
+        
+        #banner {
+            margin: 15px;
+            overflow: hidden;
+            width: calc(100% - 30px);
+            border-radius: 5px;
+        }
+        
+        #banner .side_nbox {
+            bottom: 3px;
+        }
+        
+        #scoll {
+            word-wrap: break-word;
+            overflow: hidden;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            margin-right: 15px;
+            margin-left: 15px;
+        }
+        
+        #scoll .limap {
+            height: 80px;
+            width: 105px;
+            position: relative;
+            border-radius: 4px;
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+        
+        #scoll .limap.one {
+            width: 85px;
+            box-shadow: 0px 4px 12px 0px rgba(255, 205, 31, 0.5);
+        }
+        
+        #scoll .limap img.bg {
+            position: relative;
+            z-index: 1;
+            height: 80px;
+            width: 105px;
+        }
+        
+        #scoll .limap .pos {
+            position: absolute;
+            right: -8px;
+            top: 20px;
+            height: 45px;
+            z-index: 2;
+        }
+        
+        .books {
+            height: 190px;
+            width: calc(100% - 30px);
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .books img {
+            border-radius: 4px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .posbook {
+            position: absolute;
+            left: 0;
+            top: 0px;
+            bottom: 0px;
+            width: 100%;
+            padding: 20px;
+            z-index: 2;
+            border-radius: 4px;
+        }
+        
+        .f22 {
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar bottomShadow" style="padding: 0;box-shadow: none;">
+            <div class="navBack paddl5" onclick="Comm.go('bbk.html')">
+                <img src="img/index/ic_switch.png" height="22" />
+                <span class="f12">切换背包客模式</span>
+            </div>
+            <div class="navItemIcon hasNew" style="margin-right: 6px;" onclick="Comm.IM_ConversationList('msg.html');">
+                <span class="msgred hide"></span>
+            </div>
+        </div>
+    </header>
+    <section>
+        <div class="main">
+            <div id="banner" class="banner side_box">
+                <ul class="bannerList side_ul" id="side" style="height: 90px;">
+                    <li class="scroll radius5" style="overflow:hidden;" onclick="">
+                        <img src="img/index/banner.png" class="radius5" height="90" width="100%" onerror="app.errorimg(this)" name="banner{{k}}" />
+                    </li>
+                    <li class="scroll radius5" style="overflow:hidden;" onclick="">
+                        <img src="img/index/banner.png" class="radius5" height="90" width="100%" onerror="app.errorimg(this)" name="banner{{k}}" />
+                    </li>
+                    <li class="scroll radius5" style="overflow:hidden;" onclick="">
+                        <img src="img/index/banner.png" class="radius5" height="90" width="100%" onerror="app.errorimg(this)" name="banner{{k}}" />
+                    </li>
+                </ul>
+            </div>
+            <div class="flex-between lh50 paddl15 paddr15" onclick="Comm.go('triplist.html')">
+                <div>
+                    <span class="f22">背包客行程</span>
+                    <span class="f12 color999 inblock lh20 marl5" style="margin-top: 8px;">真实出行</span>
+                </div>
+                <div>
+                    <img src="img/index/icr.png" height="10" />
+                </div>
+            </div>
+            <div class="countryList flex_wrap mart20" id="scoll">
+            </div>
+            <div class="paddl15 paddr15 mart30">
+                <div class="borderb"></div>
+            </div>
+            <div id="lists">
+                <div class="paddl15 paddr15 mart30" id="xclist">
+                </div>
+                <div class="center mart30" onclick="Comm.go('triplist.html')">查看更多行程</div>
+            </div>
+            <div class="flex-between lh50 paddl15 paddr15" style="margin-top: 50px;" onclick="Comm.go('baokuan.html')">
+                <div>
+                    <span class="f22">平台爆款</span>
+                    <span class="f12 color999 inblock lh20 marl5" style="margin-top: 8px;">全球抢购</span>
+                </div>
+                <div>
+                    <img src="img/index/icr.png" height="10" />
+                </div>
+            </div>
+            <div class="goodListByHot flex_wrap mart20" id="scoll" style="margin-top: 50px;">
+
+            </div>
+
+            <div class="flex-between lh50 paddl15 paddr15" style="margin-top: 38px;" onclick="Comm.go('articlelist.html')">
+                <div>
+                    <span class="f22">精选内容</span>
+                    <span class="f12 color999 inblock lh20 marl5" style="margin-top: 8px;">读万卷书行万里路</span>
+                </div>
+                <div>
+                    <img src="img/index/icr.png" height="10" />
+                </div>
+            </div>
+            <div id="newsList"></div>
+        </div>
+    </section>
+    <footer class="shared">
+    </footer>
+</body>
+<script id="contryListInfo" type="text/html">
+    <div class="limap one marr15 active" data="img/index/map1.png" onclick="model.qkcountry(this,'')" style="background-image:url('img/index/map.png');">
+        <div style="width:85px;height:50px;" class="mart30 paddt20 paddl10">
+            <span class="f16 bold inblock" style="">热门</span>
+        </div>
+        <img src="img/index/addr.png" height="45" class="addrimg pos" />
+    </div>
+    {{each $data v k }}
+    <div class="limap other marr15" data="{{OSS(v.wlj_home_logo,'s')}}" onclick="model.qkcountry(this,'{{v.country_id}}')" style="background-image:url({{OSS(v.wlj_home_logo,'s')}});">
+        <div style="width:105px;height:50px;" class="mart30 paddt20 paddl10">
+            <span class="f16 bold inblock colorfff" style="">{{v.chinese_name}}</span>
+        </div>
+        <img src="img/index/addr.png" height="45" class="addrimg pos hide" />
+    </div>
+    {{/each}}
+</script>
+<script id="hotGoodList" type="text/html">
+    {{each $data v k }}
+    <div class="listgoods marr10" onclick="Comm.go('baokuandetail.html?spuId={{v.spu_id}}&skuId={{v.sku_id}}&mallId={{v.mall_id}}&countryId={{v.country_id}}')">
+        <div class="">
+            <img src="{{OSS(v.master_image_local,'d')}}" width="158" height="158" onerror="app.errorimg(this)" />
+        </div>
+        <div class="lh20 wordW2 mart10" style="height: 40px;">
+            {{v.skuName}}
+        </div>
+        <div class="mart10">
+            <span class="colorprice">￥</span>
+            <span class="colorprice f20">{{priceTp(v.wlj_sellPrice)}}</span>
+        </div>
+        <div class="lh25 mart5 flex-between">
+            <div>
+                <img src="{{OSS(v.countryLogo)}}" height="17" width="17" class="countryLogo" />
+                <span class="color666 f12">{{v.countryName}}</span>
+            </div>
+            <div>{{if(v.wlj_sellCount>0)}}
+                <span class="color999 f12">{{v.wlj_sellCount}}人下单</span> {{/if}}
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+<script id="newsListInfo" type="text/html">
+    {{each $data v k }}
+    <div class="books mart20 marl15 marr15 {{(k+1)==$data.length?'marb30':''}}" onclick="Comm.go('articledetail.html?newsId={{v.newsId}}')">
+        <div>
+            <img src="{{OSS(v.cover)}}" height="190" width="100%" onerror="app.errorimg(this)" />
+            <div class="posbook " style="background-color:rgba(0,0,0,0.5)">
+                <div class="colorfff f20 lh25 wordW2" style="font-weight:500;">
+                    {{v.title}}
+                </div>
+                <div style="position: absolute;bottom:20px">
+                    <img src="img/index/good.png" class="headimg" height="20" width="20" style="border-radius: 20px;" />
+                    <span class="colorfff">{{v.authorName}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/side.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+
+<script>
+    function pageload() {
+        app.update();
+        Foot.init(); //底部
+        model.bannerList();
+        //精选内容
+        model.newsList();
+        //爆款
+        model.goodList();
+        //热门国家
+        model.countryList();
+        //行程
+        model.getTrip();
+        //定位
+        getloac();
+        //消息
+        MyMessg.count(function(d) {
+            if (d > 0) {
+                $('.msgred').removeClass('hide')
+            } else {
+                $('.msgred').addClass('hide')
+            }
+        });
+    }
+
+    function pageresume() {
+        //消息
+        MyMessg.count(function(d) {
+            if (d > 0) {
+                $('.msgred').removeClass('hide')
+            } else {
+                $('.msgred').addClass('hide')
+            }
+        });
+    }
+
+    var model = {
+        getTrip: function() {
+            AJAX.GET('/api/travel/list?pagesize=3&pageno=1&flag=1&countryId=' + model.countryId, function(d) {
+                if (d.code == 1) {
+                    $("#xclist").html(template("rqlistTpl", d.data));
+                }
+            })
+        },
+        bannerList: function() {
+            //精选内容
+            AJAX.POST('/api/advert/apiList', {
+                pageno: 1,
+                pagesize: 10,
+                postion: 1
+            }, function(a) { //精选内容
+                if (a.code == 1) {
+                    $('.bannerList').html(template('bannerListInfo', a.data));
+                    new Side('banner', 3, true);
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        newsList: function() {
+            //精选内容
+            AJAX.POST('/api/news/indexList', {
+                pageno: 1,
+                pagesize: 15
+            }, function(a) { //精选内容
+                if (a.code == 1) {
+                    $('#newsList').html(template('newsListInfo', a.data));
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        goodList: function(customerId) {
+            //平台爆款
+            AJAX.POST('/api/goods/hotList', {
+                pageno: 1,
+                pagesize: 10,
+                customerId: customerId
+            }, function(a) {
+                if (a.code == 1) {
+                    $('.goodListByHot').html(template('hotGoodList', a.data));
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        countryList: function(customerId) {
+            //热门国家
+            AJAX.POST('/api/country/listByHot', {
+                pageno: 1,
+                pagesize: 5
+            }, function(a) {
+                if (a.code == 1) {
+                    $('.countryList').html(template('contryListInfo', a.data));
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        countryId: '',
+        qkcountry: function(a, id) {
+            if (model.countryId != id) {
+                model.countryId = id;
+                var src = $('.countryList .active').attr('data');
+                $('.countryList .active').find('span.bold').addClass('colorfff');
+                $('.countryList .active').css("background-image", "url('" + src + "')").removeClass('active');
+                $(a).addClass('active');
+                $(a).find('span.bold').removeClass('colorfff');
+                $(a).css("background-image", "url('img/index/map.png')");
+                $('.countryList').find('.addrimg').addClass('hide');
+                $(a).find('.addrimg').removeClass('hide');
+                model.getTrip();
+            }
+        },
+        go: function(AdType, itemId, AdvertID, Url) {
+            if (AdType == 1) { //注册
+                Comm.go('reg.html')
+            } else if (AdType == 2) { //自定义图文
+                Comm.go('advert.html?id=' + AdvertID);
+            } else if (AdType == 3) { //商品
+                Comm.go('gooddetail.html?spuId=' + itemId);
+            } else if (AdType == 4) { //精选文章
+                Comm.go('articledetail.html?newsId=' + itemId);
+            } else if (AdType == 5) { //外部链接
+                Comm.openUrlStr(Url);
+            }
+        }
+    }
+
+    function getloac() {
+        if (Comm.w9()) {
+            //Comm.loading(1)
+            Comm.position(function(loca, code) {
+                loca.city = loca.city.indexOf('市') >= 0 ? loca.city.replace('市', '') : loca.city;
+                $("#curcity").html(loca.city);
+                loadloca(loca.lat, loca.lng, loca.city, loca.dis);
+                Comm.loading(0)
+            })
+        } else {
+            //baidu();
+        }
+
+        function baidu() {
+            Comm.loading(1)
+            new BMap.Geolocation().getCurrentPosition(function(r) {
+                if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                    r.address.city = r.address.city.indexOf('市') >= 0 ? r.address.city.replace('市', '') : r.address.city;
+                    $("#curcity").html(r.address.city);
+                    loadloca(r.latitude, r.longitude, r.address.city, r.address.district)
+                    Comm.loading(0)
+                } else {
+                    Comm.message("定位失败，请打开GPS或检查权限后重试");
+                }
+            });
+        }
+
+        function loadloca(lat, lng, city, dic) {
+            var areaId = 0;
+            var cityId = 0;
+            if (city != "" && city != null) {
+                //加载省市区
+                $.each(_area, function(i, e) {
+                    if (cityId == 0) {
+                        $.each(e.c, function(j, k) {
+                            if (cityId == 0) {
+                                if (k.s.indexOf(city) >= 0 || city.indexOf(k.s) >= 0) {
+                                    cityId = k.i;
+                                }
+                                if (areaId == 0) {
+                                    $.each(k.c, function(z, a) {
+                                        if (areaId == 0 && a.s.indexOf(city) >= 0 || city.indexOf(a.s) >= 0) {
+                                            areaId = a.i;
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            var loca = {
+                lat: lat,
+                lng: lng,
+                city: city,
+                areaId: areaId,
+                cityId: cityId
+            };
+            var locat = Comm.db('loca', loca);
+            if (locat && locat.city != loca.city) {
+                Comm.message("重新定位" + loca.city);
+            }
+            Comm.db('loca', loca);
+        }
+    }
+</script>
+
+<script id="bannerListInfo" type="text/html">
+    {{each $data v k }}
+    <li class="scroll radius5" style="overflow:hidden;" onclick="model.go('{{v.adType}}','{{v.itemID}}','{{v.advertID}}','{{v.url}}')">
+        <img src="{{OSS(v.face,'d')}}" class="radius5" height="90" width="100%" onerror="app.errorimg(this)" name="banner{{k}}" />
+    </li>
+    {{/each}}
+</script>
+
+<script id="rqlistTpl" type="text/html">
+    {{each $data v k}}
+    <div class="list flex_wrap" onclick="Comm.go('tripdetail.html?id={{v.travelId}}')" onerror="app.errorimg(this,'img/xc/right.png')" style="{{v.imgright?'background-image:url('+OSS(v.imgright)+')':''}}">
+        <div class="lfw">
+            <img src="img/ezr.png" class="ezr" />
+            <img src="{{OSS(v.imgleft)}}" height="160" width="100" onerror="app.errorimg(this,'img/xc/left.png')" />
+        </div>
+        <div class="rgw">
+            <div class="">时间 {{formatDate(v.destinationTime,'m月d日')}} - {{formatDate(v.fromTime,'m月d日')}}</div>
+            <div class="f20 mart5 wordW2 lh20" style="font-weight:600;height: 40px;">
+                <span>{{v.fromName}}</span>
+                <img src="img/xc/qk.png" height="12" />
+                <span>{{v.destinationName}}</span>
+            </div>
+            <div>
+                <img src="img/index/car.png" height="12" />
+                <span class="f12 color999">{{v.deliverName}}</span>
+            </div>
+            {{if(v.labelsName)}}
+            <div class="mart5"> {{each v.labelsName.split(',') lb j}}{{if(lb)}}
+                <span class="lb inblock color666 f12 border">{{lb}}</span> {{/if}}{{/each}}
+            </div>
+            {{/if}}
+            <div class="flex-between mart10">
+                <div class="wordW">
+                    <img src="{{OSS(v.face)}}" onerror="app.herrorimg(this)" class="headimg" height="20" width="20" style="border-radius: 20px;" />
+                    <span>{{v.nickName}}</span>
+                </div>
+                <div>
+                    <button class="btmsg" onclick="event.stopPropagation();IM_.IM_ShowContact({{v.customerId}})">立即沟通</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>设置</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {
+            background-color: #F5F5F5;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.07);
+            border-radius: 4px;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">设置</div>
+        </div>
+    </header>
+    <section>
+        <div class="bg_white paddl20 paddt20">
+            <div class="lh50 flex-between paddr20" onclick="Comm.go('pianhao.html?resoue=1')">
+                <div>
+                    <span class="f15 marl10">我的兴趣</span>
+                </div>
+                <div>
+                    <img src="img/ic_more_g.png" height="13" />
+                </div>
+            </div>
+        </div>
+        <div style="height: 10px;"></div>
+        <div class="bg_white paddl20">
+            <div class="lh50 flex-between paddr20 borderb paddt10 paddb10" onclick="model.auth();">
+                <div>
+                    <span class="f15 marl10">实名认证</span>
+                </div>
+                <div>
+                    <img src="img/ic_more_g.png" height="13" />
+                </div>
+            </div>
+            <div class="lh50 flex-between paddr20 borderb paddt10 paddb10" onclick="Comm.go('mymanager.html')">
+                <div>
+                    <span class="f15 marl10">个人管理</span>
+                </div>
+                <div>
+                    <img src="img/ic_more_g.png" height="13" />
+                </div>
+            </div>
+            <div class="lh50 flex-between paddr20 borderb paddt10 paddb10" onclick="Comm.go('msgset.html')">
+                <div>
+                    <span class="f15 marl10">消息设置</span>
+                </div>
+                <div>
+                    <img src="img/ic_more_g.png" height="13" />
+                </div>
+            </div>
+            <div class="lh50 flex-between paddr20  paddt10 paddb10" onclick="model.clearCache()">
+                <div>
+                    <span class="f15 marl10">清除缓存</span>
+                </div>
+                <div>
+                    <span class="f13 marl10 color666" id="CacheSize">0MB</span>
+                </div>
+            </div>
+        </div>
+        <div style="height: 10px;"></div>
+        <div class="bg_white paddl20">
+            <div class="lh50 flex-between paddr20  paddt10 paddb10" onclick="Comm.go('ab.html?id=1')">
+                <div>
+                    <span class="f15 marl10">关于我们</span>
+                </div>
+                <div>
+                    <span class="f13 marl10 color666" id="version">v1.0.0</span>
+                    <img src="img/ic_more_g.png" height="13" />
+                </div>
+            </div>
+        </div>
+        <div>
+        </div>
+    </section>
+    <footer class="center" style="background-color: #F5F5F5; padding-bottom: 50px;">
+        <button style="border-radius: 4px;" onclick="logout()">退出登录</button>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<!-- <script type="text/javascript" src="js/c.js"></script> -->
+
+<script>
+    function pageload() {
+        Comm.getVersion(function(res) {
+            $("#version").html("v" + res.versionName)
+        });
+        //获取缓存
+        Comm.getCacheSize(function(d) {
+            $('#CacheSize').html(d);
+        });
+    }
+
+    function pageresume() {}
+
+    var model = {
+        user: Comm.db('userinfo'),
+        auth: function() {
+            //UNAUDIT(0, "未审核"),APPLY(1, "通过"),REFUSE(2, "拒绝"),AUDIT(3,"审核中");
+            if (model.user.idCardCertification == 0) { //实名认证
+                Comm.go('certification.html')
+            } else {
+                Comm.go('certificationsucc.html?close=1');
+            }
+        },
+        clearCache: function() {
+            //清理缓存
+            Comm.clearCache(function() {
+                $('#CacheSize').html(0 + 'MB');
+                Comm.message('清除成功')
+            });
+        }
+    }
+
+    function logout() {
+        //退出登陆
+        AJAX.POST('/api/customer/logout', function(a) {});
+        AJAX.clear();
+        Comm.gotop('open.html');
+        Comm.IM_Logout();
+    }
+</script>
+
+</html>

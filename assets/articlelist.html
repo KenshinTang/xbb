@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>精选内容</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">精选内容</div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main" id="list"></div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script id="listTpl" type="text/html">
+    {{each $data v k }}
+    <div class="list flex_wrap borderb paddb10 marb10" onclick="Comm.go('articledetail.html?newsId='+{{v.newsId}})">
+        <div class="paddr10" style="width: calc(100% - 150px);">
+            <div class="lh25 wordW3" style="height: 75px;">
+                <span class="f17" style="font-weight:500;">{{v.title}}</span>
+            </div>
+            <div class="f13 color666 mart5 flex-between">
+                <div>
+                    <img src="{{OSS(v.authorFace)}}" height="20" width="20" style="border-radius:10px" />
+                    <span>{{v.authorName}}</span>
+                </div>
+                <span class="" style=""> {{formatDate(v.addTime)}}</span>
+            </div>
+        </div>
+        <div style="width: 150px;">
+            <img src="{{OSS(v.cover)}}" height="100" width="150px" style="border-radius: 4px;" />
+        </div>
+    </div>
+    {{/each}}
+</script>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script>
+    function pageload() {
+        model.search();
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/news/list',
+                    refreshTypeGet: true
+                });
+
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('listTpl', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                model.mere.refreshOption.refreshParm = {
+                    state: model.state
+                };
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        }
+    }
+</script>
+
+</html>

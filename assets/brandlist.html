@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>品牌列表</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+        
+        input {
+            width: 100%;
+            padding-left: 50px;
+            line-height: 28px;
+            height: 28px;
+            font-size: 14px;
+            background-color: #F5F5F5;
+            border-radius: 14px;
+            background-image: url('img/send/ic_search.png');
+            background-repeat: no-repeat;
+            background-size: 21px;
+            background-position: 20px center;
+            margin: 0 auto;
+        }
+        
+        .huanyip {
+            box-shadow: 0px 2px 14px 0px rgba(231, 231, 231, 1);
+            border-radius: 4px;
+            padding: 20px;
+        }
+        
+        .huanyip .dflex>div {
+            width: 50%;
+        }
+        
+        .huanyip .dflex>div:nth-child(2n) {
+            margin-left: 10px;
+        }
+        
+        .posr {
+            position: fixed;
+            right: 10px;
+            top: 90px;
+            font-size: 12px;
+            text-align: center;
+            z-index: 2;
+        }
+        
+        .bgF5F5F5 {
+            background-color: #F5F5F5;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">品牌列表</div>
+        </div>
+    </header>
+    <section>
+        <div class="main">
+            <form action="javascript:return true;" onclick="Comm.go('search.html')">
+                <input id="id_searchInput" type="search" placeholder="搜索" readonly />
+            </form>
+            <div class="mart30 huanyip" id="brandHotList">
+
+            </div>
+        </div>
+        <div>
+            <div class="item">
+
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+    <div class="posr">
+        <ul>
+            <li>
+                <a href="#brandHotList">热门</a>
+            </li>
+            <li>
+                <a href="##">#</a>
+            </li>
+            <li>
+                <a href="#A">A</a>
+            </li>
+            <li>
+                <a href="#B">B</a>
+            </li>
+            <li>
+                <a href="#C">C</a>
+            </li>
+            <li>
+                <a href="#D">D</a>
+            </li>
+            <li>
+                <a href="#E">E</a>
+            </li>
+            <li>
+                <a href="#F">F</a>
+            </li>
+            <li>
+                <a href="#G">G</a>
+            </li>
+            <li>
+                <a href="#H">H</a>
+            </li>
+            <li>
+                <a href="#J">J</a>
+            </li>
+            <li>
+                <a href="#K">K</a>
+            </li>
+            <li>
+                <a href="#L">L</a>
+            </li>
+            <li>
+                <a href="#M">M</a>
+            </li>
+            <li>
+                <a href="#n">N</a>
+            </li>
+            <li>
+                <a href="#P">P</a>
+            </li>
+            <li>
+                <a href="#Q">Q</a>
+            </li>
+            <li>
+                <a href="#R">R</a>
+            </li>
+            <li>
+                <a href="#S">S</a>
+            </li>
+            <li>
+                <a href="#T">T</a>
+            </li>
+            <li>
+                <a href="#W">W</a>
+            </li>
+            <li>
+                <a href="#X">X</a>
+            </li>
+            <li>
+                <a href="#Y">Y</a>
+            </li>
+            <li>
+                <a href="#Z">Z</a>
+            </li>
+        </ul>
+    </div>
+</body>
+<script id="brandHotListInfo" type="text/html">
+    <div class="flex-between">
+        <div class="f15" style="font-weight:500;">热门品牌</div>
+        <div class="f12 color999" onclick="model.brandHotList(1)">换一批</div>
+    </div>
+    <div class="dflex mart20">
+        {{each $data v k }}
+        <div onclick="Comm.go('goodlist.html?brandId={{v.brand_id}}')"><img src="{{OSS(v.brand_pic_url_local)}}" height="90" width="100%" onerror="app.errorimg(this)" /></div>
+        {{if((k+1)%2==0)}}</div>
+    <div class="dflex mart20">{{/if}} {{/each}}
+    </div>
+</script>
+
+<script id="ALists" type="text/html">
+    <div class="bgF5F5F5 paddl20 lh30" id="{{key}}">
+        {{key}}
+    </div>
+    <div class="lists">
+        {{each $data v k }}
+        <div class="list lh50 borderb paddl20">
+            <span class="f15" onclick="Comm.go('goodlist.html?brandId={{v.brand_id}}')">{{v.english_name}} {{v.chinese_name}}</span>
+            <span class="f13 color999 marl20">{{v.wlj_description}}</span>
+        </div>
+        {{/each}}
+    </div>
+</script>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+        model.brandHotList(0);
+        model.brandList();
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        init: function() {
+            var jj = [];
+        },
+        brandHotList: function(changeList) {
+            //热门品牌
+            AJAX.POST('/api/goods/hotBrandList', {
+                changeList: changeList
+            }, function(a) {
+                if (a.code == 1) {
+                    $('#brandHotList').html(template('brandHotListInfo', a.data));
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        brandList: function() {
+            //品牌列表
+            AJAX.POST('/api/goods/brandList', {}, function(a) {
+                if (a.code == 1) {
+                    var r = {};
+                    for (var i = 0; i < a.data.length; i++) {
+                        if (r[a.data[i].brand_index]) {
+                            r[a.data[i].brand_index].push(a.data[i]);
+                        } else {
+                            r[a.data[i].brand_index] = [a.data[i]];
+                        }
+                    }
+                    for (var v in r) {
+                        r.key = v;
+                        r[v].key = v;
+                        $('.item').append(template('ALists', r[v]));
+                    }
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        }
+    }
+</script>
+
+</html>

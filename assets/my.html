@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>我的</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {
+            padding: 20px;
+        }
+        
+        .navItemIcon.msg {
+            background-image: url(img/index/ic_news.png);
+            background-size: auto 32px;
+        }
+        
+        .navItemIcon.set {
+            background-image: url(img/my/ic_personal_set.png);
+            background-size: auto 25px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.07);
+            border-radius: 4px;
+            padding: 20px;
+        }
+        
+        .readnum {
+            height: 18px;
+            line-height: 15px;
+            font-size: 12px;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 18px;
+            background-color: #FB3A2F;
+            display: inline-block;
+            position: absolute;
+            right: 3px;
+            top: 0px;
+        }
+        
+        button.isCertification {
+            height: 18px;
+            line-height: 18px;
+            width: 100px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navItemIcon marr15 hasNew msg" onclick="Comm.IM_ConversationList('msg.html');">
+                <span class="msgred hide"></span>
+            </div>
+            <div class="navItemIcon set" onclick="app.checkIslogin(true,'setting.html')"></div>
+        </div>
+    </header>
+    <section>
+        <div class="cusInfo flex_wrap">
+
+        </div>
+        <div class="card mart30">
+            <div class="flex-between borderb lh30 paddb10" onclick="app.checkIslogin(true,'orderlist.html')">
+                <div><span class="f13" style="font-weight:500;">查看全部订单</span></div>
+                <div><img src="img/ic_more_g.png" height="13" /></div>
+            </div>
+            <div class="dflex mart15">
+                <div onclick="app.checkIslogin(true,'orderlist.html?state=1')">
+                    <div style="position: relative;"><img src="img/my/ic_card.png" height="40" /><span id="waitpay" class="readnum hide">0</span></div>
+                    <div class="color666 f12">待付款</div>
+                </div>
+                <div onclick="app.checkIslogin(true,'orderlist.html?state=3')">
+                    <div style="position: relative;"><img src="img/my/ic_accepte.png" height="40" /><span id="payend" class="readnum hide">0</span></div>
+                    <div class="color666 f12">待承接</div>
+                </div>
+                <div onclick="app.checkIslogin(true,'orderlist.html?state=5')">
+                    <div style="position: relative;"><img src="img/my/ic_aircraft.png" height="40" /><span id="purchase" class="readnum hide">0</span></div>
+                    <div class="color666 f12">待发货</div>
+                </div>
+                <div onclick="app.checkIslogin(true,'orderlist.html?state=6')">
+                    <div style="position: relative;"><img src="img/my/ic_box.png" height="40" /><span id="deliver" class="readnum hide">0</span></div>
+                    <div class="color666 f12">待收货</div>
+                </div>
+                <div onclick="app.checkIslogin(true,'orderlist.html?evaluate=0')">
+                    <div style="position: relative;"><img src="img/my/ic_commented.png" height="40" /><span id="comm" class="readnum hide">0</span></div>
+                    <div class="color666 f12">待评价</div>
+                </div>
+            </div>
+        </div>
+        <div class="f17 mart25" style="font-weight:500;">
+            我的服务
+        </div>
+        <div class="lh50 flex-between mart20" onclick="app.checkIslogin(true,'aftersalelist.html')">
+            <div>
+                <img src="img/my/ic_refund_order.png" height="22" />
+                <span class="f15 marl10">售后订单</span>
+            </div>
+            <div>
+                <img src="img/ic_more_g.png" height="13" />
+            </div>
+        </div>
+        <div class="lh50 flex-between mart20" onclick="app.checkIslogin(true,'myev.html')">
+            <div>
+                <img src="img/my/ic_evaluation.png" height="22" />
+                <span class="f15 marl10">我的评价</span>
+            </div>
+            <div>
+                <img src="img/ic_more_g.png" height="13" />
+            </div>
+        </div>
+        <div class="lh50 flex-between mart20" onclick="app.checkIslogin(true,'wallet.html')">
+            <div>
+                <img src="img/my/ic_wallet.png" height="22" />
+                <span class="f15 marl10">我的钱包</span>
+            </div>
+            <div>
+                <img src="img/ic_more_g.png" height="13" />
+            </div>
+        </div>
+        <div class="lh50 flex-between mart20" onclick="Comm.go('qa.html')">
+            <div>
+                <img src="img/my/ic_feedback.png" height="22" />
+                <span class="f15 marl10">帮助与反馈</span>
+            </div>
+            <div>
+                <img src="img/ic_more_g.png" height="13" />
+            </div>
+        </div>
+    </section>
+    <footer class="shared"></footer>
+</body>
+<script id="customer" type="text/html">
+    <div>
+        <img onclick="Comm.go('mymanager.html')" src="{{OSS(face)}}" onerror="app.herrorimg(this)" height="50" width="50" style="border-radius: 50px;" />
+    </div>
+    <div class="marl15">
+        <div class="editNickName lh25">
+            <span id="nickName" class="f24" onclick="model.editNickName()">{{nickName}}</span>
+            <img src="img/addr/ic_edit.png" height="20" class="marl10 mart5" onclick="model.editNickName()" />
+        </div>
+        {{if(idCardCertification==0||isCertification==0)}}
+        <div><button onclick="Comm.go('certification.html')" class="isCertification"><img class="marr5" src="img/my/auth.png" height="12"/><span class="f10">未实名认证</span></button></div>
+        {{else}}
+        <div class="f12 color999 mart5">{{autograph?autograph:'这个人很懒什么也没留下'}}</div>
+        {{/if}}
+    </div>
+</script>
+<script id="customerNoTpl" type="text/html">
+    <div onclick="app.checkIslogin(true,'')">
+        <img src="{{OSS(face)}}" onerror="app.herrorimg(this)" height="50" width="50" style="border-radius: 50px;" />
+    </div>
+    <div class="marl15" onclick="app.checkIslogin(true,'')">
+        <div class="editNickName lh25">
+            <span id="nickName" class="f24">未登录</span>
+        </div>
+        <div class="f12 color999 mart5">您还未登录,去登录吧！</div>
+    </div>
+</script>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+
+<script>
+    var userinfo = Comm.db('userinfo');
+
+    function pageload() {
+        Foot.init();
+
+        if (app.isLogin()) {
+            model.getCustomerInfo();
+            model.count();
+            //消息
+            MyMessg.count(function(d) {
+                if (d > 0) {
+                    $('.msgred').removeClass('hide')
+                } else {
+                    $('.msgred').addClass('hide')
+                }
+            });
+        } else {
+            $('.cusInfo').html(template('customerNoTpl', {}));
+        }
+    }
+
+    function pageresume() {
+        if (app.isLogin()) {
+            model.getCustomerInfo();
+            model.count();
+            //消息
+            MyMessg.count(function(d) {
+                if (d > 0) {
+                    $('.msgred').removeClass('hide')
+                } else {
+                    $('.msgred').addClass('hide')
+                }
+            });
+        }
+    }
+
+    var model = {
+        count: function() {
+            AJAX.GET('/api/order/count', function(d) {
+                if (d.code == 1) {
+                    function shownum(id, num) {
+                        if (num > 0) {
+                            if (num < 10) {
+                                $('#' + id).css('padding', "0px 4px")
+                            } else {
+                                $('#' + id).css('padding', "0px 3px")
+                            }
+                            $('#' + id).removeClass('hide').html(num >= 100 ? '99+' : num);
+                        } else {
+                            $('#' + id).addClass('hide').html(num);
+                        }
+                    }
+                    shownum('comm', d.data.comm);
+                    shownum('deliver', d.data.deliver);
+                    shownum('payend', d.data.payend);
+                    shownum('purchase', d.data.purchase);
+                    shownum('waitpay', d.data.waitpay);
+                }
+            })
+        },
+        getCustomerInfo: function() { //用户信息
+            AJAX.POST('/api/customer/info', {}, function(a) { //精选内容
+                if (a.code == 1) {
+                    Comm.db('userinfo', a.data);
+                    $('.cusInfo').html(template('customer', a.data));
+                }
+            });
+        },
+        editNickName: function() {
+            $(".editNickName").html('<input class="lh30" value="' + userinfo.nickName + '" style="" type="text" placeholder="请输入昵称" onblur="model.blur(this.value)" onchange="model.updateNickName(this.value)"/>');
+            $('input').focus();
+        },
+        updateNickName: function(nickName) {
+            //修改昵称
+            AJAX.POST('/api/customer/updateNickName', {
+                nickName: nickName
+            }, function(a) { //精选内容
+                if (a.code == 1) {
+                    userinfo.nickName = nickName;
+                    Comm.db('userinfo', userinfo);
+                    $('.editNickName').html('<span onclick="model.editNickName()" id="nickName" class="f24">' + nickName + '</span><img src="img/addr/ic_edit.png" height="20" class="marl10 mart5" onclick="model.editNickName()">');
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        blur: function(nickName) {
+            if (userinfo.nickName == nickName) {
+                $('.editNickName').html('<span onclick="model.editNickName()" id="nickName" class="f24">' + nickName + '</span><img src="img/addr/ic_edit.png" height="20" class="marl10 mart5" onclick="model.editNickName()">');
+            }
+        }
+
+    }
+</script>
+
+</html>

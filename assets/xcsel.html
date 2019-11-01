@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>选择出行地区</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #fff;
+        }
+        
+        .card {
+            box-shadow: 0px 4px 24px 0px rgba(231, 231, 231, 0.66);
+            border-radius: 4px;
+            background-size: auto 100%;
+            background-repeat: no-repeat;
+            border: 2px solid transparent;
+        }
+        
+        .card img {
+            visibility: hidden;
+        }
+        
+        .card.active {
+            border: 2px solid rgba(255, 205, 31, 1);
+        }
+        
+        .card.active img {
+            visibility: visible;
+        }
+        
+        .card.img_ill_hongkong {
+            background-image: url('img/xc/img_ill_hongkong.png');
+        }
+        
+        .card.img_ill_taiwan {
+            background-image: url('img/xc/img_ill_taiwan.png');
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17">选择出行地区</div>
+        </div>
+    </header>
+    <section>
+        <div class="paddl30 paddr30 paddt20 mart30">
+            <div class="f17" style="font-weight:500;">沿途站点仅能从所选类目内选择</div>
+            <div class="card paddr15 paddb20 paddt20 img_ill_hongkong active" style="margin-top: 35px;" onclick="model.qk(this,1)">
+                <div class="f19 tright">香港／澳门</div>
+                <div class="f12 color999 tright">Hong Kong／Macau</div>
+                <div class="tright mart30">
+                    <img src="img/pay/ic_check_y.png" height="20" />
+                </div>
+            </div>
+            <div class="card paddr15 paddb20 paddt20 img_ill_taiwan" style="margin-top: 35px;" onclick="model.qk(this,2)">
+                <div class="f19 tright">中国台湾及海外国家</div>
+                <div class="f12 color999 tright">Overseas countries</div>
+                <div class="tright mart30">
+                    <img src="img/pay/ic_check_y.png" height="20" />
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="paddl20 paddr20 center marb15">
+            <button style="border-radius: 4px;width: 100%;" onclick="model.sub()">下一步</button>
+        </div>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+
+    }
+
+    function pageresume() {}
+    var model = {
+        t: 1,
+        resouce: Comm.query('resouce') ? Comm.query('resouce') : '',
+        qk: function(a, i) {
+            if (!$(a).hasClass('active')) {
+                model.t = i;
+                $('.card').removeClass('active')
+                $(a).addClass('active');
+            }
+        },
+        sub: function() {
+            if (model.t == 1) {
+                Comm.go('countryhk.html?resouce=' + model.resouce);
+            } else {
+                Comm.go('country.html?resouce=' + model.resouce);
+            }
+        }
+    }
+</script>
+
+</html>

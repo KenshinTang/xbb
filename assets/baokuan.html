@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>平台爆款</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+        
+        .listgoods {
+            width: calc(50% - 10px);
+            margin-right: 10px;
+        }
+        
+        .listgoods:nth-child(2n) {
+            margin-right: 0px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">平台爆款</div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main">
+            <div class="flex_wrap" id="list">
+
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script>
+    function pageload() {
+        model.search();
+    }
+
+    function pageresume() {
+
+    }
+    var model = {
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/goods/hotList',
+                    refreshTypeGet: true
+                });
+
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('goodsList', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        }
+    }
+</script>
+
+<script id="goodsList" type="text/html">
+    {{each $data v k }}
+    <div class="listgoods marb20" onclick="Comm.go('baokuandetail.html?spuId={{v.spu_id}}&skuId={{v.sku_id}}&mallId={{v.mall_id}}&countryId={{v.country_id}}')">
+        <div class="">
+            <img src="{{OSS(v.master_image_local)}}" style="width:100%;" height="158" onerror="app.errorimg(this)" />
+        </div>
+        <div class="lh20 wordW2 mart10" style="height: 40px;">
+            {{v.skuName}}
+        </div>
+        <div class="mart10">
+            <span class="colorprice">￥</span>
+            <span class="colorprice f20">{{priceTp(v.wlj_sellPrice)}}</span>
+        </div>
+        <div class="lh25 mart5 flex-between">
+            <div>
+                <img src="{{OSS(v.countryLogo)}}" onerror="app.errorimg(this)" class="countryLogo" />
+                <span class="color666 f12">{{v.countryName}}</span>
+            </div>
+            <div>{{if(v.wlj_sellCount>0)}}
+                <span class="color999 f12">{{v.wlj_sellCount}}人下单</span> {{/if}}
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

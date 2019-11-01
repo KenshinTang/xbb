@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>背包客行程</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        #WTDBOX {
+            top: 91px;
+            height: calc(100% - 91px);
+        }
+        
+        #MainBg {
+            top: 91px;
+            height: calc(100% - 91px);
+        }
+        
+        #WTDBOX .winpost {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        
+        .bgF5F5F5 {
+            background-color: #F5F5F5;
+            width: 128px;
+        }
+        
+        .mddcss>div {
+            height: 270px;
+            overflow: hidden;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">背包客行程</div>
+        </div>
+        <div class="dflex lh45 paddl10 paddr10">
+            <div id="nav1" onclick="model.nav(this,1)" i="1">
+                <span id="n1" class="color999">目的地</span>
+                <img src="img/down.png" height="6" />
+            </div>
+            <div id="nav2" onclick="model.nav(this,2)" i="2">
+                <span id="n2" class="color999">发货地</span>
+                <img src="img/down.png" height="6" />
+            </div>
+            <div id="nav3" onclick="model.nav(this,3)" i="3">
+                <span id="n3" class="color999 wordW">智能排序</span>
+                <img src="img/down.png" height="6" />
+            </div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main" id="list">
+            <div id="lists" class="">
+                <div class="paddl15 paddr15" id="rqlist">
+                </div>
+            </div>
+    </section>
+    <footer></footer>
+    <div wtd="mddWinTemp" class="winpost">
+        <div class="bg_white flex_wrap mddcss">
+
+        </div>
+    </div>
+    <div wtd="fhdWinTemp" class="winpost">
+        <div class="bg_white flex_wrap mddcss">
+
+        </div>
+    </div>
+    <div wtd="selTimeWinTemp" class="winpost">
+        <div class="bg_white">
+            <div class="lh50 color999" id="sel1" onclick="model.seln3(1,'默认排序')">默认排序</div>
+            <div class="lh50 color999" id="sel2" onclick="model.seln3(2,'按行程时间排序')">按行程时间排序</div>
+        </div>
+    </div>
+</body>
+
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script>
+    function pageload() {
+        model.search();
+        GDict.init(function() {
+            model.continent = GDict.get('continent');
+            model.listByHot();
+        })
+
+        for (var i = 0; i < _area.length; i++) {
+            var e = _area[i];
+            var ee = {
+                id: e.i,
+                n: e.s,
+                child: []
+            }
+            for (var j = 0; j < e.c.length; j++) {
+                ee.child.push({
+                    id: e.c[j].i,
+                    n: e.c[j].s
+                })
+            }
+            modeldata.area.push(ee);
+        }
+    }
+
+    function pageresume() {
+
+    }
+
+    var modeldata = {
+        coum: [{
+            id: -1,
+            n: '全部',
+            child: [{
+                id: '',
+                n: '目的地'
+            }]
+        }, {
+            id: 0,
+            n: '热门',
+            child: []
+        }],
+        area: [{
+            id: -1,
+            n: '全部',
+            child: [{
+                id: '',
+                n: '发货地'
+            }]
+        }]
+    };
+
+    var model = {
+        mddWinTemp: function() {
+            Comm.showWindow('mddWinTemp', true);
+            if (model.nav1) {
+                modeldata.coum.curi = model.nav1;
+            } else {
+                modeldata.coum.curi = modeldata.coum[0];
+                modeldata.coum.curi.i = 0;
+                modeldata.coum.curi.ni = '1';
+                model.nav1 = modeldata.coum[0];
+                model.nav1.i = 0;
+            }
+            $('#WTDBOX .mddcss').html(template('showlTpl', modeldata.coum));
+            $('#WTDBOX,#MainBg').css('top', $('header').height() + "px");
+            $('#WTDBOX').css('height', 'calc(100% - ' + $('header').height() + 'px)')
+        },
+        fhdWinTemp: function() {
+            Comm.showWindow('fhdWinTemp', true);
+
+            if (model.nav2) {
+                modeldata.area.curi = model.nav2;
+            } else {
+                modeldata.area.curi = modeldata.area[0];
+                modeldata.area.curi.i = 0;
+                modeldata.area.curi.ni = '2';
+                model.nav2 = modeldata.area[0];
+                model.nav2.i = 0;
+            }
+            $('#WTDBOX .mddcss').html(template('showlTpl', modeldata.area));
+            $('#WTDBOX,#MainBg').css('top', $('header').height() + "px");
+            $('#WTDBOX').css('height', 'calc(100% - ' + $('header').height() + 'px)')
+
+        },
+        selTimeWinTemp: function() {
+            Comm.showWindow('selTimeWinTemp', true);
+            $('#WTDBOX,#MainBg').css('top', $('header').height() + "px");
+            $('#WTDBOX').css('height', 'calc(100% - ' + $('header').height() + 'px)')
+            if (model.nav3) {
+                $("#WTDBOX #sel" + model.nav3.i).addClass('color333').removeClass('color999');
+            }
+        },
+        iss: false,
+        addEvent: function() {
+            if (!model.iss) {
+                model.iss = true;
+                Comm.g('WTDBOX').addEventListener("touchstart", function() {
+                    model.forcolor();
+                }, false);
+            }
+        },
+        forcolor: function() {
+            for (var i = 1; i <= 3; i++) {
+                if (!model['nav' + i] && i == 3) {
+                    $("#nav" + i).find('.color333').addClass('color999').removeClass('color333');
+                } else if (i == 1 && model['nav' + i] && (!model['nav' + i].curchild || model['nav' + i].curchild && model['nav' + i].curchild.id == "")) {
+                    $("#nav" + i).find('.color333').addClass('color999').removeClass('color333');
+                } else if (i == 2 && model['nav' + i] && (!model['nav' + i].curchild || model['nav' + i].curchild && model['nav' + i].curchild.id == "")) {
+                    $("#nav" + i).find('.color333').addClass('color999').removeClass('color333');
+                }
+                $("#nav" + i).find('img').attr('src', 'img/down.png');
+            }
+        },
+        curnav: null,
+        nav1: null,
+        nav2: null,
+        nav3: null,
+        nav: function(a, i) {
+            Comm.showWindow();
+            $(a).find('.color999').addClass('color333').removeClass('color999');
+            $(a).find('img').attr('src', 'img/top.png');
+            model.curnav = a;
+            if (i == 1) {
+                model.mddWinTemp();
+            } else if (i == 2) {
+                model.fhdWinTemp();
+            } else if (i == 3) {
+                model.selTimeWinTemp();
+            }
+            model.addEvent();
+        },
+        seln3: function(i, n) {
+            event.stopPropagation();
+            model.nav3 = {
+                i: i,
+                n: n
+            };
+            $("#n3").html(n).addClass('color333').removeClass('color999');
+            Comm.showWindow();
+            model.search();
+        },
+        oneclick: function(a, id, i, n, ni) {
+            event.stopPropagation();
+            model['nav' + ni] = {
+                id: id,
+                i: i,
+                n: n,
+                child: ni == 1 ? modeldata.coum[i].child : modeldata.area[i].child
+            };
+            $(a).parent().find('.color333').removeClass('bg_white').removeClass('color333').addClass('color999');
+            $(a).removeClass('color999').addClass('color333').addClass('bg_white');
+            model['nav' + ni].ni = ni;
+            $('#WTDBOX  #showchild').html(template('showchildTpl', model['nav' + ni]))
+        },
+        twoclick: function(a, id, i, n, ni) {
+            event.stopPropagation();
+            model['nav' + ni].curchild = {
+                id: id,
+                i: i,
+                n: n
+            };
+            $(a).parent().find('.color333').removeClass('color333').addClass('color999');
+            $(a).removeClass('color999').addClass('color333');
+            $("#n" + ni).html(n);
+            model.forcolor();
+            Comm.showWindow();
+            model.search();
+        },
+        listByHot: function() { //获取热门国家
+            AJAX.GET('/api/country/listByHot?pageno=1&pagesize=20', function(d) {
+                if (d.code == 1) {
+                    for (var i = 0; i < d.data.length; i++) {
+                        modeldata.coum[1].child.push({
+                            id: d.data[i].country_id,
+                            n: d.data[i].chinese_name,
+                        })
+                    }
+                }
+                model.listByLetter();
+            })
+        },
+        listByLetter: function() {
+            //获取国家信息
+            AJAX.GET('/api/country/listByLetter?pageno=1&pagesize=1000', function(a) {
+                if (a.code) {
+
+                    for (var i = 0; i < model.continent.length; i++) {
+                        var cs = {
+                            id: model.continent[i].dictid,
+                            n: model.continent[i].dictname,
+                            child: []
+                        }
+                        for (var j = 0; j < a.data.length; j++) {
+                            if (a.data[j].wlj_continent == cs.id) {
+                                cs.child.push({
+                                    id: a.data[j].country_id,
+                                    n: a.data[j].chinese_name
+                                })
+                            }
+                        }
+                        modeldata.coum.push(cs)
+                    }
+                }
+            })
+        },
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,rqlist', {
+                    pagesize: 10,
+                    refreshUrl: '/api/travel/list',
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+                    flag: 1
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('rqlistTpl', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+
+                model.mere.refreshOption.refreshParm = {
+
+                };
+                if (model.nav1 && model.nav1.curchild) {
+                    model.mere.refreshOption.refreshParm.countryId = model.nav1.curchild.id
+                }
+
+                if (model.nav2 && model.nav2.curchild) {
+                    model.mere.refreshOption.refreshParm.deliverId = model.nav2.curchild.id
+                }
+                if (model.nav3) {
+                    model.mere.refreshOption.refreshParm.flag = model.nav3.i
+                } else {
+                    model.mere.refreshOption.refreshParm.flag = 1;
+                }
+
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        }
+    }
+</script>
+
+<script id="showlTpl" type="text/html">
+    <div class="bgF5F5F5">
+        {{each $data v k}}
+        <div class="lh45 {{curi&&curi.i==k?'color333 bg_white':'color999'}}" onclick="model.oneclick(this,'{{v.id}}', {{k}},'{{v.n}}',{{curi.ni}})">
+            {{v.n}}
+        </div>
+        {{/each}}
+    </div>
+    <div class="bg_white" id="showchild" style="width: calc(100% - 128px)">
+        {{ include 'showchildTpl' $data.curi }}
+    </div>
+</script>
+
+<script id="showchildTpl" type="text/html">
+    {{each $data.child v k}}
+    <div class="lh45 {{curchild&&curchild.i==k?'color333':'color999'}}" onclick="model.twoclick(this,'{{v.id}}', {{k}},'{{v.n}}',{{ni}})">
+        {{v.n}}
+    </div>
+    {{/each}}
+</script>
+
+<script id="rqlistTpl" type="text/html">
+    {{each $data v k}}
+    <div class="list flex_wrap" onclick="Comm.go('tripdetail.html?id={{v.travelId}}')" style="{{v.imgright?'background-image:url('+OSS(v.imgright)+')':''}}">
+        <div class="lfw">
+            <img src="img/ezr.png" class="ezr" />
+            <img src="{{OSS(v.imgleft)}}" height="160" width="100" onerror="app.errorimg(this,'img/xc/left.png')" />
+        </div>
+        <div class="rgw">
+            <div class="">时间 {{formatDate(v.destinationTime,'m月d日')}} - {{formatDate(v.fromTime,'m月d日')}}</div>
+            <div class="f20 mart5 wordW2 lh20" style="font-weight:600;height: 40px;">
+                <span>{{v.fromName}}</span>
+                <img src="img/xc/qk.png" height="12" />
+                <span>{{v.destinationName}}</span>
+            </div>
+            <div>
+                <img src="img/index/car.png" height="12" />
+                <span class="f12 color999">{{v.deliverName}}</span>
+            </div>
+            {{if(v.labelsName)}}
+            <div class="mart5"> {{each v.labelsName.split(',') lb j}}{{if(lb)}}
+                <span class="lb inblock color666 f12 border">{{lb}}</span> {{/if}}{{/each}}
+            </div>
+            {{/if}}
+            <div class="flex-between mart10">
+                <div class="wordW">
+                    <img src="{{OSS(v.face)}}" onerror="app.herrorimg(this)" class="headimg" height="20" width="20" style="border-radius: 20px;" />
+                    <span>{{v.nickName}}</span>
+                </div>
+                <div>
+                    <button class="btmsg" onclick="event.stopPropagation();IM_.IM_ShowContact({{v.customerId}})">立即沟通</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

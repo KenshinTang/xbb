@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>帮助与反馈</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        #id_searchInput {
+            background-image: url('img/send/ic_search.png');
+            background-repeat: no-repeat;
+            background-size: 18px;
+            background-color: #fff;
+            background-position: 10px 6px;
+            width: 100%;
+            border-radius: 15px;
+            line-height: 30px;
+            padding-left: 40px
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17">帮助与反馈</div>
+        </div>
+    </header>
+    <section>
+        <div class="paddr20 paddl20 mart15">
+            <div class="flex-between">
+                <form style="width: calc(100% - 50px);" action="javascript:return true;" onsubmit="model.search()">
+                    <input class="colorc7 f15" id="id_searchInput" type="search" placeholder="搜索问题" oninput="model.search()" />
+                </form>
+                <div class="f15 colorprice center" style="width: 30px;" onclick="model.clear()">
+                    取消
+                </div>
+            </div>
+        </div>
+        <div class="bg_white" id="questionList">
+
+        </div>
+    </section>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script>
+    function pageload() {
+
+    }
+
+    function pageresume() {}
+    var model = {
+        search: function() {
+            var v = $('#id_searchInput').val();
+            if (v) {
+                AJAX.POST('/api/article/articleList', {
+                    pageno: 1,
+                    pagesize: 100,
+                    articleType: 2,
+                    keyword: v,
+                }, function(a) { //问题
+                    if (a.code == 1) {
+                        $('#questionList').html(template('questionListTpl', a.data));
+                    } else {
+                        Comm.message(a.msg);
+                    }
+                });
+            } else {
+                $('#questionList').html('');
+            }
+        },
+        clear: function() {
+            $('#id_searchInput').val('');
+            $('#questionList').html('');
+        }
+    }
+</script>
+
+<script id="questionListTpl" type="text/html">
+    <div class="paddr20 paddl20 mart30 paddb20 paddt20" id="questionList">
+        {{each $data v k}}
+        <div class="lh40 f15" onclick="Comm.go('ab.html?id={{v.ArticleID}}')">{{v.ArticleName}}</div>
+        {{/each}}
+    </div>
+</script>
+
+</html>

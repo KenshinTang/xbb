@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {
+            background-color: #f5f5f5;
+        }
+        
+        .main {
+            background-color: #fff;
+            padding-bottom: 35px;
+            padding-top: 30px;
+        }
+        
+        button {
+            width: 130px;
+            border-radius: 4px;
+        }
+        
+        button.bgh {
+            background: linear-gradient(45deg, rgba(81, 81, 81, 1) 0%, rgba(51, 51, 51, 1) 100%);
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close(2)"></div>
+            <div class="navTitle"></div>
+        </div>
+    </header>
+    <section>
+
+    </section>
+</body>
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {
+
+    }
+    var model = {
+        bbk: Comm.query('bbk') ? Comm.query('bbk') : '',
+        orderId: Comm.query('orderId') ? Comm.query('orderId') : '',
+        init: function() {
+            if (model.bbk == 1) {
+                document.title = '受理成功';
+                $('.navTitle').html('受理成功');
+            } else {
+                document.title = '支付成功';
+                $('.navTitle').html('支付成功');
+            }
+
+            AJAX.GET('/api/order/orderDetail?orderId=' + model.orderId, function(d) {
+                if (d.code == 1) {
+                    $('section').html(template('mainTpl' + model.bbk, d.data));
+                }
+            })
+        },
+        godetail: function() {
+            Comm.go('orderdetail.html?id=' + model.orderId + "&bbk=" + model.bbk);
+        }
+    }
+</script>
+
+<script id="mainTpl" type="text/html">
+    <div class="main">
+        <div class="center">
+            <img src="img/pay/ic_pay_success.png" height="115" />
+        </div>
+        <div class="f15 center mart15">
+            恭喜你，支付成功
+        </div>
+        <div class="dflex" style="margin-top: 45px;">
+            <div class="marr25" style="text-align: right;">
+                <button onclick="model.godetail()">查看订单</button>
+            </div>
+            <div style="text-align: left;">
+                <button class="bgh" onclick="Comm.gotop('index.html')">返回首页</button>
+            </div>
+        </div>
+    </div>
+    <div class="mart35" style="height: 10px;background: #f5f5f5;"></div>
+    <div class="flex-between lh25 bg_white paddl20 paddr20 paddt20 paddb20" style="align-items:center;">
+        <div>
+            <img src="img/ic_positioning.png" height="23" />
+        </div>
+        <div style="text-align:left;width:calc(100% - 35px);" class="marl10">
+            <div>
+                <span class="f17" style="font-weight: 500;">{{consignee}}</span>
+                <span class="f17" style="font-weight: 500;">{{consigneePhone}}</span>
+            </div>
+            <div class="f13 wordW2 color666 lh20 mart5" style="font-weight: 300;">{{consigneeAddress}}</div>
+        </div>
+    </div>
+</script>
+
+<script id="mainTpl1" type="text/html">
+    <div class="main">
+        <div class="center">
+            <img src="img/xc/ic_xuqiu_success.png" height="115" />
+        </div>
+        <div class="f15 center mart15">
+            需求受理成功
+        </div>
+        <div class="dflex" style="margin-top: 45px;">
+            <div class="marr25" style="text-align: right;">
+                <button onclick="model.godetail()">查看订单</button>
+            </div>
+            <div style="text-align: left;">
+                <button class="bgh" onclick="Comm.gotop('bbk.html')">返回首页</button>
+            </div>
+        </div>
+    </div>
+    <div class="mart35" style="height: 10px;background: #f5f5f5;"></div>
+    <div class="flex-between lh25 bg_white paddl20 paddr20 paddt20 paddb20" style="align-items:center;">
+        <div>
+            <img src="img/ic_positioning.png" height="23" />
+        </div>
+        <div style="text-align:left;width:calc(100% - 35px);" class="marl10">
+            <div>
+                <span class="f17" style="font-weight: 500;">{{consignee}}</span>
+                <span class="f17" style="font-weight: 500;">{{consigneePhone}}</span>
+            </div>
+            <div class="f13 wordW2 color666 lh20 mart5" style="font-weight: 300;">{{consigneeAddress}}</div>
+        </div>
+    </div>
+</script>
+
+
+
+
+</html>

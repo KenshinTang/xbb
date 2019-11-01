@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>搜索行程</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        section {
+            background-color: #F5F5F5;
+        }
+        
+        .main {
+            padding: 20px;
+        }
+        
+        .navItemIcon {
+            background: inherit;
+        }
+        
+        .searchBar {
+            margin: 0 auto;
+        }
+        
+        .searchBar input {
+            width: 95%;
+            padding-left: 50px;
+            line-height: 28px;
+            height: 28px;
+            font-size: 14px;
+            background-color: #F5F5F5;
+            border-radius: 14px;
+            background-image: url('img/send/ic_search.png');
+            background-repeat: no-repeat;
+            background-size: 21px;
+            background-position: 20px center;
+            margin: 0 auto;
+        }
+        
+        .pad10ed {
+            padding: 10px 10px 0px 10px;
+        }
+        
+        .catch span {
+            display: inline-block;
+            background-color: #F5F5F5;
+            color: #999;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 15px;
+            padding: 0px 15px;
+            margin-bottom: 20px;
+            margin-right: 20px;
+        }
+        
+        #WTDBOX {
+            top: 92px;
+        }
+        
+        #MainBg {
+            top: 92px;
+            height: calc(100% - 92px);
+        }
+        
+        #WTDBOX .conun {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+            background-color: #fff;
+        }
+        
+        #WTDBOX .nth258 button {
+            height: 30px;
+            line-height: 30px;
+            color: #333;
+            width: 100%;
+        }
+        
+        #WTDBOX .nth258 div {
+            width: calc((100% - 40px)/3);
+        }
+        
+        #WTDBOX .nth258 div:nth-child(3n-1) {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+        
+        #WTDBOX .nth258 {
+            flex-grow: 3;
+            padding: 20px;
+        }
+        
+        #WTDBOX button {
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        #WTDBOX button.no {
+            background-color: #fff;
+            border: 1px solid #F1F1F1;
+        }
+        
+        #WTDBOX button.active {
+            background-color: #333;
+            color: #fff;
+        }
+        
+        .list {
+            border-radius: 4px;
+            padding: 20px;
+        }
+        
+        .list button {
+            width: 80px;
+            font-size: 13px;
+            line-height: 23px;
+            padding-top: 2px;
+            border-radius: 12px;
+        }
+        
+        .list .imgc {
+            position: relative;
+        }
+        
+        .list .pos {
+            position: absolute;
+            top: 0px;
+            padding: 3px 15px 3px 15px;
+            background-color: #333;
+            color: #fff;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 头部 -->
+    <header>
+        <div class="navBar bottomShadow" style="padding: 0;box-shadow: none;">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="nav-title block searchBar" style="width: calc(100% - 50px);height: 44px;">
+                <form action="javascript:return true;" onsubmit="model.search()">
+                    <input id="id_searchInput" type="search" placeholder="搜索">
+                </form>
+            </div>
+        </div>
+        <div class="dflex lh45 borderb">
+            <div onclick="model.query(this,'price')">
+                <span class="color999" id="price">按价格</span>
+                <img src="img/down.png" width="12" class="priceimg" />
+            </div>
+            <div onclick="model.query(this,'category')">
+                <span class="color999" id="category">类目</span>
+                <img src="img/down.png" width="12" class="categoryimg" />
+            </div>
+            <div onclick="model.query(this,'pub')">
+                <span class="color999" id="pub">安发布时间</span>
+                <img src="img/down.png" width="12" class="pubimg" />
+            </div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main" id="list">
+
+        </div>
+    </section>
+
+    <div wtd="queryWinTemp" class="query" id="query">
+        <div class="conun"></div>
+    </div>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script>
+    function pageload() {
+        $("#id_searchInput").val(model.keyword);
+        model.search();
+        model.categoryList();
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        keyword: Comm.query('keyword') ? Comm.query('keyword') : '',
+        price: '', //1 正序 2降序
+        category: [],
+        pub: '', //1 正序 2降序
+        query: function(a, t) {
+            Comm.showWindow();
+            Comm.showWindow('queryWinTemp', true);
+            $('#WTDBOX,#MainBg').css('top', $('header').height() + "px");
+            $('#WTDBOX').css('height', 'calc(100% - ' + $('header').height() + 'px)')
+            $('.conun').html(template(t + 'Tpl', model));
+            if (t == "category") {
+                //$("#category").removeClass('color999');
+                //$("img.categoryimg").attr('src', 'img/top.png');
+            }
+        },
+        qk: function(a, v, t) {
+            if (t == "price") {
+                model.price = v;
+                if (model.price == 1) {
+                    $("#price").html('价格最高').removeClass('color999');
+                    $("img.priceimg").attr('src', 'img/top.png');
+                } else if (model.price == 2) {
+                    $("#price").html('价格最低').removeClass('color999');
+                    $("img.priceimg").attr('src', 'img/top.png');
+                } else if (model.price == "") {
+                    $("#price").html('按价格').addClass('color999');
+                    $("img.priceimg").attr('src', 'img/down.png');
+                }
+                model.pub = '';
+                $("#pub").html('按发布时间').addClass('color999');
+                $("img.pubimg").attr('src', 'img/down.png');
+            }
+            if (t == "pub") {
+                model.pub = v;
+                if (model.pub == 1) {
+                    $("#pub").html('时间最早').removeClass('color999');
+                    $("img.pubimg").attr('src', 'img/top.png');
+                } else if (model.pub == 2) {
+                    $("#pub").html('价格最低').removeClass('color999');
+                    $("img.pubimg").attr('src', 'img/top.png');
+                } else if (model.pub == "") {
+                    $("#pub").html('按发布时间').addClass('color999');
+                    $("img.pubimg").attr('src', 'img/down.png');
+                }
+                model.price = '';
+                $("#price").html('按价格').addClass('color999');
+                $("img.priceimg").attr('src', 'img/down.png');
+            }
+            model.search();
+        },
+        categorydata: [],
+        categoryList: function() {
+            AJAX.GET('/api/goods/categoryList?level=1&pagesize=100', function(d) {
+                if (d.code == 1) {
+                    model.categorydata = d.data;
+                    model.categorydata.unshift({
+                        category_id: '',
+                        category_name: '全部'
+                    })
+                }
+            })
+        },
+        sel: function(a, id, name) {
+            model.category = [];
+            if ($(a).hasClass('active')) {
+                $(a).removeClass('active');
+                var i = model.category.indexOf(id);
+                if (i >= 0) {
+                    model.category = model.category.del(i);
+                }
+            } else {
+                $(a).addClass('active');
+                model.category.push(id);
+            }
+            name = name == "全部" ? '类目' : name;
+            if (id == "") {
+                $("#category").html(name).addClass('color999');
+                $("img.categoryimg").attr('src', 'img/down.png');
+            } else {
+                $("#category").html(name).removeClass('color999');
+                $("img.categoryimg").attr('src', 'img/top.png');
+            }
+            model.search();
+        },
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/porder/list',
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+                    keyword: model.keyword,
+                    labels: model.category.join(','),
+                    price: model.price,
+                    pub: model.pub,
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('needList', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                Comm.showWindow();
+                model.mere.refreshOption.refreshParm = {
+                    keyword: $("#id_searchInput").val(),
+                    labels: model.category.join(','),
+                    price: model.price,
+                    pub: model.pub,
+                };
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        }
+    }
+</script>
+
+<script id="needList" type="text/html">
+    {{each $data v k }}
+    <div class="list bg_white marb20" onclick="Comm.go('needdetail.html?orderDetailId={{v.orderDetailId}}')">
+        <div class="imgc">
+            <img src="{{OSS(v.skuImg)}}" width="100%" onerror="app.errorimg(this)" />
+            <div class="pos">
+                <img src="{{OSS(v.countryLogo)}}" onerror="app.errorimg(this)" class="countryLogo" />
+                <span class="colorfff">{{v.countryChineseName}}</span>
+            </div>
+        </div>
+        <div class="lh20 f15">
+            {{v.skuName}}
+        </div>
+        <div class="flex-between mart10">
+            <div>
+                <span class="f13 colorprice">￥</span>
+                <span class="f19 colorprice">{{priceTp(v.sellPrice)}}</span>
+            </div>
+            <div>
+                <button onclick="model.gobuy('')">我也想要</button>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+<script id="priceTpl" type="text/html">
+    <div class="lh50 {{price==''?'color999':''}}" onclick="model.qk(this,'','price')">默认</div>
+    <div class="lh50 {{price=='1'?'color999':''}}" onclick="model.qk(this,'2','price')">价格最高</div>
+    <div class="lh50 {{price=='2'?'color999':''}}" onclick="model.qk(this,'1','price')">价格最低</div>
+</script>
+
+<script id="categoryTpl" type="text/html">
+    <div class="flex_wrap nth258">
+        {{each categorydata v k}}
+        <div style="">
+            <button class="no {{category.indexOf(v.category_id)>=0?'active':''}}" onclick="model.sel(this,'{{v.category_id}}','{{v.category_name}}')">{{v.category_name}}</button>
+        </div>
+        {{/each}}
+    </div>
+</script>
+
+<script id="pubTpl" type="text/html">
+    <div class="lh50 {{pub==''?'color999':''}}" onclick="model.qk(this,'','pub')">默认</div>
+    <div class="lh50 {{pub=='1'?'color999':''}}" onclick="model.qk(this,'1','pub')">时间最早</div>
+    <div class="lh50 {{pub=='2'?'color999':''}}" onclick="model.qk(this,'2','pub')">时间最晚</div>
+</script>
+
+</html>

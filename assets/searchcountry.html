@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>搜索国家</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        section {
+            background-color: #F7F7F7;
+        }
+        
+        .navItemIcon {
+            background: inherit;
+        }
+        
+        .searchBar {
+            margin: 0 auto;
+        }
+        
+        .searchBar input {
+            width: 95%;
+            padding-left: 50px;
+            line-height: 28px;
+            height: 28px;
+            font-size: 14px;
+            background-color: #F5F5F5;
+            border-radius: 14px;
+            background-image: url('img/send/ic_search.png');
+            background-repeat: no-repeat;
+            background-size: 21px;
+            background-position: 20px center;
+            margin: 0 auto;
+        }
+        
+        .pad10ed {
+            padding: 10px 10px 0px 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 头部 -->
+    <header>
+        <div class="navBar bottomShadow" style="padding: 0;box-shadow: none;">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navItemIcon marl5 marr10" onclick="model.search()">搜索</div>
+            <div class="nav-title block searchBar" style="width: calc(100% - 95px);height: 44px;">
+                <form action="javascript:return true;" onsubmit="model.search()">
+                    <input id="id_searchInput" type="search" placeholder="搜索" oninput="model.search()">
+                </form>
+            </div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="list pad10 clearfix" id="list">
+
+        </div>
+    </section>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/goods/goodsListByBrand',
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+                    categoryIds: model.categoryIds.join(','),
+                    brandId: model.brandId
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('goodsList', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                Comm.showWindow();
+                model.mere.refreshOption.refreshParm = {
+                    categoryIds: model.categoryIds.join(','),
+                    brandId: model.brandId
+                };
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        }
+    }
+</script>
+
+<script id="historyTpl" type="text/html">
+    <div class="pad10" style="padding-bottom:0px">
+        <span class="color999">历史搜索</span>
+        <img src="img/del.png" height="14" class="fr" onclick="model.delcatch()" />
+    </div>
+    <div class="catch pad10" id="history">
+        {{each $data v k }}
+        <span onclick="model.search('{{v}}')">{{v}}</span> {{/each}}
+    </div>
+</script>
+
+</html>

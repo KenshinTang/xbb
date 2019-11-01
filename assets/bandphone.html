@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>绑定手机</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        input {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17">绑定手机</div>
+        </div>
+    </header>
+    <section>
+        <div class="paddl20 paddr20 bg_white hide" id="exti">
+            <div class="lh65  borderb">
+                <div class="f15" id="phone"></div>
+            </div>
+            <div class="lh20 paddt10">
+                <div>
+                    <span class="f13 colorc7">您已绑定手机号，若需要修改请联系客服。</span>
+                </div>
+            </div>
+            <div class="f13 lh30 paddb10" style="color:#007AFF;">客服电话：
+                <a id="pdkh" style="color:#007AFF;"></a>
+            </div>
+        </div>
+        <div class="hide" id="noband">
+            <div class="paddl20 paddr20 bg_white ">
+                <div class="lh65">
+                    <input name="phone" class="lh50" type="tel" number placeholder="请输入手机号码" maxlength="11" data-reg='m' oninput="model.oninput()" />
+                </div>
+            </div>
+            <div class="paddl20 paddr20 bg_white tyle2 flex-between">
+                <div class="f15 lh65" style="width: 70px;">验证码：</div>
+                <div class="lh65 flex-between" style="width: calc(100% - 70px);">
+                    <input style="width: 130px;" name="code" class="lh50" type="tel" maxlength="6" number placeholder="请输入验证码" data-reg='c' oninput="model.oninput()" />
+                    <span class="f15" style="color:#007AFF;" onclick="model.send(this)">发送验证码</span>
+                </div>
+            </div>
+            <div class="paddl20 paddr20 center mart30">
+                <div class="f13 tleft color999 marb20">为了确保账号安全，我们将向您发送短信验证码</div>
+                <button class="no" onclick="model.upPhone()" style="border-radius: 4px;width: 100%;">保存</button>
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+        model.init()
+    }
+
+    function pageresume() {}
+    var model = {
+        user: Comm.db('userinfo'),
+        bbk: Comm.query('bbk'),
+        init: function() {
+            if (model.user.phone) {
+                $('#exti').removeClass('hide');
+                $('#phone').html("已绑定：" + template.defaults.imports.strhide(model.user.phone));
+
+                AJAX.GET('/api/sysconfig/getconfig?key=khphone', function(d) {
+                    if (d.code == 1) {
+                        $("#pdkh").attr('href', 'tel:' + d.data).html(d.data);
+                    }
+                })
+            } else {
+                $('#noband').removeClass('hide');
+            }
+        },
+        wait: 59,
+        send: function(a) {
+            var reg = /^1\d{10}$/;
+            var ph = $('input[name="phone"]').val();
+            if (!reg.test(ph)) {
+                Comm.message('请输入正确的手机号')
+                return;
+            }
+            AJAX.POST('/api/customer/sendMsg', {
+                phone: ph,
+                bo: 5
+            }, function(d) {
+                if (d.code == 1) {
+                    Comm.message('短信已发送，请注意查收');
+                    if (model.inter) {
+                        clearInterval(model.inter);
+                    }
+                    model.inter = setInterval(function() {
+                        if (model.wait == 0) {
+                            $(a).html('重新发送');
+                            model.wait = 59;
+                            clearInterval(model.inter);
+                            model.inter = null;
+                        } else {
+                            $(a).html(model.wait + '秒后可重新发送');
+                            model.wait--;
+                        }
+                    }, 1000);
+                }
+            });
+        },
+        oninput: function(a) {
+            var reg = /^1\d{10}$/;
+            var ph = $('input[name="phone"]').val();
+            var co = /^\d{6}$/;
+            var code = $('input[name="code"]').val();
+
+            if (reg.test(ph) && co.test(code)) {
+                $('button').removeClass('no');
+                return;
+            }
+            $("button").addClass('no');
+        },
+        upPhone: function() {
+            var data = Check.submit('POST');
+            if (!data) {
+                return false;
+            }
+            AJAX.POST('/api/customer/updatePhone', data, function(d) {
+                if (d.code == 1) {
+                    model.user.phone = data.phone;
+                    Comm.db('userinfo', model.user);
+                    Comm.message('绑定成功');
+                    Comm.close()
+                } else {
+                    Comm.message(d.msg);
+                }
+            })
+        }
+    }
+</script>
+
+</html>

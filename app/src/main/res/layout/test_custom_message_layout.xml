@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <RelativeLayout
+        android:id="@+id/im_relative"
+        android:layout_width="240dp"
+        android:layout_height="100dp"
+        android:background="@drawable/text_circle">
+
+        <ImageView
+            android:id="@+id/im_img"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/tupian"/>
+
+        <TextView
+            android:id="@+id/im_title"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_toRightOf="@+id/im_img"
+            android:text="Apple/苹果 Watch 深空黑色不锈钢表壳搭配深空黑色米兰尼斯表带  42mm GPS + 蜂窝网络表款"
+            android:textSize="18sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="#333333"
+            />
+
+        <TextView
+            android:id="@+id/im_money"
+            android:layout_toRightOf="@+id/im_img"
+            android:layout_below="@+id/im_title"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="30dp"
+            android:maxLines="1"
+            android:textColor="#FF5B1F"
+            android:text="￥3045.94"
+            android:gravity="left|center"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            />
+
+
+
+    </RelativeLayout>
+
+</LinearLayout>

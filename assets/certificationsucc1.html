@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>认证</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {}
+    </style>
+</head>
+
+<body>
+    <header>
+    </header>
+    <section>
+        <div class="bg_white paddt20 paddb20 hide" style="margin-top: 80px;" id="succ">
+            <div class="center">
+                <img src="img/bbk/succ.png" />
+            </div>
+            <div class="center f22 " style="margin-top: 35px;">
+                提交成功
+            </div>
+            <div class="center paddt10" style="width: 50%;margin: 0 auto;">
+                <span class="f13 color666">您的认证信息已提交成功，审核需要</span>
+                <span class="f13 ">1-2</span>
+                <span class="f13 color666">个工作日</span>
+            </div>
+            <div class="f15 paddt30 paddb20" style="width: 70%;margin: 0 auto;">
+                <button style="border-radius: 4px;width: 100%;" onclick="Comm.gotop('bbk.html')">随便逛逛</button>
+            </div>
+        </div>
+        <div class="bg_white paddt20 paddb20 hide" style="margin-top: 80px;" id="error">
+            <div class="center">
+                <img src="img/bbk/error.png" />
+            </div>
+            <div class="center f22 " style="margin-top: 35px;">
+                认证失败
+            </div>
+            <div class="center paddt10" style="width: 50%;margin: 0 auto;">
+                <span class="f13 color666">抱歉，您的资料审核失败。失败原因：</span>
+                <span class="f13 color666" id="passportReason"></span>
+            </div>
+            <div class="f15 paddt30 paddb20" style="width: 70%;margin: 0 auto;">
+                <button style="border-radius: 4px;width: 100%;" onclick="Comm.goself('authbbk.html')">重新认证</button>
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+
+<script>
+    function pageload() {
+        if (model.succ) {
+            $('#succ').removeClass('hide');
+        } else {
+            $('#error').removeClass('hide');
+            AJAX.GET('/api/customer/authInfo', function(d) {
+                if (d.code == 1) {
+                    model.info = d.data;
+                    if (d.data.passportReason) {
+                        $('#passportReason').html(d.data.passportReason);
+                    }
+                }
+            })
+        }
+    }
+
+    function pageresume() {}
+
+    var model = {
+        succ: Comm.query('succ'),
+        status: Comm.query('status')
+    }
+</script>
+
+</html>

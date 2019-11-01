@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+        
+        .f26 {
+            font-size: 26px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navItemIcon hide share" onclick="model.share()"></div>
+            <div class="navTitle f15" style="color: #3F3F3F;"></div>
+        </div>
+    </header>
+    <section>
+        <div class="main" id="info">
+
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+<script id="newsInfo" type="text/html">
+    <div class="f26" style="font-weight:500; line-height: 38px;">
+        {{title}}
+    </div>
+    <div class="f13 color666 mart5 flex-between">
+        <div>
+            <img src="{{OSS(authorFace)}}" height="20" width="20" style="border-radius:10px" />
+            <span>{{authorName}}</span>
+        </div>
+        <span class="" style=""> {{formatDate(addTime)}}</span>
+    </div>
+    <div class="f20 lh30 mart15">
+        {{content}}
+    </div>
+</script>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    var newsId = Comm.query('newsId');
+
+    function pageload() {
+        model.newsInfo(newsId);
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        isshare: Comm.query('isshare'),
+        newsInfo: function(newsId) {
+            if (model.isshare != 1) {
+                $('header .share').removeClass('hide');
+            }
+            //精选内容
+            AJAX.POST('/api/news/info?newsId=' + newsId, {
+                pageno: 1,
+                pagesize: 10
+            }, function(a) { //精选内容
+                if (a.code == 1) {
+                    document.title = a.data.title;
+                    $('.navTitle').html(a.data.title);
+                    $('#info').html(template('newsInfo', a.data));
+
+                    Share_.init();
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        share: function() {
+            var len = $('#info').text().length;
+            Comm.shareUrl({
+                pic: config.webroot + "img/logo.png", //分享图片路径
+                title: document.title, //分享标题
+                desc: len > 50 ? $('#info').text().substr(0, 50) : $('#info').text(), //分享描述
+                url: config.webroot + 'articledetail.html?newsId=' + newsId + '&isshare=1', //分享路径
+            }, function(d) { //回调
+                if (d == 1) {
+                    Comm.message("分享成功");
+                }
+            });
+        }
+    }
+</script>
+
+</html>

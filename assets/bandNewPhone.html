@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>绑定手机号</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .mart70 {
+            margin-top: 70px;
+            margin-bottom: 70px;
+        }
+        
+        #phone {
+            font-size: 17px;
+            line-height: 40px;
+            border-bottom: 1px solid #F1F1F1;
+            width: 75%;
+        }
+        
+        button {
+            width: 75%;
+            background: #D8D8D8;
+            color: #fff;
+            font-size: 15px;
+            border-radius: 4px;
+        }
+        
+        button.active {
+            background: #FFCD1F;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+    </header>
+    <section>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+        </div>
+        <div class="paddb20">
+            <div class="f25 center mart70" style="font-weight: 500;">绑定手机号</div>
+            <div class="mart30 center">
+                <input type="tel" number name="phone" id="phone" placeholder="请输入手机号" oninput="model.oninput(this)" data-reg='m' maxlength="11" />
+            </div>
+            <div class="f12 mart10">
+                <div style="width: 75%;margin: 0 auto;color: #c9c9c9;">温馨提示:为您的账户安全，请绑定手机号。</div>
+            </div>
+            <div class="mart30 center">
+                <button id="sub" onclick="model.sub(this)">发送验证码</button>
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript">
+    function pageload() {
+        ShortMsg.init(function(code) {
+            model.reg(code);
+        });
+    }
+
+    function androidback() {
+        Comm.gotop('index.html');
+    }
+
+    var model = {
+        oninput: function(a) {
+            var reg = /^1\d{10}$/;
+            if (!reg.test($(a).val())) {
+                $('#sub').removeClass('active');
+                return;
+            }
+            $('#sub').addClass('active');
+        },
+        sub: function(a) {
+            if ($(a).hasClass('active')) {
+                var data = Check.submit('POST');
+                if (!data) {
+                    return false;
+                }
+                ShortMsg.show(data.phone, 5);
+            }
+        },
+        reg: function(code) {
+            var data = Check.submit('POST');
+            if (!data) {
+                return false;
+            }
+            data.code = code.join('');
+            //验证验证码是否正确
+            AJAX.POST('/api/customer/checkMsgByOnly', {
+                phone: data.phone,
+                code: code.join(''),
+                bo: 5
+            }, function(a) { //注册
+                if (a.code == 1) {
+                    Comm.go('setpwd.html?code=' + code.join('') + '&phone=' + data.phone + '&wx=1');
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        }
+    }
+</script>
+
+</html>

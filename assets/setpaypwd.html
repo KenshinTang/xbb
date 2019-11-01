@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>设置支付密码</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        section {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        #WTDBOX {
+            display: block;
+            position: relative;
+            height: 100px;
+        }
+        
+        #WTDBOX .codemsgWin input {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17">设置支付密码</div>
+        </div>
+    </header>
+    <section>
+        <div class="center f17 lh65 msg" style="margin-top: 50px;">请输入6位数字支付密码</div>
+        <div class="paddr20 paddl20" id="WTDBOX">
+            <div style="display: block;">
+                <div class="mart20 codemsgWin center">
+                    <input i="1" type="tel" number name="code1" onkeydown="ShortMsg.keydown(this)" oninput="ShortMsg.oninput(this)">
+                    <input i="2" type="tel" number name="code2" onkeydown="ShortMsg.keydown(this)" oninput="ShortMsg.oninput(this)">
+                    <input i="3" type="tel" number name="code3" onkeydown="ShortMsg.keydown(this)" oninput="ShortMsg.oninput(this)">
+                    <input i="4" type="tel" number name="code4" onkeydown="ShortMsg.keydown(this)" oninput="ShortMsg.oninput(this)">
+                    <input i="5" type="tel" number name="code5" onkeydown="ShortMsg.keydown(this)" oninput="ShortMsg.oninput(this)">
+                    <input i="6" type="tel" number name="code6" onkeydown="ShortMsg.keydown(this)" oninput="ShortMsg.oninput(this)">
+                </div>
+            </div>
+        </div>
+        <div class="paddl20 paddr20 center">
+            <button class="no" style="border-radius: 4px;width: 100%;" onclick="model.comp()">完成</button>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {}
+
+    function pageresume() {
+
+    }
+    var model = {
+        code: Comm.query('code'),
+        sub: function() {
+            $('button').removeClass('no');
+        },
+        comp: function() {
+            if (!$('button').hasClass('no')) {
+                var o = {};
+                o.phone = Comm.db('userinfo').phone;
+                o.code = model.code;
+                o.payPassword = model.pwd.join('');
+                AJAX.POST('/api/customer/updatePayPsw', o, function(d) {
+                    if (d && d.code == 1) {
+                        Comm.message('设置支付密码成功');
+                        Comm.close(2)
+                    }
+                })
+            }
+        },
+        pwd: [],
+        pwd1: [],
+    }
+
+    ShortMsg.oninput = function(a) {
+        $('button').addClass('no');
+        if (a.value.length == 1) {
+            end();
+        } else if (a.value.length == 0) {
+            $(a).focus();
+        } else {
+            a.value = a.value.substr(0, 1);
+            $(a).next().focus();
+            end();
+        }
+
+        function end() {
+            if ($(a).attr('i') == "6") {
+                $(a).next().blur();
+                //验证验证码是否成功
+                var isnext = true;
+                if (model.pwd.length == 0) {
+                    model.pwd = [];
+                } else {
+                    model.pwd1 = [];
+                    isnext = false;
+                }
+                $('#WTDBOX input').each(function(i, e) {
+                    if (isnext) {
+                        model.pwd.push($(e).val())
+                    } else {
+                        model.pwd1.push($(e).val())
+                    }
+                })
+                if (isnext) {
+                    $('.msg').html('请再次输入，以确认密码');
+                    $('input').val('');
+                    $(a).blur();
+                    $('input[name="code1"]').focus();
+                } else {
+                    if (model.pwd.join('') != model.pwd1.join('')) {
+                        Comm.message('两次输入密码不一致');
+                    } else {
+                        model.sub();
+                    }
+                }
+            } else {
+                $(a).next().focus();
+            }
+        }
+    }
+
+    ShortMsg.keydown = function(a) {
+        if (event.keyCode == 8) {
+            if (a.value.length == 0) {
+                if ($(a).attr('i') == "1" && model.pwd.length == 6) {
+                    $('#WTDBOX input').each(function(i, e) {
+                        $(e).val(model.pwd[i]);
+                    })
+                    $('.msg').html('请输入6位数字支付密码');
+                    $('input[name="code6"]').focus();
+                    model.pwd1 = [];
+                    model.pwd = [];
+                } else {
+                    $(a).prev().focus();
+                }
+            }
+        }
+    }
+</script>
+
+</html>

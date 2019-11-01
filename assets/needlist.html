@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>看需求</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="css/side.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        section {
+            background-color: #F5F5F5;
+        }
+        
+        .main {
+            padding: 20px;
+        }
+        
+        #banner .side_nbox {
+            bottom: 3px;
+        }
+        
+        .nav {
+            overflow: hidden;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+        
+        .nav>div {
+            padding: 0 10px;
+            position: relative;
+            color: #999;
+        }
+        
+        .nav>div.active {
+            color: #333;
+        }
+        
+        .nav>div.active::after {
+            position: absolute;
+            content: '';
+            bottom: 10px;
+            width: 12px;
+            height: 3px;
+            left: 50%;
+            margin-left: -6px;
+            background-color: #333;
+            border-radius: 2px;
+        }
+        
+        .list {
+            border-radius: 4px;
+            padding: 20px;
+        }
+        
+        .list button {
+            width: 80px;
+            font-size: 13px;
+            line-height: 23px;
+            padding-top: 2px;
+            border-radius: 12px;
+        }
+        
+        .list .imgc {
+            position: relative;
+        }
+        
+        .list .pos {
+            position: absolute;
+            top: 0px;
+            padding: 3px 15px 3px 15px;
+            background-color: #333;
+            color: #fff;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">看需求</div>
+        </div>
+        <div id="banner" class="banner side_box">
+
+        </div>
+        <div class="flex-between">
+            <div style="width: calc(100%);">
+                <div class="bg_white lh50 nav flex_wrap" id="nav">
+
+                </div>
+            </div>
+            <div style="width: 50px;" class="center bg_white lh50 hide">
+                <img src="img/need/ic_drop_down.png" height="13" />
+            </div>
+        </div>
+    </header>
+    <section id="box" class="mescroll paddb20">
+        <div class="main" id="list">
+
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/side.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script>
+    function pageload() {
+        model.bannerList();
+        model.listByHot();
+        model.search();
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        countryId: '',
+        bannerList: function() {
+            //精选内容
+            AJAX.POST('/api/advert/apiList', {
+                pageno: 1,
+                pagesize: 10,
+                postion: 2
+            }, function(a) { //精选内容
+                if (a.code == 1) {
+                    $('#banner').html(template('bannerListInfo', a.data));
+                    new Side('banner', 3, true);
+                    Comm.resizeSection();
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        listByHot: function() {
+            AJAX.GET('/api/country/listByHot?pageno=1&pagesize=20', function(d) {
+                if (d.code == 1) {
+                    $('#nav').html(template('navTpl', d.data))
+                }
+            })
+        },
+        selnav: function(a, id) {
+            if (!$(a).hasClass('active')) {
+                $(a).parent().find('.active').removeClass('active');
+                $(a).addClass('active');
+                model.countryId = id;
+                model.search();
+            }
+        },
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/order/lookOrder',
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+                    countryId: model.countryId
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('needList', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                model.mere.refreshOption.refreshParm = {
+                    countryId: model.countryId
+                };
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        },
+        gobuy: function(spuId, skuId, mallId, buynum) {
+            event.stopPropagation();
+            Comm.go('gooddetail.html?spuId=' + spuId + '&skuId=' + skuId + "&mallId=" + mallId + "&buynum=" + buynum);
+        },
+        go: function(AdType, itemId, AdvertID, Url) {
+            if (AdType == 1) { //注册
+                Comm.go('reg.html')
+            } else if (AdType == 2) { //自定义图文
+                Comm.go('advert.html?id=' + AdvertID);
+            } else if (AdType == 3) { //商品
+                Comm.go('gooddetail.html?spuId=' + itemId);
+            } else if (AdType == 4) { //精选文章
+                Comm.go('articledetail.html?newsId=' + itemId);
+            } else if (AdType == 5) { //外部链接
+                Comm.openUrlStr(Url);
+            }
+        }
+    }
+</script>
+
+<script id="bannerListInfo" type="text/html">
+    <ul class="bannerList side_ul" id="side" style="height: 90px;">
+        {{each $data v k }}
+        <li class="scroll " style="overflow:hidden;" onclick="model.go('{{v.adType}}','{{v.itemID}}','{{v.advertID}}','{{v.url}}')">
+            <img src="{{OSS(v.face,'d')}}" class="" height="90" width="100%" onerror="app.errorimg(this)" name="banner{{k}}" />
+        </li>
+        {{/each}}
+    </ul>
+</script>
+<script id="navTpl" type="text/html">
+    <div class="active" onclick="model.selnav(this,'')">全部</div>
+    {{each $data v k}}
+    <div class="" onclick="model.selnav(this,'{{v.country_id}}')">{{v.chinese_name}}</div>
+    {{/each}}
+</script>
+<script id="needList" type="text/html">
+    {{each $data v k }}
+    <div class="list bg_white marb20" onclick="Comm.go('needdetail.html?orderDetailId={{v.orderDetailId}}')">
+        <div class="imgc">
+            <img src="{{OSS(v.skuImg)}}" width="100%" onerror="app.errorimg(this)" />
+            <div class="pos">
+                <img src="{{OSS(v.countryLogo)}}" onerror="app.errorimg(this)" class="countryLogo" />
+                <span class="colorfff">{{v.countryChineseName}}</span>
+            </div>
+        </div>
+        <div class="lh20 f15">
+            {{v.skuName}}
+        </div>
+        <div class="flex-between mart10">
+            <div>
+                <span class="f13 colorprice">￥</span>
+                <span class="f19 colorprice">{{priceTp(v.sellPrice)}}</span>
+            </div>
+            <div>
+                <button onclick="model.gobuy('{{v.spuId}}','{{v.skuId}}','{{v.mallId}}','{{v.buynum}}')">我也想要</button>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

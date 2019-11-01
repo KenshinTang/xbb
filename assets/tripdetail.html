@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>行程详情</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+        
+        .card {
+            box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.07);
+            border-radius: 6px;
+            background-image: url('img/xc/bg_card.png');
+            background-repeat: no-repeat;
+            background-position: top right;
+            background-size: auto 45px;
+            padding: 10px;
+        }
+        
+        .card .headimg {
+            border-radius: 60px;
+        }
+        
+        .xccard {
+            box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.07);
+            border-radius: 6px;
+            padding: 10px 15px 10px 15px;
+        }
+        
+        .imgindex2 {
+            z-index: 2;
+            position: relative;
+        }
+        
+        .bghh {
+            background-color: #333;
+            border-radius: 10px;
+            padding: 0px 13px 0px;
+            line-height: 19px;
+            color: #fff;
+            font-size: 12px;
+        }
+        
+        .borde3 {
+            border-radius: 3px;
+        }
+        
+        .posb {
+            position: absolute;
+            top: 40px;
+            width: 3px;
+            left: 50%;
+            margin-left: -1.5px;
+            background-color: #F1F1F1;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .posb.active {
+            background-color: #FFCF1D;
+        }
+        
+        .endr {
+            position: absolute;
+            height: 12px;
+            width: 12px;
+            border-radius: 12px;
+            background-color: #F1F1F1;
+            left: 50%;
+            margin-left: -6px;
+            margin-top: 3px;
+        }
+        
+        .endr.active {
+            background-color: #FFCF1D;
+        }
+        
+        .linb {
+            background-color: #FFCF1D;
+            height: 3px;
+            display: inline-block;
+            border-radius: 3px;
+        }
+        
+        footer {
+            z-index: 3;
+        }
+        
+        button.upimg {
+            height: 30px;
+            line-height: 30px;
+            width: 60%;
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="model.back()"></div>
+            <div class="navItemIcon hide share" onclick="model.share()"></div>
+            <div class="navTitle">行程详情</div>
+        </div>
+    </header>
+    <section>
+    </section>
+    <footer class="center">
+    </footer>
+</body>
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script>
+    function pageload() {
+
+        AJAX.GET('/api/sysconfig/getconfig?key=boardingCheck', function(d) {
+            if (d.code == 1) {
+                model.boardingCheck = d.data;
+            }
+            model.init();
+        })
+    }
+
+    function pageresume() {
+        model.init();
+    }
+
+    var model = {
+        bbk: Comm.query('bbk'),
+        close: Comm.query('close') ? Comm.query('close') : '',
+        id: Comm.query('id'),
+        isshare: Comm.query('isshare'),
+        boardingCheck: 24,
+        init: function() {
+            if (model.isshare != 1) {
+                $('header .share').removeClass('hide');
+            }
+            var url = "/api/travel/detail";
+            if (model.bbk == 1) {
+                url = "/api/ptravel/detail";
+            }
+            AJAX.GET(url + "?travelId=" + model.id, function(d) {
+                if (d.code == 1) {
+                    d.data.boardingCheck = model.boardingCheck;
+                    d.data.bbk = model.bbk;
+                    if (d.data.labelsName) {
+                        d.data.labelsName = d.data.labelsName.split(',');
+                    }
+                    model.data = d.data;
+                    $('section').html(template('mainTpl', d.data));
+                    $('footer').html(template('footerTpl', d.data));
+                    Share_.init();
+                    Comm.resizeSection();
+                }
+            });
+        },
+        down: function() {
+            Comm.confirm('是否确认下架该行程？', function(d) {
+                if (d) {
+                    AJAX.POST('/api/ptravel/soldout', {
+                        travelId: model.id
+                    }, function(d) {
+                        if (d.code == 1) {
+                            Comm.message('下架成功');
+                            model.init();
+                        } else {
+                            Comm.message(d.msg);
+                        }
+                    })
+                }
+            })
+        },
+        rup: function() {
+            Comm.db('countryStart', '');
+            Comm.db('bqcategory', '');
+            Comm.go('sendxc.html?id=' + model.id);
+        },
+        look: function(checkContent) {
+            Comm.alert(checkContent, function() {}, '知道了');
+        },
+        back: function() {
+            Comm.close(model.close);
+        },
+        share: function() {
+            Comm.shareUrl({
+                pic: config.webroot + "img/logo.png", //分享图片路径
+                title: '行程详情', //分享标题
+                desc: $('#destination').text() + "" + $('#from').text(), //分享描述
+                url: config.webroot + 'tripdetail.html?id=' + model.id + '&isshare=1', //分享路径
+            }, function(d) { //回调
+                if (d == 1) {
+                    Comm.message("分享成功");
+                }
+            });
+        }
+    }
+
+    function androidback() {
+        model.back();
+    }
+</script>
+
+<script id="mainTpl" type="text/html">
+    <div class="main">
+        <div class="mart10 card flex_wrap" onclick="Comm.go('homepage.html?id={{customerId}}')" style="padding-left:12px;">
+            <div>
+                <img class="headimg" src="{{OSS(face)}}" onerror="app.herrorimg(this)" height="60" width="60" />
+            </div>
+            <div class="marl10">
+                <div class="f19" style="font-weight: 600;margin-top: 8px;">{{nickName}}</div>
+                <div class="mart10">
+                    <img src="img/xc/ic_verified.png" height="18" />
+                    <span class="f12 color666 marr10">实名认证</span>
+                    <img src="img/xc/ic_sesame.png" height="18" class="hide" />
+                    <span class="f12 color666 marr10 hide">芝麻信用</span>
+                    <img src="img/xc/ic_passport.png" height="18" />
+                    <span class="f12 color666 ">护照认证</span>
+                </div>
+            </div>
+        </div>
+        <div class="mart25"><span class="f20 f19" style="font-weight:500;">行程规划</span></div>
+        <div class="mart25">
+            <div class="flex_wrap">
+                <div style="width: 40px;position: relative;">
+                    {{if(state==1)}}
+                    <img src="img/xc/ic_certified_gray.png" height="40" class="imgindex2" /> {{else if(state==2||state==4)}}
+                    <img src="img/xc/ic_review.png" height="40" class="imgindex2" /> {{else if(state==3)}}
+                    <img src="img/xc/ic_certified_y.png" height="40" class="imgindex2" /> {{else if(state==5||state==6||state==7)}}
+                    <img src="img/xc/ic_audit_failure.png" height="40" class="imgindex2" /> {{else}}
+                    <img src="img/xc/ic_audit_failure.png" height="40" class="imgindex2" /> {{/if}}
+                    <div class="posb {{state==3?'active':''}}"></div>
+                </div>
+                <div class="xccard marl10" style="width: calc(100% - 50px);">
+                    <!--PUB(1,"发布成功(未认证)"),UPLOAD(2,"已上传凭证未审核"),AGREE(3,"审核通过"),FINISH(4,"正常结束"),REFUSE(5,"审核不通过"),TIMEOUT(6,"认证超时"),CANCEL(7,"取消"),-->
+                    {{if(state==1)}}
+                    <div class="f17" style="font-weight: 600;margin-top: 2px;">行程未认证</div>
+                    <div class="f13 color999 mart10"> <span class="color666 f13">请您出行</span> <span class="f13 bold" id="boardingCheck">当天{{boardingCheck}}小时</span> <span class="color666 f13">内拍摄登机牌上传认证，以免造成行程失效。</span></div>
+                    <div><button class="upimg mart10" onclick="Comm.go('tripup.html?id={{travelId}}')"><img src="img/pay/ic_add_trip.png" height="13" class="marr15"/><span>上传入境凭证</span></button></div>
+                    {{else if(state==2)}}
+                    <div class="f17" style="font-weight: 600;margin-top: 2px;">行程认证中</div>
+                    <div class="f13 color999 mart10">正在飞速审核中，审核完成将以系统消息进行通知。</div>
+                    {{else if(state==3)}}
+                    <div class="f17" style="font-weight: 600;margin-top: 2px;">行程已认证</div>
+                    {{if(bbk==1)}}
+                    <div class="f13 color999 mart10">该行程已认证通过，快接单挣路费吧。</div>
+                    <div><button class="upimg mart10" onclick="Comm.gotop('bbk.html?countryId={{destinationId}}&labels={{labels}}')"><span>去抢单</span></button></div>
+                    {{else}}
+                    <div class="f13 color999 mart10">该行程已通过平台审核认证。</div>
+                    {{/if}} {{else if(state==4)}}
+                    <div class="f17" style="font-weight: 600;margin-top: 2px;">行程已结束</div>
+                    <div class="f13 color999 mart10">该行程已结束。</div>
+                    {{else if(state==5)}}
+                    <div class="f17" style="font-weight: 600;margin-top: 2px;">行程已失效</div>
+                    <div class="f13 color999 mart10">很遗憾，你的行程认证不通过</div>
+                    <div><button class="upimg mart10" onclick="model.look('{{checkContent}}')"><span>查看失败原因</span></button></div>
+                    {{else if(state==6)}}
+                    <div class="f17" style="font-weight: 600;margin-top: 2px;">行程已超时</div>
+                    <div class="f13 color999 mart10">您未在规定时间内上传登机牌，行程已超时取消</div>
+                    {{else if(state==7)}}
+                    <div class="f17" style="font-weight: 600;margin-top: 2px;">行程已失效</div>
+                    <div class="f13 color999 mart10">该行程已失效。</div>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="flex_wrap paddt20">
+                <div style="width: 40px;position: relative;">
+                    <div class="posb {{state==3?'active':''}}" style="top:20px;"></div>
+                </div>
+                <div class="xccard marl10" style="width: calc(100% - 50px);">
+                    <div class="f17" style="font-weight: 600;margin-top: 2px;">本次行程可代购</div>
+                    <div class="mart10">
+                        {{each labelsName v k}}{{if(v)}}
+                        <span class="inblock bghh">{{v}}</span> {{/if}}{{/each}}
+                    </div>
+                </div>
+            </div>
+            <div class="flex_wrap paddt20">
+                <div style="width: 40px;position: relative;">
+                    {{if(2>=state)}}
+                    <img src="img/xc/ic_aircraft_gary.png" height="40" class="imgindex2" /> {{else if(state==3||state==4)}}
+                    <img src="img/xc/ic_aircraft_.png" height="40" class="imgindex2" />{{else}}
+                    <img src="img/xc/ic_aircraft_gary.png" height="40" class="imgindex2" /> {{/if}}
+                    <div class="posb {{state==4?'active':''}}" style="top:35px;"></div>
+                </div>
+                <div class="marl10" style="width: calc(100% - 50px);">
+                    <div style="margin-top: 8px;" id="destination">
+                        <span class="f17">{{formatDate(destinationTime,'m/d')}}</span>
+                        <span class="linb">&nbsp;&nbsp;</span>
+                        <span class="f12 color999">前往</span>
+                        <span class="f19" style="font-weight:500;">{{destinationName}}</span>
+                    </div>
+                    <div class="mart15">
+                        <img class="borde3" src="{{OSS(destinationImg)}}" height="110" width="100%" onerror="app.errorimg(this,'img/xc/line.png')" />
+                    </div>
+                </div>
+            </div>
+            <div class="flex_wrap paddt20">
+                <div style="width: 40px;position: relative;">
+                    <span class="endr {{state==4?'active':''}}"></span>
+                </div>
+                <div class="marl10" style="width: calc(100% - 50px);">
+                    <div style="margin-top: 0px;" id="from">
+                        <span class="f17">{{formatDate(fromTime,'m/d')}}</span>
+                        <span class="linb">&nbsp;&nbsp;</span>
+                        <span class="f12 color999">返程地</span>
+                        <span class="f19" style="font-weight:500;">{{fromName}}</span>
+                    </div>
+                    <div class="mart15">
+                        <img class="borde3" src="{{OSS(fromImg)}}" height="110" width="100%" onerror="app.errorimg(this,'img/xc/line.png')" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="footerTpl" type="text/html">
+    {{if(bbk==1)}}
+    <div>
+        {{if(state==1)}}
+        <button class="mart10 marb10" style="border-radius:4px;" onclick="model.down()">下架行程</button> {{else if(state==5||state==6||state==7)}}
+        <button class="mart10 marb10" style="border-radius:4px;" onclick="model.rup()">重新编辑发布</button> {{/if}}
+    </div>
+    {{else}}
+    <button class="mart10 marb10" style="border-radius:4px;" id="msg" onclick="event.stopPropagation();IM_.IM_ShowContact({{customerId}})">立即沟通</button> {{/if}}
+</script>
+
+</html>

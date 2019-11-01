@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>售后订单</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        section {
+            background-color: #F5F5F5;
+        }
+        
+        .main {
+            padding: 20px;
+        }
+        
+        .list {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.07);
+            border-radius: 4px;
+            padding: 20px 10px 20px 20px;
+        }
+        
+        .list button {
+            width: 75px;
+            height: 30px;
+            line-height: 30px;
+            font-size: 13px;
+        }
+        
+        .list button.nobg {
+            background-color: #fff;
+            border: 1px solid #D8D8D8;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">售后订单</div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main" id="list">
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script id="listTpl" type="text/html">
+    {{each $data v k}}
+    <div class="list marb20" id="orderId{{v.orderId}}" onclick="Comm.go('orderdetail.html?id={{v.orderId}}&sale=1')">
+        <div class="flex_wrap mart10 borderb paddb20">
+            <div style="width: 90px;">
+                <img src="{{OSS(v.orderdetail.skuImg)}}" width="90" height="90" onerror="app.errorimg(this)">
+            </div>
+            <div style="width: calc(100% - 100px);">
+                <div class="f15 wordW lh50">{{v.orderdetail.skuName}}</div>
+                <div class="">
+                    <img src="{{OSS(v.orderdetail.countryLogo)}}" class="countryLogo" onerror="app.errorimg(this)" />
+                    <span class="color666 f12">{{v.orderdetail.countryChineseName}}</span>
+                </div>
+                <div class="f13 flex-between lh20 mart10">
+                    <div>
+                        <span class="f13">¥</span>
+                        <span class="f17">{{priceTp(v.orderdetail.sellPrice)}}</span>
+                    </div>
+                    <div class="f12 color666">x{{v.aftersaleNum}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="tright lh25 paddt15">
+            <span>共{{v.aftersaleNum}}件商品  总额：</span>
+            <span>￥</span>
+            <span class="bold">{{priceTp(v.aftersaleNum*v.orderdetail.sellPrice)}}</span>
+        </div>
+        <div class="tright mart15">
+            {{if(v.state==11||v.state==10)}}
+            <button class="nobg" onclick="model.del({{v.orderId}})">删除订单</button> {{/if}}
+            <button>查看详情</button>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script>
+    function pageload() {
+        model.search();
+    }
+
+    function pageresume() {
+
+    }
+    var model = {
+        del: function(orderId) {
+            event.stopPropagation();
+            Comm.confirm('确认删除，删除后无法恢复?', function(d) {
+                if (d) {
+                    AJAX.POST('/api/order/del', {
+                        orderId: orderId
+                    }, function(d) {
+                        if (d.code == 1) {
+                            $('#orderId' + orderId).remove();
+                            Comm.message('删除成功');
+                        } else {
+                            Comm.message(d.msg);
+                        }
+                    })
+                }
+            })
+        },
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/order/list',
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+                    state: 9
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('listTpl', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        }
+    }
+</script>
+
+</html>

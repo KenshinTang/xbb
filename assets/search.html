@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>分类</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {}
+        
+        .navItemIcon {
+            background: inherit;
+        }
+        
+        .searchBar {
+            margin: 0 auto;
+        }
+        
+        .searchBar input {
+            width: 95%;
+            padding-left: 50px;
+            line-height: 28px;
+            height: 28px;
+            font-size: 14px;
+            background-color: #F5F5F5;
+            border-radius: 14px;
+            background-image: url('img/send/ic_search.png');
+            background-repeat: no-repeat;
+            background-size: 21px;
+            background-position: 20px center;
+            margin: 0 auto;
+        }
+        
+        .pad10ed {
+            padding: 10px 10px 0px 10px;
+        }
+        
+        .catch span {
+            display: inline-block;
+            background-color: #F5F5F5;
+            color: #999;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 15px;
+            padding: 0px 15px;
+            margin-bottom: 20px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 头部 -->
+    <header>
+        <div class="navBar bottomShadow" style="padding: 0;box-shadow: none;">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navItemIcon marl5 marr10" onclick="model.search()">搜索</div>
+            <div class="nav-title block searchBar" style="width: calc(100% - 95px);height: 44px;">
+                <form action="javascript:return true;" onsubmit="model.search()">
+                    <input id="id_searchInput" type="search" placeholder="搜索">
+                </form>
+            </div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="hot bg_white">
+        </div>
+        <div class="history bg_white">
+        </div>
+    </section>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        t: Comm.query('t'),
+        stype: 1,
+        init: function() {
+            if (!model.t) {
+                $('#nav').removeClass('hide')
+            }
+            model.t = !model.t ? 1 : model.t
+            if (model.t) {
+                $("header .dflex span").removeClass('active')
+                $("header .dflex span.cur" + model.t).addClass('active')
+                model.stype = model.t
+            }
+            model.history();
+            model.hot();
+        },
+        qh: function(a, i) {
+            if (!$(a).find('span').hasClass('active')) {
+                $(a).parent().find('span').removeClass('active')
+                $(a).find('span').addClass('active')
+                model.stype = i;
+                $('#list').html('')
+
+                var keyword = $("#id_searchInput").val();
+                if (keyword != "") {
+                    model.search()
+                }
+            }
+        },
+        history: function() {
+            var history = Comm.db('history');
+            if (history) {
+                $(".history").html(template('historyTpl', history))
+            } else {
+
+            }
+        },
+        hot: function() {
+            AJAX.GET('/api/goods/hotBrandListBySearch', function(d) {
+                if (d.code == 1) {
+                    $(".hot").html(template('hotTpl', d.data))
+                }
+            })
+        },
+        delcatch: function() {
+            Comm.db('history', null);
+            $(".history").html('')
+        },
+        addhistory: function(v) {
+            var history = Comm.db('history');
+            if (history) {
+                if (history.indexOf(v) < 0) {
+                    history.push(v);
+                }
+            } else {
+                history = [];
+                history.push(v);
+            }
+            Comm.db('history', history);
+        },
+        search: function(v, brand_id) {
+            if (v) {
+                $("#id_searchInput").val(v)
+            }
+            var keyword = $("#id_searchInput").val();
+            if (keyword) {
+                model.addhistory(keyword);
+                Comm.go('goodlistsearch.html?keyword=' + keyword);
+            } else {
+                Comm.message('请输入搜索品牌')
+            }
+        }
+    }
+</script>
+
+<script id="hotTpl" type="text/html">
+    <div class="pad10" style="padding-bottom:0px">
+        <span class="f15">热门搜索</span>
+    </div>
+    <div class="catch pad10" id="history">
+        {{each $data v k }}
+        <span onclick="Comm.go('goodlistsearch.html?brandId={{v.brand_id}}&k={{v.chinese_name}}')">{{v.chinese_name}}</span> {{/each}}
+    </div>
+</script>
+
+<script id="historyTpl" type="text/html">
+    <div class="pad10" style="padding-bottom:0px">
+        <span class="f15">历史搜索</span>
+        <img src="img/ic_delete.png" height="18" class="fr" onclick="model.delcatch()" />
+    </div>
+    <div class="catch pad10" id="history">
+        {{each $data v k }}
+        <span onclick="model.search('{{v}}')">{{v}}</span> {{/each}}
+    </div>
+</script>
+
+</html>

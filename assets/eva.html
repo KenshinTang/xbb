@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>发表评价</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .main {
+            background-color: #fff;
+            padding: 20px;
+        }
+        
+        textarea {
+            border: 0px;
+            width: 100%;
+            padding-top: 20px;
+            height: 100px;
+            line-height: 15px;
+        }
+        
+        .imgcon {
+            width: 70px;
+            height: 70px;
+            background-color: #F5F5F5;
+            text-align: center;
+            border-radius: 4px;
+            margin-right: 10px;
+            position: relative;
+        }
+        
+        img.posdel {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+        }
+        
+        #WTDBOXTD {
+            display: block;
+            padding: 20px;
+        }
+        
+        .succ {
+            background-color: #fff;
+            width: 100%;
+            border-radius: 4px;
+        }
+        
+        .mart40 {
+            margin-top: 40px;
+        }
+        
+        .visibilityH {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navItem f13 colorprice" onclick="model.save()">发表</div>
+            <div class="navTitle">发表评价</div>
+        </div>
+    </header>
+    <section>
+    </section>
+    <footer></footer>
+
+    <div wtd="succWinTemp" class="succ">
+        <div class="paddl20 paddr20 paddt20">
+            <img src="img/sendclose.png" height="20" style="position: relative;right:-10px;top:-10px;" class="fr" onclick="Comm.close()" />
+            <div class="mart30">
+                <img src="img/my/ic_xingcheng_success.png" height="80" />
+            </div>
+            <div class="f15 mart10">
+                感谢评价
+            </div>
+        </div>
+        <div class="bordert mart40 lh50" onclick="Comm.go('myev.html?cl=2')">
+            <span class="f15 color999">查看我的评价</span>
+            <img src="img/ic_more_g.png" height="13" />
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {}
+
+    var model = {
+        id: Comm.query('id'),
+        init: function() {
+            AJAX.GET('/api/order/orderDetail?orderId=' + model.id, function(d) {
+                if (d.code == 1) {
+                    model.data = d.data;
+                    $("section").html(template('mainTpl', d.data));
+                    model.upimg();
+                }
+            })
+        },
+        counimg: 0,
+        upimg: function() {
+            model.upimg = new imgUploader('box', 3, "upimg");
+            model.upimg.success = function() {
+                $('#box').html(template('upimgTpl', this.imgList));
+                model.counimg = this.imgList.length;
+                if (model.counimg >= 3) {
+                    $('#upimg').addClass('visibilityH');
+                }
+            }
+        },
+        delimg: function(a, k) {
+            model.upimg.imgList = model.upimg.imgList.del(k);
+            $(a).parent().remove();
+            $('#upimg').removeClass('visibilityH');
+        },
+        save: function() {
+            var content = $('textarea').val();
+            if (!content) {
+                Comm.message('请输入您的评价内容')
+                return;
+            }
+            AJAX.POST('/api/comment/submitComment', {
+                content: content,
+                orderId: model.id,
+                imgs: model.upimg.imgList.join(','),
+                goodsStart: model.goodsStart,
+                buyerStart: model.buyerStart,
+            }, function(d) {
+                if (d.code == 1) {
+                    Comm.showWindow('succWinTemp', false);
+                } else {
+                    Comm.message(d.msg);
+                }
+            })
+        },
+        goodsStart: 4,
+        buyerStart: 4,
+        clgoodsStart: function(a, ii) {
+            model.goodsStart = ii;
+            $(a).parent().find('img').each(function(i, e) {
+                if ((ii - 1) >= i) {
+                    $(e).attr('src', 'img/my/ic_smiley_face_y.png')
+                } else {
+                    $(e).attr('src', 'img/my/ic_smiley_face_g.png')
+                }
+            })
+        },
+        clbuyerStart: function(a, ii) {
+            model.buyerStart = ii;
+            $(a).parent().find('img').each(function(i, e) {
+                if ((ii - 1) >= i) {
+                    $(e).attr('src', 'img/my/ic_smiley_face_y.png')
+                } else {
+                    $(e).attr('src', 'img/my/ic_smiley_face_g.png')
+                }
+            })
+        },
+        blur: function() {
+            window.scrollTo(0, 0);
+        },
+    }
+</script>
+
+<script id="mainTpl" type="text/html">
+    <div class="main">
+        <div class="flex_wrap borderb paddb20">
+            <div style="width: 90px;">
+                <img src="{{OSS(orderdetail.skuImg)}}" width="90" height="90" onerror="app.errorimg(this)">
+            </div>
+            <div style="width: calc(100% - 100px);">
+                <div class="f15 wordW lh50">{{orderdetail.skuName}}</div>
+                <div class="">
+                    <img src="{{OSS(orderdetail.countryLogo)}}" class="countryLogo" onerror="app.errorimg(this)" />
+                    <span class="color666 f12">{{orderdetail.countryChineseName}}</span>
+                </div>
+                <div class="f13 flex-between lh20 mart10">
+                    <div>
+                        <span class="f13">¥</span>
+                        <span class="f17">{{priceTp(orderdetail.sellPrice)}}</span>
+                    </div>
+                    <div class="f12 color666">x{{orderdetail.buynum}}</div>
+                </div>
+            </div>
+        </div>
+        <textarea onblur="model.blur()" placeholder="说说该商品的优点和美中不足的地方吧～"></textarea>
+        <div class="flex_wrap mart20">
+            <div class="flex_wrap" id="box"></div>
+            <div>
+                <div class="imgcon" id="upimg">
+                    <img src='img/my/ic_add.png' height="20" class="mart15" />
+                    <div class="f12 mart5 color999 center">添加图片</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="height: 10px; background-color: #F5F5F5;"></div>
+    <div class="main">
+        <div class="flex_wrap lh25">
+            <div class="marr20">
+                <span class="f15">商品质量</span>
+            </div>
+            <div>
+                <img src="img/my/ic_smiley_face_y.png" height="25" class="marr10" onclick="model.clgoodsStart(this,1)" />
+                <img src="img/my/ic_smiley_face_y.png" height="25" class="marr10" onclick="model.clgoodsStart(this,2)" />
+                <img src="img/my/ic_smiley_face_y.png" height="25" class="marr10" onclick="model.clgoodsStart(this,3)" />
+                <img src="img/my/ic_smiley_face_y.png" height="25" class="marr10" onclick="model.clgoodsStart(this,4)" />
+                <img src="img/my/ic_smiley_face_g.png" height="25" onclick="model.clgoodsStart(this,5)" />
+            </div>
+        </div>
+        <div class="flex_wrap mart20 lh25">
+            <div class="marr20">
+                <span class="f15">买手服务</span>
+            </div>
+            <div>
+                <img src="img/my/ic_smiley_face_y.png" height="25" class="marr10" onclick="model.clbuyerStart(this,1)" />
+                <img src="img/my/ic_smiley_face_y.png" height="25" class="marr10" onclick="model.clbuyerStart(this,2)" />
+                <img src="img/my/ic_smiley_face_y.png" height="25" class="marr10" onclick="model.clbuyerStart(this,3)" />
+                <img src="img/my/ic_smiley_face_y.png" height="25" class="marr10" /onclick="model.clbuyerStart(this,4)">
+                <img src="img/my/ic_smiley_face_g.png" height="25" onclick="model.clbuyerStart(this,5)" />
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="upimgTpl" type="text/html">
+    {{each $data v k}}
+    <div class="imgcon marb10">
+        <img src='{{OSS(v)}}' width="100%" height="100%" class="uprimg" data="{{v}}" />
+        <img src="img/my/ic_delete.png" height="20" class="posdel" onclick="model.delimg(this,{{k}})" />
+    </div>
+    {{/each}}
+</script>
+
+</html>

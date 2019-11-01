@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>选择出行地</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">选择出行地</div>
+        </div>
+    </header>
+    <section>
+        <script type="text/html" id="mainTpl">
+            <div class="item">
+                <div class="lists">
+                    {{each $data v k}}
+                    <div class="list lh50 borderb paddl20" onclick="model.sel({{k}})">
+                        <span class="f15">{{v.chinese_name}}</span>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </script>
+    </section>
+    <footer>
+    </footer>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        data: [],
+        resouce: Comm.query('resouce') ? Comm.query('resouce') : '',
+        init: function() {
+            AJAX.GET('/api/country/listByLetter?pageno=1&pagesize=1000', function(d) {
+                if (d.code == 1) {
+                    for (var i = 0; i < d.data.length; i++) {
+                        if (d.data[i].chinese_name.indexOf('香港') >= 0 || d.data[i].chinese_name.indexOf('澳门') >= 0) {
+                            //d.data[i].chinese_name
+                            model.data.push(d.data[i]);
+                        }
+                    }
+                    $('section').html(template('mainTpl', model.data))
+                }
+            })
+        },
+        sel: function(i) {
+            Comm.db('country' + model.resouce, model.data[i]);
+            Comm.close(2);
+        }
+    }
+</script>
+
+</html>

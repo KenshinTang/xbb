@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>支付宝</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        input {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17">支付宝</div>
+        </div>
+    </header>
+    <section>
+        <div class="paddl20 paddr20 bg_white mart20">
+            <div class="lh65 flex-between">
+                <div>支付宝</div>
+                <div><input class="lh50 tright" id="payId" type="text" placeholder="请输入账户" /></div>
+            </div>
+        </div>
+        <div class="paddl20 paddr20 center mart30">
+            <button style="border-radius: 4px;width: 100%;" onclick="model.sub()">确认</button>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+
+    }
+
+    function pageresume() {
+    	
+    }
+    var model = {
+    	sub:function(){
+    		var payId=$('#payId').val();
+    		if(payId==""){
+    			Comm.message('请输入提现账户');
+    			return false;
+    		}
+    		AJAX.GET('/api/customer/saveAliPay?aliPay='+payId,function(d){
+    			if(d&&d.code==1){
+    				Comm.message('绑定成功');
+    				Comm.close();
+    			}
+    		})
+    	}
+    }
+</script>
+
+</html>

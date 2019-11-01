@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>个人主页</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {
+            position: relative;
+        }
+        
+        section .bgh {
+            background: linear-gradient(45deg, rgba(81, 81, 81, 1) 0%, rgba(51, 51, 51, 1) 100%);
+            padding-bottom: 50px;
+            position: fixed;
+            width: 100%;
+            z-index: 1;
+        }
+        
+        section .bgh .navBackIcon {
+            background-image: url('css/stIconfile/back_w.png');
+        }
+        
+        section .bgh .navItemIcon {
+            background-image: url('img/ic_share_w.png');
+        }
+        
+        .headimg {
+            border-radius: 60px;
+        }
+        
+        .dflex.dlft>* {
+            text-align: left;
+        }
+        
+        .main {
+            padding: 20px;
+            border-radius: 20px 20px 0px 0px;
+            margin-top: 220px;
+            background-color: #fff;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .mart35 {
+            margin-top: 35px;
+        }
+        
+        .posb {
+            position: absolute;
+            top: 7px;
+            width: 1px;
+            border-left: 1px dashed #E0E0E0;
+            left: 50%;
+            margin-left: -0.5px;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .bodk {
+            border: 2px solid rgba(51, 51, 51, 1);
+            height: 10px;
+            width: 10px;
+            border-radius: 10px;
+            background-color: #fff;
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            margin-left: -5px;
+            z-index: 2;
+        }
+        
+        button.reply {
+            height: 25px;
+            line-height: 25px;
+            width: 25px;
+            width: 80px;
+            color: #fff;
+            background-color: #333;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+    </header>
+    <section>
+        <div class="bgh">
+            <div class="navBar">
+                <div class="navBackIcon" onclick="Comm.close()"></div>
+                <div class="navItem f13 colorfff hide" onclick="Comm.go('mymanager.html?bbk=1')">编辑资料</div>
+                <div class="navItemIcon hide " onclick="model.share()"></div>
+            </div>
+            <div class="paddl20 paddr20 paddt15 paddb15" id="head">
+
+            </div>
+        </div>
+        <div class="main">
+            <div id="repair">
+            </div>
+            <div id="recentNews">
+            </div>
+            <div class="flex-between mart35" onclick="model.gocomm()">
+                <div>
+                    <span class="f19">收到的评价</span>
+                </div>
+                <div>
+                    <span class="f12 color999 inblock marl5">全部评论</span>
+                    <img src="img/index/icr.png" height="12" />
+                </div>
+            </div>
+            <div class="comms mart35">
+
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {
+        //刷新用户信息
+        AJAX.POST('/api/customer/info', {
+            cId: model.id
+        }, function(a) { //精选内容
+            if (a.code == 1) {
+                $('section #head').html(template('headTpl', a.data));
+            }
+        });
+    }
+    var model = {
+        bbk: Comm.query('bbk'),
+        id: Comm.query('id'),
+        isshare: Comm.query('isshare'),
+        init: function() {
+            if (model.bbk == 1) {
+                $('.navItem').removeClass('hide');
+            } else {
+                if (model.isshare != 1)
+                    $('.navItemIcon').removeClass('hide');
+            }
+            //刷新用户信息
+            AJAX.POST('/api/customer/info', {
+                cId: model.id
+            }, function(a) { //精选内容
+                if (a.code == 1) {
+                    $('section #head').html(template('headTpl', a.data));
+                }
+            });
+            model.recentNews();
+            model.repair();
+            model.comment();
+            Share_.init();
+        },
+        recentNews: function() { //最新动态
+            AJAX.GET('/api/travel/recentNews?pageno=1&pagesize=4&receiveId=' + model.id, function(d) {
+                if (d.code == 1) {
+                    var now = new Date();
+                    if (d.data && d.data.length > 0) {
+                        var start = new Date(d.data[0].destinationTime.replace(/-/g, "/").replace(/\.0/g, ""));
+                        var end = new Date(d.data[0].fromTime.replace(/-/g, "/").replace(/\.0/g, ""));
+                        if (start.getTime() < now.getTime() && now.getTime() < end.getTime()) {
+                            d.data[0].online = true;
+                        }
+                        $('section #recentNews').html(template('recentNewsTpl', d.data));
+                    }
+                }
+            })
+        },
+        repair: function() { //常去
+            AJAX.GET('/api/travel/repair?receiveId=' + model.id, function(a) {
+                if (a.code) {
+                    if (a.data && a.data.length) {
+                        var d = {
+                            len: 0,
+                            data: []
+                        }
+                        for (var i = 0; i < a.data.length; i++) {
+                            //d.len += a.data[i].num * 1
+                            d.data.push(a.data[i].chineseName)
+                        }
+                        d.len = a.msg;
+
+                        $('section #repair').html(template('repairTpl', d));
+                    }
+                }
+            })
+        },
+        newdynamic: function() {
+            Comm.go('newdynamic.html?id=' + model.id);
+        },
+        comment: function() {
+            AJAX.GET('/api/comment/backlist?receiveCustomerId=' + model.id, function(d) {
+                $('.comms').html(template('commsTpl', d.data));
+            })
+        },
+        gocomm: function() {
+            Comm.go('comms.html?id=' + model.id);
+        },
+        share: function() {
+            Comm.shareUrl({
+                pic: $('.headimg').attr('src'), //分享图片路径
+                title: $('#nickName').html(), //分享标题
+                desc: '个人主页', //分享描述
+                url: config.webroot + 'homepage.html?id=' + model.id + '&isshare=1', //分享路径
+            }, function(d) { //回调
+                if (d == 1) {
+                    Comm.message("分享成功");
+                }
+            });
+        }
+    }
+</script>
+
+<script id="headTpl" type="text/html">
+    <div class="flex_wrap">
+        <div>
+            <img class="headimg" src="{{OSS(face,'s')}}" height="60" width="60" onerror="app.herrorimg(this)" />
+        </div>
+        <div class="marl15">
+            <div class="f17 colorfff" style="margin-top: 8px;" id="nickName">{{nickName}}</div>
+            {{if(settlement)}}
+            <div class="f13 colorfff mart10">居住地：{{settlement}}</div>{{/if}}
+        </div>
+    </div>
+    <div class="mart30 marl15">
+        <div class="dflex dlft">
+            <div>
+                <div>
+                    <img src="img/xc/ic_verified.png" height="18" />
+                    <span class="f12 colorfff marr10">实名认证</span>
+                </div>
+                <div style="margin-left: 23px;">
+                    <span class="f10 colorfff inblock">已认证</span>
+                </div>
+            </div>
+            <div class="">
+                <div class="">
+                    <img src="img/xc/ic_passport.png" height="18" />
+                    <span class="f12 colorfff">护照认证</span>
+                </div>
+                <div class="" style="margin-left: 23px;">
+                    <span class="f10 colorfff inblock">已认证</span>
+                </div>
+            </div>
+            <div>
+                <div class="hide">
+                    <img src="img/xc/ic_sesame.png" height="18" />
+                    <span class="f12 colorfff marr10">芝麻信用</span>
+                </div>
+                <div class="hide" style="margin-left: 23px;">
+                    <span class="f10 colorfff inblock">已认证</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+<script id="repairTpl" type="text/html">
+    <div class="mart10">
+        <span class="f19">行程</span>
+        <span class="f17">（{{len}}次）</span>
+    </div>
+    <div class="mart20">
+        <img src="img/ic_stroke_yellow.png" height="16" />
+        <span class="f15">常去：{{data}}</span>
+    </div>
+    <div class="mart30">
+        <div class="borderb"></div>
+    </div>
+</script>
+
+<script id="recentNewsTpl" type="text/html">
+    <div class="flex-between mart35" onclick="model.newdynamic()">
+        <div>
+            <span class="f19">最新动态</span>
+        </div>
+        <div>
+            <span class="f12 color999 inblock marl5">查看详情</span>
+            <img src="img/index/icr.png" height="12" />
+        </div>
+    </div>
+    {{if($data[0].online)}}
+    <div class="mart30">
+        <div>
+            <img src="img/ic_stroke_yellow.png" height="16" />
+            <span class="f15">进行中</span>
+        </div>
+        <div class="f12 color999 marl20">{{formatDate($data[0].creatime,'Y年m月d日')}}创建</div>
+    </div>
+    {{/if}}
+    <div class="mart25">
+        {{each $data v k}} {{if((k==0&&!v.online)||k>0)}}
+        <div class="flex_wrap" style="height: 50px;">
+            <div style="width: 20px;position: relative;">
+                <span class="bodk">&nbsp;</span> {{if($data.length>(k+1))}}
+                <div class="posb"></div> {{/if}}
+            </div>
+            <div>
+                <span class="f15">{{formatDate(v.destinationTime,'m月d日')}}</span>
+                <span class="f13 color666 marl15 marr20">前往</span>
+                <img src="{{OSS(v.dimg)}}" class="countryLogo" onerror="app.errorimg(this)" />
+                <span class="f13 color666">{{v.destinationName}}</span>
+            </div>
+        </div>
+        {{/if}} {{/each}}
+    </div>
+    <div class="mart10">
+        <div class="borderb"></div>
+    </div>
+</script>
+
+<script id="commsTpl" type="text/html">
+    {{each $data v k}}
+    <div class="flex_wrap comm marb20">
+        <div class="" style="width: 20px;">
+            <img class="headimg" src="{{OSS(v.face)}}" height="20" width="20" style="border-radius: 20px;" onerror="app.herrorimg(this)" />
+        </div>
+        <div class="marl5" style="width: calc(100% - 30px);">
+            <div class="f15" style="font-weight: 500;">{{v.customerName}}</div>
+            <div class="lh20 f13 mart15" style="font-weight: 300;">
+                {{v.content}}
+            </div>
+            <div class="f12 color999">{{formatDate(v.addTime,'Y-m-d')}}</div>
+            {{if(v.imgs)}}
+            <div class="flex_wrap mart20">
+                {{each v.imgs.split(',') img j}}
+                <div class="marr15">
+                    <img src="{{OSS(img)}}" width="90" height="90" />
+                </div>
+                {{/each}}
+            </div>
+            {{/if}} {{if(v.reply)}}
+            <div style="background-color:#FCFCFC;border-radius:4px;padding:10px;" class="border mart15">
+                <div class="flex-between">
+                    <div>
+                        <button class="reply">背包客回复</button>
+                    </div>
+                    <div class="f12 color999">
+                        {{formatDate(v.replyTime,'Y-m-d')}}
+                    </div>
+                </div>
+                <div class="mart10">{{v.reply}}</div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

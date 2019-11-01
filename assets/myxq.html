@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>需求列表</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        section {
+            padding: 10px 20px;
+        }
+        
+        button.lookbut {
+            width: 60px;
+            height: 30px;
+            line-height: 30px;
+            font-size: 12px;
+            background-size: auto 11px;
+            background-repeat: no-repeat;
+            background-position: 90% center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">需求列表</div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main" id="list"></div>
+    </section>
+    <footer class="shared"></footer>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+
+<script>
+    function pageload() {
+        model.search();
+    }
+
+    function pageresume() {}
+
+    var model = {
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/order/list',
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+                    state: 3,
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('needList', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                model.mere.refreshOption.refreshParm = {
+                    state: 3,
+                };
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        },
+        lookbut: function(a) {
+            var d = JSON.parse($(a).attr('data'));
+            d.skuImg = Comm.OSS.getImgUrl(d.skuImg);
+            d.sellPrice = app.price(d.sellPrice)
+            Comm.IM_SendNeed(d);
+        }
+    }
+</script>
+
+<script id="needList" type="text/html">
+    {{each $data v k }}
+    <div class="list mart25">
+        <div class="lh25 mart5">
+            <img src="{{OSS(v.orderdetail.countryLogo)}}" onerror="app.errorimg(this)" class="countryLogo" />
+            <span class="color666 f12">{{v.orderdetail.countryChineseName}}{{v.orderdetail.mallName}}</span>
+        </div>
+        <div class="flex-between mart10">
+            <div style="width: 105px">
+                <img src="{{OSS(v.orderdetail.skuImg)}}" height="105" width="105" onerror="app.errorimg(this)" />
+            </div>
+            <div class="marl10" style="width: calc(100% - 115px);">
+                <div class="f15 wordW3 lh20" style="height: 60px;">{{v.orderdetail.skuName}}</div>
+                <div class="flex-between">
+                    <div>
+                        <span class="f13 colorred">￥</span>
+                        <span class="f19 colorred">{{priceTp(v.orderdetail.sellPrice)}}</span>
+                    </div>
+                    <div>
+                        <button class="lookbut" onclick="model.lookbut(this)" data='{{jsontostring(v.orderdetail)}}'>发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

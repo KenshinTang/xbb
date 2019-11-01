@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>实名认证</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {
+            background-color: #fff;
+        }
+        
+        .hg100 {
+            height: 100px;
+            position: relative;
+        }
+        
+        .post {
+            height: 40px;
+            width: 40px;
+            background-image: url('img/my/bg.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -20px;
+            margin-top: -20px;
+        }
+        
+        button.no {
+            background-color: #D8D8D8;
+            color: #fff;
+        }
+        
+        #auth .dflex>div {
+            position: relative;
+            height: 52px;
+        }
+        
+        #auth .dflex div img {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .postline {
+            position: absolute;
+            left: 0px;
+            bottom: 39px;
+            height: 3px;
+            width: 100%;
+            background-color: #ECECEC;
+            z-index: 1;
+        }
+        
+        .postlinel50 {
+            width: 50%;
+            left: 50%;
+        }
+        
+        .postliner50 {
+            width: 50%;
+        }
+        
+        .brd10 {
+            border-radius: 10px;
+            height: 10px;
+            width: 10px;
+            background-color: #ECECEC;
+            display: inline-block;
+        }
+        
+        #WTDBOXTD {
+            display: block;
+            padding: 20px;
+        }
+        
+        .mark {
+            background-color: #fff;
+            width: 100%;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">实名认证</div>
+        </div>
+    </header>
+    <section>
+        <div class="lh30 f13 paddl20" style="background-color: #FFCD1F;">您的信息仅用于平台审核，绝不外泄</div>
+        <div id="auth" class="hide">
+            <div class="dflex" style="padding: 20px 20px;">
+                <div>
+                    <div><img src="img/bbk/point.png" height="20" /></div>
+                    <div class="f13 mart10">身份证认证</div>
+                    <div class="postline postlinel50 "></div>
+                </div>
+                <div>
+                    <div class="lh20">
+                        <span class="brd10">&nbsp;</span>
+                    </div>
+                    <div class="f13 color999 mart10">护照认证</div>
+                    <div class="postline "></div>
+                </div>
+                <div>
+                    <div class="lh20">
+                        <span class="brd10">&nbsp;</span>
+                    </div>
+                    <div class="f13 color999 mart10">认证成功</div>
+                    <div class="postline postliner50 "></div>
+                </div>
+            </div>
+            <div style="background-color: #F5F5F5;height: 10px;"></div>
+        </div>
+        <div class="paddl20 paddr20 mart30">
+            <div onclick="Comm.showWindow('markWinTemp', true);">
+                <span style="font-family: 500;" class="f17">请开始认证</span>
+                <img src="img/my/ic_unknow.png" height="12" class="marl5" />
+                <span class="f12 color999">认证说明</span>
+            </div>
+            <div class="dflex mart30">
+                <div class="hg100" id="cardzm">
+                    <img src="img/my/pic_ID_card.png" width="100%" height="100" class="thimg" />
+                    <div class="post">
+                        <img src="img/my/ic_shooting_y.png" />
+                    </div>
+                </div>
+                <div class="marl30 hg100" id="cardfm">
+                    <img src="img/my/pic_ID_card_.png" width="100%" height="100" class="thimg" />
+                    <div class="post">
+                        <img src="img/my/ic_shooting_y.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="dflex mart5">
+                <div class="f12 color999 ">身份证正面照</div>
+                <div class="f12 color999 marl30 ">身份证背面照</div>
+            </div>
+            <div class="dflex mart30">
+                <div class="hg100" id="cardsc">
+                    <img src="img/my/pic_ID_card.png" width="100%" height="100" class="thimg" />
+                    <div class="post">
+                        <img src="img/my/ic_shooting_y.png" />
+                    </div>
+                </div>
+                <div class="marl30 hg100">
+                </div>
+            </div>
+            <div class="dflex mart5">
+                <div class="f12 color999 ">人脸识别证照</div>
+                <div class="f12 color999 marl30"></div>
+            </div>
+            <div class="flex-between mart30 borderb paddt20 paddb20">
+                <div class="" style="width: 80px;">真实姓名</div>
+                <div style="width: calc(100% - 80px);">
+                    <input type="text" name="idCardName" placeholder="请输入正确的名字" data-reg='empty' style="width: 100%;" oninput="model.oninput()" onblur="model.blur()" />
+                </div>
+            </div>
+            <div class="flex-between borderb paddt20 paddb20">
+                <div style="width: 80px;">身份证号</div>
+                <div style="width: calc(100% - 80px);">
+                    <input type="text" name="idCardNum" placeholder="请输入正确的18位身份证件号" data-reg='cd' style="width: 100%;" oninput="model.oninput()" onblur="model.blur()" />
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="center paddl20 paddr20">
+        <button style="border-radius: 4px;width: 100%;" onclick="model.look()" class="marb20 mart20">开始认证</button>
+    </footer>
+    <div wtd="markWinTemp" class="mark">
+        <div class="paddl20 paddr20 paddt20">
+            <div class="f17">证件上传示例</div>
+            <div class="f12 color999 mart10">要求：四角完整、照片清晰、亮度均匀</div>
+            <div class="mart20">
+                <img src="img/bbk/cary.png" height="88" />
+            </div>
+            <div class="mart10">
+                <img src="img/bbk/ic_tick_green.png" height="16" />
+                <span class="f13">标准</span>
+            </div>
+            <div class="dflex mart10">
+                <div>
+                    <div><img src="img/bbk/carn1.png" width="70" /></div>
+                    <div class="mart10"><img src="img/bbk/ic_ cross_red.png" height="16" /><span class="f13">边框缺失</span></div>
+                </div>
+                <div>
+                    <div><img src="img/bbk/carn2.png" width="70" /></div>
+                    <div class="mart10"><img src="img/bbk/ic_ cross_red.png" height="16" /><span class="f13">边框缺失</span></div>
+                </div>
+                <div>
+                    <div><img src="img/bbk/carn3.png" width="70" /></div>
+                    <div class="mart10"><img src="img/bbk/ic_ cross_red.png" height="16" /><span class="f13">边框缺失</span></div>
+                </div>
+            </div>
+            <div class="f15 mart30 paddb20">
+                <button style="border-radius: 4px;width: 100%;" onclick="Comm.showWindow()">知道了</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+
+<script>
+    function pageload() {
+        //Comm.showWindow('markWinTemp', true);
+        model.init();
+
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        user: Comm.db('userinfo'),
+        bbk: Comm.query('bbk'),
+        cardzm: '',
+        cardfm: '',
+        cardsc: '',
+        look: function() {
+            if (Comm.w9()) {
+                Comm.personalAuthentication(function(d) {
+                    if (d.verifyState == -1) {
+                        Comm.message('取消认证');
+                    } else if (d.verifyState == 2) {
+                        Comm.message('认证未通过,请重新实名认证');
+                    } else {
+                        AJAX.GET('/api/customer/idCardCertification?ticketId=' + d.ticketId, function(d) {
+                            if (d.code == 1) {
+                                Comm.message('实名认证成功！');
+                                model.user.idCardCertification = 1;
+                                model.user.isCertification = 1;
+
+                                $("input[name='idCardName']").val(d.data.idCardName);
+                                $("input[name='idCardNum']").val(d.data.idCardNum);
+
+                                $('#cardzm .thimg').attr('src', Comm.OSS.getImgUrl(d.data.idCardFrontPic, 'm'));
+                                $('#cardfm .thimg').attr('src', Comm.OSS.getImgUrl(d.data.idCardBackPic, 'm'));
+                                $('#cardsc .thimg').attr('src', Comm.OSS.getImgUrl(d.data.idCardHandOnPic, 'm'));
+                                $('#cardzm .post').remove();
+                                $('#cardfm .post').remove();
+                                $('#cardsc .post').remove();
+
+                                if (model.bbk != 1) {
+                                    $('footer button').html('认证完成').attr('onclick', 'model.succ()');
+                                } else {
+                                    $('footer button').html('下一步').attr('onclick', 'model.succ()');
+                                }
+                                Comm.db('userinfo', model.user);
+                                //Comm.go('certificationsucc.html');
+                            } else {
+                                Comm.message('实名认证失败！');
+                            }
+                        })
+                    }
+                })
+            } else {
+                model.succ();
+            }
+        },
+        blur: function() {
+            window.scrollTo(0, 0);
+        },
+        init: function() {
+            if (model.bbk == 1) {
+                $('#auth').removeClass('hide');
+                //usertype 1 普通用户，2背包客
+                //status 1：未实名2：已实名3：未实名护照4：护照实名通过5：护照实名未通过6：护照实名审核中
+                var tauth = app.auth();
+                if (tauth.status == 1) {
+                    //model.look();
+                } else {
+                    model.authInfo();
+                    $('footer button').html('下一步').attr('onclick', 'model.succ()')
+                }
+            } else {
+                //model.look();
+            }
+
+            if (!Comm.w9()) {
+                var cardzm = new imgUploader("cardzm");
+                cardzm.success = function() {
+                    var cimgUrl = this.imgList.length > 0 ? this.imgList[0] : 'img/error.png';
+                    model.cardzm = cimgUrl;
+                    model.oninput();
+                    $('#cardzm .post').remove();
+                }
+                var cardfm = new imgUploader("cardfm");
+                cardfm.success = function() {
+                    var cimgUrl = this.imgList.length > 0 ? this.imgList[0] : 'img/error.png';
+                    model.cardfm = cimgUrl;
+                    model.oninput();
+                    $('#cardfm .post').remove();
+                }
+                var cardsc = new imgUploader("cardsc");
+                cardsc.success = function() {
+                    var cimgUrl = this.imgList.length > 0 ? this.imgList[0] : 'img/error.png';
+                    model.cardsc = cimgUrl;
+                    model.oninput();
+                    $('#cardsc .post').remove();
+                }
+            } else {
+                $('input[name="idCardName"]').addClass('bg_white').attr('disabled', 'true').val('如：张**').parent().parent().removeClass('borderb');
+                $('input[name="idCardNum"]').addClass('bg_white').attr('disabled', 'true').val('如：510******21155').parent().parent().removeClass('borderb');
+            }
+        },
+        info: null,
+        authInfo: function() {
+            AJAX.GET('/api/customer/authInfo', function(d) {
+                if (d.code == 1) {
+                    model.info = d.data;
+                    $("input[name='idCardName']").val(d.data.idCardName);
+                    $("input[name='idCardNum']").val(d.data.idCardNum);
+                    $('footer button').removeClass('no');
+                    model.cardzm = d.data.idCardFrontPic;
+                    model.cardfm = d.data.idCardBackPic;
+                    model.cardsc = d.data.idCardHandOnPic;
+                    $('#cardzm .thimg').attr('src', Comm.OSS.getImgUrl(model.cardzm, 'm'));
+                    $('#cardfm .thimg').attr('src', Comm.OSS.getImgUrl(model.cardfm, 'm'));
+                    $('#cardsc .thimg').attr('src', Comm.OSS.getImgUrl(model.cardsc, 'm'));
+                    $('#cardzm .post').remove();
+                    $('#cardfm .post').remove();
+                    $('#cardsc .post').remove();
+                }
+            })
+        },
+        oninput: function() {
+            var idCardName = $("input[name='idCardName']").val();
+            var idCardNum = $("input[name='idCardNum']").val();
+            if (idCardNum.length > 18) {
+                $("input[name='idCardNum']").val(idCardNum.substr(0, 18));
+                idCardNum = $("input[name='idCardNum']").val();
+            }
+            var reg = /(^\d{15}$)|(^\d{17}(x|X|\d)$)/;
+            if (idCardName && reg.test(idCardNum) && model.cardzm && model.cardfm && model.cardsc) {
+                $('footer button').removeClass('no');
+            } else {
+                $('footer button').addClass('no');
+            }
+        },
+        succ: function() {
+            if (Comm.w9()) {
+                if (model.bbk == 1) {
+                    Comm.go('authbbkhz.html');
+                } else {
+                    Comm.go('certificationsucc.html');
+                }
+            } else {
+
+                var tauth = app.auth();
+                if (tauth.usertype == 1 && tauth.status == 2) {
+                    Comm.go('authbbkhz.html');
+                }
+                //usertype 1 普通用户，2背包客
+                //status 1：未实名2：已实名3：未实名护照4：护照实名通过5：护照实名未通过6：护照实名审核中
+
+
+                var data = Check.submit('POST');
+                if (!data) {
+                    return false;
+                }
+
+                data.idCardFrontPic = model.cardzm;
+                data.idCardBackPic = model.cardfm;
+                data.idCardHandOnPic = model.cardsc;
+                data.idCardFacePic = "";
+                data.ticketId = "";
+                data.idCardCertification = 1;
+                if (!data.idCardFrontPic) {
+                    Comm.message('请上传身份证正面照');
+                    return
+                }
+                if (!data.idCardBackPic) {
+                    Comm.message('请上传身份证反面照');
+                    return
+                }
+                if (!data.idCardHandOnPic) {
+                    Comm.message('请上手持身份证照');
+                    return
+                }
+
+                AJAX.POST('/api/customer/idCardCertificationPC', data, function(d) {
+                    if (d.code == 1) {
+                        model.user.idCardCertification = 1;
+                        model.user.isCertification = 1;
+                        Comm.db('userinfo', model.user);
+                        if (model.bbk == 1) {
+                            Comm.go('authbbkhz.html')
+                        } else {
+                            Comm.go('certificationsucc.html')
+                        }
+                    } else {
+                        Comm.message(d.msg);
+                    }
+                });
+            }
+        }
+    }
+</script>
+
+</html>

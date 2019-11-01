@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>申请售后</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.07);
+            border-radius: 4px;
+            padding: 20px 15px 20px 20px;
+        }
+        
+        section {
+            background-color: #F5F5F5;
+        }
+        
+        textarea {
+            border: 0px;
+            width: 100%;
+            height: 80px;
+            line-height: 15px;
+        }
+        
+        .imgcon {
+            width: 70px;
+            height: 70px;
+            background-color: #F5F5F5;
+            text-align: center;
+            border-radius: 4px;
+            margin-right: 10px;
+            position: relative;
+        }
+        
+        img.posdel {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+        }
+        
+        .reous {
+            border-radius: 6px 6px 0px 0px;
+            background-color: #fff;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+            padding: 20px;
+            bottom: 0px;
+        }
+        
+        .visibilityH {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">申请售后</div>
+        </div>
+    </header>
+    <section>
+    </section>
+    <footer></footer>
+
+    <div wtd="reousWinTemp" class="reous">
+        <img src="img/sendclose.png" height="30" style="position: absolute;left:10px;" class="fl" onclick="Comm.showWindow()" />
+        <div class="center lh30">
+            <span class="f17" style="font-weight:500;">售后原因</span>
+        </div>
+        <div id="afterSaleReason"></div>
+        <div class="mart30">
+            <button class="paybut no" style="border-radius: 4px;" onclick="model.ok()">确定</button>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+
+<script>
+    function pageload() {
+        model.init();
+        GDict.init(function() {
+            model.afterSaleReason = GDict.get('afterSaleReason');
+            $('#afterSaleReason').html(template('afterSaleReasonTpl', model.afterSaleReason));
+        })
+    }
+
+    function pageresume() {}
+
+    var model = {
+        id: Comm.query('id'),
+        init: function() {
+            AJAX.GET('/api/order/orderDetail?orderId=' + model.id, function(d) {
+                if (d.code == 1) {
+                    model.data = d.data;
+                    $("section").html(template('mainTpl', d.data));
+                    model.upimg();
+                }
+            })
+        },
+        counimg: 0,
+        upimg: function() {
+            model.upimg = new imgUploader('box', 3, "upimg");
+            model.upimg.success = function() {
+                $('#box').html(template('upimgTpl', this.imgList));
+                model.counimg = this.imgList.length;
+                if (model.counimg >= 3) {
+                    $('#upimg').addClass('visibilityH');
+                }
+            }
+        },
+        delimg: function(a, k) {
+            model.upimg.imgList = model.upimg.imgList.del(k);
+            $(a).parent().remove();
+            $('#upimg').removeClass('visibilityH');
+        },
+        showR: function() {
+            Comm.showWindow('reousWinTemp', true);
+        },
+        selafter: null,
+        afterSaleReasoncl: function(a, k) {
+            model.selafter = model.afterSaleReason[k];
+            $('#rselafter').html(model.selafter.dictname);
+            $('.reous .paybut').removeClass('no');
+            $(a).parent().parent().find('img.active').attr('src', 'img/pay/ic_check_n.png').removeClass('active');
+            $(a).find('img').attr('src', 'img/pay/ic_check_y.png').addClass('active');
+        },
+        ok: function() {
+            if (model.selafter) {
+                Comm.showWindow();
+            } else {
+                Comm.message('请选择原因')
+            }
+        },
+        num: 1,
+        save: function() {
+            if (!model.selafter) {
+                Comm.message('选择申请原因');
+                return
+            }
+            var content = $('textarea').val();
+            if (!content) {
+                Comm.message('请输入申请说明');
+                return
+            }
+
+            if (model.upimg.imgList.length == 0) {
+                Comm.message('请上传图片凭证');
+                return
+            }
+
+            AJAX.POST('/api/aftersale/submitAftersale', {
+                orderId: model.id,
+                dictId: model.selafter.dictid,
+                num: model.num,
+                content: content,
+                imgs: model.upimg.imgList.join(','),
+            }, function(d) {
+                if (d.code == 1) {
+                    Comm.message('申请成功');
+                    setTimeout(function() {
+                        Comm.close();
+                    }, 600);
+                } else {
+                    Comm.message(d.msg);
+                }
+            })
+        },
+        subadd: function(a, i) {
+            if (model.num == 1 && i < 0) {
+                return
+            }
+            if (model.num + i > model.data.orderdetail.buynum) {
+                return
+            }
+            model.num = model.num + i;
+            $(a).parent().find('input').val(model.num);
+        },
+        blur: function() {
+            window.scrollTo(0, 0);
+        },
+        max: function(a) {
+            var num = $(a).val();
+            if (num * 1 <= 0) {
+                $(a).val('')
+                return;
+            }
+            if (num && num > model.data.orderdetail.buynum) {
+                $(a).val(model.data.orderdetail.buynum);
+            }
+        },
+    }
+</script>
+<script id="mainTpl" type="text/html">
+    <div class="main">
+        <div class="card">
+            <div class="flex_wrap borderb paddb20">
+                <div style="width: 90px;">
+                    <img src="{{OSS(orderdetail.skuImg)}}" width="90" height="90" onerror="app.errorimg(this)">
+                </div>
+                <div style="width: calc(100% - 100px);">
+                    <div class="f15 wordW lh50">{{orderdetail.skuName}}</div>
+                    <div class="">
+                        <img src="{{OSS(orderdetail.countryLogo)}}" class="countryLogo" onerror="app.errorimg(this)" />
+                        <span class="color666 f12">{{orderdetail.countryChineseName}}</span>
+                    </div>
+                    <div class="f13 flex-between lh20 mart10">
+                        <div>
+                            <span class="f13">¥</span>
+                            <span class="f17">{{priceTp(orderdetail.sellPrice)}}</span>
+                        </div>
+                        <div class="f12 color666">x{{orderdetail.buynum}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tright lh25 paddt15">
+                <span>共{{orderdetail.buynum}}件商品  总额：</span>
+                <span>￥</span>
+                <span class="bold">{{priceTp(orderdetail.totalPrice)}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="lh50 paddr20 paddl20 bg_white flex-between" onclick="model.showR()">
+        <div><span>申请原因</span></div>
+        <div>
+            <span id="rselafter"></span>
+            <img src="img/ic_more_g.png" height="13" />
+        </div>
+    </div>
+    <div class="lh50 paddr20 paddl20 bg_white flex-between mart10">
+        <div><span>申请数量</span></div>
+        <div>
+            <img src="img/order/jj.png" height="20" onclick="model.subadd(this,-1)" />
+            <input class="center" type="number" number value="1" oninput="model.max(this)" onblur="model.blur()" style="border: 0px;width:40px;" />
+            <img src="img/order/add.png" height="20" onclick="model.subadd(this,1)" />
+        </div>
+    </div>
+    <div class="paddr20 paddl20 bg_white mart10 paddb20">
+        <div class="lh50"><span>详情描述</span></div>
+        <div>
+            <textarea placeholder="请输入申请原因～" onblur="model.blur()"></textarea>
+            <div class="flex_wrap mart10">
+                <div class="flex_wrap" id="box"></div>
+                <div>
+                    <div class="imgcon" id="upimg">
+                        <img src='img/my/ic_add.png' height="20" class="mart15" />
+                        <div class="f12 mart5 color999 center">添加图片</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="paddl20 paddr20 center mart30 marb10">
+        <button style="border-radius: 4px;width: 100%;" onclick="model.save()">提交订单</button>
+    </div>
+</script>
+
+
+<script id="afterSaleReasonTpl" type="text/html">
+    {{each $data v k}}
+    <div class="flex-between lh30 mart20" onclick="model.afterSaleReasoncl(this,{{k}})">
+        <div>
+            <span class="f15">{{v.dictname}}</span>
+        </div>
+        <div>
+            <img src="img/pay/ic_check_n.png" height="20" />
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+<script id="upimgTpl" type="text/html">
+    {{each $data v k}}
+    <div class="imgcon marb10">
+        <img src='{{OSS(v)}}' width="100%" height="100%" class="uprimg" data="{{v}}" />
+        <img src="img/my/ic_delete.png" height="20" class="posdel" onclick="model.delimg(this,{{k}})" />
+    </div>
+    {{/each}}
+</script>
+
+</html>

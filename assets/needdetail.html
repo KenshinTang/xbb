@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>需求详情</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {
+            background-color: #fff;
+        }
+        
+        .main {
+            padding: 20px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 14px 0px rgba(231, 231, 231, 1);
+            border-radius: 4px;
+            padding: 20px;
+        }
+        
+        .no {
+            background-color: #D8D8D8;
+        }
+        
+        .active {
+            background-color: #FFCD1F;
+        }
+        
+        .selxc {
+            border-radius: 6px 6px 0px 0px;
+            background-color: #fff;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+            padding: 20px;
+            bottom: 0px;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        .list .card {
+            background-image: url('img/xc/yes.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            height: 65px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navItemIcon share hide" onclick="model.share()"></div>
+            <div class="navTitle">需求详情</div>
+        </div>
+    </header>
+    <section>
+
+    </section>
+    <footer class="center" style="height: 50px;">
+        <button class="hide lh50" style="border-radius: initial;width: 100%;background-color: #fff;" onclick="model.gobuy()">
+            <img src="img/need/ic_order_edit.png" height="22"/>
+            <span>我也想要</span>
+        </button>
+        <div class="dflex lh50 hide">
+            <div>
+                <a id="consigneePhone" style="display: block;">
+                    <img src="img/xc/ic_contact_buyer_yb.png" height="22" />
+                    <span f13>联系买家</span>
+                </a>
+            </div>
+            <div class="no" onclick="model.goaccept()">去受理</div>
+        </div>
+    </footer>
+    <div wtd="selxcWinTemp" class="selxc">
+        <img src="img/sendclose.png" height="30" style="position: relative;left:-10px;" class="fl" onclick="Comm.showWindow()" />
+        <div class="center lh30 paddr30">
+            <span class="f17" style="font-weight:500;">请选择行程</span>
+        </div>
+        <div class="items paddb15" style="max-height: 350px;overflow: hidden; overflow-y: auto;" id="xc">
+
+        </div>
+        <div class="">
+            <button class="paybut no" style="border-radius: 4px;width: 100%;" onclick="model.sub()">确定</button>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+        Area.init();
+        model.init();
+    }
+
+    function pageresume() {
+
+    }
+    var model = {
+        isshare: Comm.query('isshare'),
+        orderDetailId: Comm.query('orderDetailId'),
+        bbk: Comm.query('bbk') ? Comm.query('bbk') : 0,
+        t: Comm.query('t') ? Comm.query('t') : 0,
+        init: function() {
+            if (model.isshare != 1) {
+                $('header .share').removeClass('hide');
+            }
+            Share_.init();
+            if (model.t == 1) {
+                var u = Comm.db('userinfo');
+                if (u && u.passportCertification == 1) {
+                    model.bbk = 1;
+                }
+            }
+            var url = "/api/order/lookOrderDetail";
+            if (model.bbk == 1) {
+                $('footer .dflex').removeClass('hide');
+                url = "/api/porder/lookOrderDetail"
+            } else {
+                $('footer button').removeClass('hide');
+            }
+            AJAX.GET(url + "?orderDetailId=" + model.orderDetailId, function(d) {
+                if (d.code == 1) {
+                    d.data.descriptions = "";
+                    try {
+                        if (d.data.description) {
+                            d.data.description = JSON.parse(d.data.description);
+                        }
+                    } catch (e) {
+                        d.data.descriptions = d.data.description;
+                    }
+
+                    model.data = d.data;
+                    model.data.bbk = model.bbk;
+                    model.data.skuDescribImg = JSON.parse(model.data.skuDescribImg);
+                    if (model.data.skuDescribImg && model.data.skuDescribImg.length == 0) {
+                        model.data.skuDescribImg.push(model.data.skuImg);
+                    }
+                    $("section").html(template('sectionTpl', model.data));
+                    //$('#consigneePhone').attr('onclick', "tel:" + model.data.consigneePhone);
+                    $('#consigneePhone').attr('onclick', "IM_.IM_ShowContact(" + model.data.customerId + ")");
+                    model.orderToTravleList();
+                }
+            })
+        },
+        gobuy: function() {
+            Comm.go('gooddetail.html?spuId=' + model.data.spuId + '&skuId=' + model.data.skuId + "&mallId=" + model.data.mallId + "&buynum=" + model.data.buynum);
+        },
+        toTravleList: [],
+        orderToTravleList: function() {
+            //匹配行程
+            AJAX.GET('/api/ptravel/orderToTravleList?pageno=1&pagesize=10&countryId=' + model.data.countryId + "&categoryId=" + model.data.categoryId, function(d) {
+                if (d.code == 1) {
+                    model.toTravleList = d.data;
+                    if (d.data.length > 0) {
+                        $('footer .no').removeClass('no').addClass('active');
+                    }
+                }
+            })
+        },
+        goaccept: function() {
+            if (!app.isLogin()) {
+                app.gologin();
+                return
+            }
+            if (model.toTravleList.length == 0) {
+                var div = "<div class='f17'>您没有匹配的行程</div><div class='f13'>1.行程站点需包含需求期望购买地</div><div class='f13'>2.行程所选产品分类包含需求产品分类</div>"
+                Comm.alert(div, function() {
+
+                }, '知道了');
+            } else {
+                Comm.showWindow('selxcWinTemp', true);
+                $('#WTDBOX #xc').html(template('xcTpl', model.toTravleList))
+            }
+        },
+        k: -1,
+        selxc: function(a, k) {
+            model.k = k;
+            $(a).parent().find('img.ac').attr('src', 'img/pay/ic_check_n.png').removeClass('ac');
+            $(a).find('img.qk').attr('src', 'img/pay/ic_check_y.png').addClass('ac');
+            $("#WTDBOX .paybut").removeClass('no')
+        },
+        sub: function() {
+            if (model.k < 0) {
+                Comm.message('请选择行程')
+            }
+            AJAX.POST('/api/porder/orderRece', {
+                travelId: model.toTravleList[model.k].travelId,
+                orderId: model.data.orderId
+            }, function(d) {
+                if (d.code == 1) {
+                    Comm.go('paysucc.html?bbk=1&orderId=' + model.data.orderId)
+                } else {
+                    Comm.message(d.msg);
+                }
+            })
+        },
+        share: function() {
+            Comm.shareUrl({
+                pic: Comm.OSS.getImgUrl(model.data.skuImg), //分享图片路径
+                title: model.data.skuName, //分享标题
+                desc: model.data.countryChineseName, //分享描述
+                url: config.webroot + 'needdetail.html' + location.search + '&isshare=1', //分享路径
+            }, function(d) { //回调
+                if (d == 1) {
+                    Comm.message("分享成功");
+                }
+            });
+        }
+    }
+</script>
+
+<script id="sectionTpl" type="text/html">
+    <div class="main">
+        <div class="f22">
+            需求信息
+        </div>
+        {{if(commission>0&&bbk)}}
+        <div class="card mart30">
+            <div class="">
+                <div class="f13 color999">期望购买地</div>
+                <div class="f19 mart15" style="font-weight:500;">{{countryChineseName}}</div>
+            </div>
+            <div class="flex-between mart30">
+                <div class="f13 color999 paddl5">订单金额</div>
+                <div class="f13 color999 paddl5" style="width: 50%;">预计到账</div>
+            </div>
+            <div class="flex-between mart15">
+                <div class="f24 colorprice">￥{{priceTp(sellPrice*buynum)}}</div>
+                <div class="f24 colorprice" style="font-weight:500;width: 50%;">￥{{priceTp(sellPrice*buynum-commission*buynum/100)}}</div>
+            </div>
+        </div>
+        {{else}}
+        <div class="card mart30">
+            <div class="flex-between">
+                <div class="f13 color999">期望购买地</div>
+                <div class="f13 color999 paddl5" style="width: 50%;">订单金额</div>
+            </div>
+            <div class="flex-between mart15">
+                <div class="f19" style="font-weight:500;">{{countryChineseName}}</div>
+                <div class="f24 colorprice" style="width: 50%;">￥{{priceTp(sellPrice*buynum)}}</div>
+            </div>
+        </div>
+        {{/if}}
+        <div class="card mart30">
+            <div class="f13 color999">数量</div>
+            <div class="f15 mart10">{{buynum}}</div>
+            <div class="f13 color999 mart10">期望款式</div>
+            <div class="f15 mart10">{{skuName}}</div>
+            <div class="f13 color999 mart10">备注</div>
+            <div class="f15 mart10">{{remark?remark:'无备注'}}</div>
+        </div>
+        <div class="mart30">
+            <div class="center">
+                {{each skuDescribImg v k}}
+                <img src="{{OSS(v)}}" width="100%" onerror="app.errorimg(this)" class="marb10" /> {{/each}}
+            </div>
+            <div class="f15 lh20 center ">
+                {{if(description&&description.goodPic&&description.goodPic.length>0)}} {{each description.goodPic v k }}
+                <img src="{{OSS(v)}}" width="100%" onerror="app.errorimg(this)" class="marb10" /> {{/each}} {{/if}} {{descriptions}}
+            </div>
+        </div>
+    </div>
+    <div class="mart20 paddl20">
+        <div class="flex-between bordert paddr20 lh50">
+            <div>
+                <img height="20" width="20" src="{{OSS(face)}}" onerror="app.herrorimg(this)" style="border-radius: 20px;" />
+                <span class="f15">{{strhide(customerName)}}</span>
+            </div>
+            <div>
+                <span class="color999 f13">{{sldate(createTime)}}</span>
+                <span class="color999 f13">发布于{{getAreaName(area)}}</span>
+            </div>
+        </div>
+    </div>
+    <div style="height: 10px; background-color: #f5f5f5"></div>
+</script>
+
+<script id="xcTpl" type="text/html">
+    {{each $data v k}}
+    <div class="item mart15" onclick="model.selxc(this,{{k}})">
+        <div class="f12 color999 tleft" style="margin-left: 40px;">{{formatDate(v.creatime,'Y年m月d日')}}创建</div>
+        <div class="list flex_wrap mart15">
+            <div class="lh65">
+                <img src="img/pay/ic_check_n.png" height="20" class="qk" />
+            </div>
+            <div class="card marl20" style="width: calc(100% - 50px);">
+                <span class="f10">{{formatDate(v.destinationTime,'Y')}}</span>
+                <span class="f15">{{formatDate(v.destinationTime,'m月d日')}}</span>
+                <span class="f13 color666 marl10 marr10">前往</span>
+                <img src="{{OSS(v.img)}}" class="countryLogo" onerror="app.errorimg(this)" />
+                <span class="color666 f13">{{v.destinationName}}</span>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

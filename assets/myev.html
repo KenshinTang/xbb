@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>我的评价</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="model.close()"></div>
+            <div class="navTitle">我的评价</div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main" id="list">
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script id="commentListInfo" type="text/html">
+    {{each $data v k }} {{if(v.orderdetailList&&v.orderdetailList.length>0)}}
+    <div class="comm marb20">
+        <div class="">
+            <img class="headimg" src="{{OSS(user.face)}}" height="20" width="20" style="border-radius: 20px;" onerror="app.herrorimg(this)" />
+            <span class="f15" style="font-weight: 500;">{{user.nickName}}</span>
+        </div>
+        <div class="paddt10">
+            <div class="lh25 f13" style="font-weight: 300;">
+                {{v.content}}
+            </div>
+            <div class="f12 color999">{{formatDate(v.addTime,'Y-m-d')}}</div>
+        </div>
+        <div onclick="Comm.go('orderdetail.html?id={{v.orderId}}')" class="flex_wrap mart20 border" style="border-radius: 4px; background-color: #FCFCFC;">
+            <div style="width: 90px;">
+                <img src="{{OSS(v.orderdetailList[0].skuImg)}}" width="90" height="90" onerror="app.errorimg(this)">
+            </div>
+            <div style="width: calc(100% - 100px);">
+                <div class="f15 wordW lh50">{{v.orderdetailList[0].skuName}}</div>
+                <div class="f13">¥ {{priceTp(v.orderdetailList[0].sellPrice)}}</div>
+            </div>
+        </div>
+    </div>
+    {{/if}} {{/each}}
+</script>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script>
+    function pageload() {
+        model.search();
+    }
+
+    function pageresume() {
+
+    }
+    var model = {
+        user: Comm.db('userinfo'),
+        cl: Comm.query('cl') ? Comm.query('cl') : '',
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/comment/mylist',
+                    refreshTypeGet: true
+                });
+
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    d.data.user = model.user;
+                    var h = template('commentListInfo', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        },
+        close: function() {
+            Comm.close(model.cl);
+        },
+    }
+
+    function androidback() {
+        model.close();
+    }
+</script>
+
+</html>

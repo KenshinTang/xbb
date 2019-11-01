@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>物流信息</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .main {
+            padding: 20px;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        .brd10 {
+            border-radius: 10px;
+            height: 10px;
+            width: 10px;
+            background-color: #ECECEC;
+            display: inline-block;
+        }
+        
+        .posb {
+            position: absolute;
+            top: 7px;
+            width: 2px;
+            background-color: #EBEBEB;
+            left: 50%;
+            margin-left: -1px;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .point {
+            z-index: 2;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="model.back()"></div>
+            <div class="navTitle">物流信息</div>
+        </div>
+    </header>
+    <section>
+
+    </section>
+    <footer class="tright paddr20 paddt10 paddb10 bg_white">
+        <a style="display: block;">
+            <button class="borderb" style="width: 74px;color:#666;font-size: 13px;line-height: 30px;height: 30px;background-color: #fff;border:1px solid #C7C7C7;">联系客服</button>
+        </a>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {}
+    var model = {
+        cl: Comm.query('cl') ? Comm.query('cl') : '',
+        courierNumber: Comm.query('courierNumber') ? Comm.query('courierNumber') : '',
+        courierid: Comm.query('courierid') ? Comm.query('courierid') : '',
+        init: function() {
+            AJAX.GET('/api/express/traceQuery?comid=' + model.courierid + '&num=' + model.courierNumber, function(d) {
+                if (d.code == 1) {
+                    model.data = d.data;
+                    model.data.traces = model.data.traces.reverse();
+                    $("section").html(template('sectionTpl', model.data));
+                    $('footer a').attr('href', 'tel:' + model.data.tel);
+                }
+            })
+        },
+        back: function() {
+            Comm.close(model.cl);
+        }
+    }
+
+    function androidback() {
+        model.back();
+    }
+</script>
+
+<script id="sectionTpl" type="text/html">
+    <div class="main bg_white">
+        <div class="flex_wrap">
+            <div>
+                <img src="{{OSS(src)}}" height="70" width="70" onerror="app.errorimg(this)" />
+            </div>
+            <div class="marl10">
+                <div class="lh30"><span class="f13">物流公司：</span><span class="f13 color666">{{com}}</span></div>
+                <div class="lh30"><span class="f13">物流单号：</span><span class="f13 color666">{{number}}</span><span class="f13 fr marl30" onclick="Comm.copyText('{{number}}');Comm.message('复制成功')">复制</span></div>
+            </div>
+        </div>
+    </div>
+    <div style="height: 10px; background-color: #F5F5F5;"></div>
+    <div class="main bg_white">
+        <div class="f17 marb25">订单跟踪</div>
+        <div class="lists">
+            {{each traces v k}}
+            <div class="flex_wrap" style="min-height: 90px;">
+                <div style="position: relative;width: 18px;">
+                    <img src="img/bbk/point.png" height="18" class="point" /> {{if(traces.length>(k+1))}}
+                    <div class="posb"></div>
+                    {{/if}}
+                </div>
+                <div class="marl15" style="width:calc(100% - 35px);">
+                    <div class="f15">{{v.desc}}</div>
+                    <div class="f13 color999 mart10">{{v.time}}</div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</script>
+
+</html>

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">小背包Android版</string>
+    <string name="facebook_app_id">637758443238130</string>
+
+
+    <string name="viewfinderview_status_text1">将二维码放入取景框内</string>
+    <string name="viewfinderview_status_text2">即可自动扫描</string>
+
+    <string name="msg_intent_failed">Sorry, the requested application could not be launched. The barcode contents may be invalid.</string>
+    <string name="button_ok">OK</string>
+    <string name="msg_camera_framework_bug">Sorry, the Android camera encountered a problem. You may need to restart the device.</string>
+    <string name="title_activity_bai_du">BaiDuActivity</string>
+    <string name="profile">需求</string>
+    <string name="tu_imgs">图片</string>
+    <string name="photo">拍照</string>
+</resources>

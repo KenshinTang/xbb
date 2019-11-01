@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>护照认证</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {
+            background-color: #fff;
+        }
+        
+        .hg100 {
+            height: 100px;
+            position: relative;
+        }
+        
+        .post {
+            height: 40px;
+            width: 40px;
+            background-image: url('img/my/bg.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -20px;
+            margin-top: -20px;
+        }
+        
+        button.no {
+            background-color: #D8D8D8;
+            color: #fff;
+        }
+        
+        #auth .dflex>div {
+            position: relative;
+            height: 52px;
+        }
+        
+        #auth .dflex div img {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .postline {
+            position: absolute;
+            left: 0px;
+            bottom: 39px;
+            height: 3px;
+            width: 100%;
+            background-color: #ECECEC;
+            z-index: 1;
+        }
+        
+        .postlinel50 {
+            width: 50%;
+            left: 50%;
+        }
+        
+        .postliner50 {
+            width: 50%;
+        }
+        
+        .brd10 {
+            border-radius: 10px;
+            height: 10px;
+            width: 10px;
+            background-color: #ECECEC;
+            display: inline-block;
+        }
+        
+        #WTDBOXTD {
+            display: block;
+            padding: 20px;
+        }
+        
+        .mark {
+            background-color: #fff;
+            width: 100%;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">护照认证</div>
+        </div>
+    </header>
+    <section>
+        <div class="lh30 f13 paddl20" style="background-color: #FFCD1F;">您的信息仅用于平台审核，绝不外泄</div>
+        <div id="auth" class="hide">
+            <div class="dflex" style="padding: 20px 20px;">
+                <div>
+                    <div><img src="img/bbk/point.png" height="20" /></div>
+                    <div class="f13 mart10">身份证认证</div>
+                    <div class="postline postlinel50" style="background-color: #FFCD1F;"></div>
+                </div>
+                <div>
+                    <div><img src="img/bbk/point.png" height="20" /></div>
+                    <div class="f13  mart10">护照认证</div>
+                    <div class="postline" style="background-color: #FFCD1F;"></div>
+                </div>
+                <div>
+                    <div class="lh20">
+                        <span class="brd10">&nbsp;</span>
+                    </div>
+                    <div class="f13 color999 mart10">认证成功</div>
+                    <div class="postline postliner50 "></div>
+                </div>
+            </div>
+            <div style="background-color: #F5F5F5;height: 10px;"></div>
+        </div>
+        <div class="paddl20 paddr20 mart30">
+            <div onclick="Comm.showWindow('markWinTemp', true);">
+                <span style="font-family: 500;" class="f17">请拍摄并上传护照</span>
+                <img src="img/my/ic_unknow.png" height="12" class="marl5" />
+                <span class="f12 color999">上传说明</span>
+            </div>
+            <div class="dflex mart30">
+                <div class="hg100" id="cardzm">
+                    <img src="img/bbk/pic_passport_01.png" width="100%" height="100" />
+                    <div class="post">
+                        <img src="img/my/ic_shooting_y.png" />
+                    </div>
+                </div>
+                <div class="marl30 hg100" id="cardfm">
+                    <img src="img/bbk/pic_passport.png" width="100%" height="100" />
+                    <div class="post">
+                        <img src="img/my/ic_shooting_y.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="dflex mart5">
+                <div class="f12 color999">点击上传护照签发页</div>
+                <div class="f12 color999 marl30">点击上传手持护照签发页</div>
+            </div>
+            <div class="flex-between mart30 borderb paddt20 paddb20 hide">
+                <div class="" style="width: 80px;">真实姓名</div>
+                <div style="width: calc(100% - 80px);">
+                    <input type="text" name="relename" placeholder="请输入正确的名字" />
+                </div>
+            </div>
+            <div class="flex-between borderb paddt20 paddb20 hide">
+                <div style="width: 80px;">身份证号</div>
+                <div style="width: calc(100% - 80px);">
+                    <input type="text" name="card" placeholder="请输入正确的18位身份证件号" />
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <footer class="center paddl20 paddr20" style="padding-bottom: 50px;">
+        <button style="border-radius: 4px;width: 100%;" class="no" onclick="model.succ()">下一步</button>
+    </footer>
+    <div wtd="markWinTemp" class="mark">
+        <div class="paddl20 paddr20 paddt20">
+            <div class="f17">证件上传示例</div>
+            <div class="f12 color999 mart10">要求：四角完整、照片清晰、亮度均匀</div>
+            <div class="mart20">
+                <img src="img/bbk/hzy.png" height="88" />
+            </div>
+            <div class="mart10">
+                <img src="img/bbk/ic_tick_green.png" height="16" />
+                <span class="f13">标准</span>
+            </div>
+            <div class="dflex mart10">
+                <div>
+                    <div><img src="img/bbk/authn1.png" width="70" /></div>
+                    <div class="mart10"><img src="img/bbk/ic_ cross_red.png" height="16" /><span class="f13">边框缺失</span></div>
+                </div>
+                <div>
+                    <div><img src="img/bbk/authn2.png" width="70" /></div>
+                    <div class="mart10"><img src="img/bbk/ic_ cross_red.png" height="16" /><span class="f13">边框缺失</span></div>
+                </div>
+                <div>
+                    <div><img src="img/bbk/authn3.png" width="70" /></div>
+                    <div class="mart10"><img src="img/bbk/ic_ cross_red.png" height="16" /><span class="f13">边框缺失</span></div>
+                </div>
+            </div>
+            <div class="f15 mart30 paddb20">
+                <button style="border-radius: 4px;width: 100%;" onclick="Comm.showWindow()">知道了</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+
+<script>
+    function pageload() {
+
+        model.init();
+    }
+
+    function pageresume() {}
+
+    var model = {
+        bbk: Comm.query('bbk'),
+        init: function() {
+            if (model.bbk == 1) {
+                $('#auth').removeClass('hide');
+            }
+            var cardzm = new imgUploader("cardzm");
+            cardzm.success = function() {
+                var cimgUrl = this.imgList.length > 0 ? this.imgList[0] : 'img/error.png';
+                model.cardzm = cimgUrl;
+                model.oninput();
+                $('#cardzm .post').remove();
+            }
+            var cardfm = new imgUploader("cardfm");
+            cardfm.success = function() {
+                var cimgUrl = this.imgList.length > 0 ? this.imgList[0] : 'img/error.png';
+                model.cardfm = cimgUrl;
+                model.oninput();
+                $('#cardfm .post').remove();
+            }
+        },
+        oninput: function() {
+            var idCardName = $("input[name='idCardName']").val();
+            var idCardNum = $("input[name='idCardNum']").val();
+            var reg = /(^\d{15}$)|(^\d{17}(x|X|\d)$)/;
+            if (model.cardzm && model.cardfm) {
+                $('footer button').removeClass('no');
+            } else {
+                $('footer button').addClass('no');
+            }
+        },
+        succ: function() {
+            var data = {};
+            data.passportPic = model.cardzm;
+            data.passportHandOnPic = model.cardfm;
+            if (!data.passportPic) {
+                Comm.message('点击上传护照签发页');
+                return
+            }
+            if (!data.passportHandOnPic) {
+                Comm.message('点击上传手持护照签发页');
+                return
+            }
+            AJAX.POST('/api/customer/passportCertification', data, function(d) {
+                if (d.code == 1) {
+                    var user = Comm.db('userinfo');
+                    user.passportCertification = 3;
+                    Comm.db('userinfo', user);
+                    Comm.go('certificationsucc1.html?succ=true');
+                } else {
+                    Comm.message(d.msg);
+                }
+            });
+        }
+    }
+
+    function androidback() {
+        Comm.close(2);
+    }
+</script>
+
+</html>

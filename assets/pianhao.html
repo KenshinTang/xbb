@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>偏好设置</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .mart40 {
+            margin-top: 40px;
+        }
+        
+        .mart70 {
+            margin-top: 70px;
+        }
+        
+        button {
+            width: auto;
+            border-radius: 20px;
+            background: #fff;
+            border: 1px solid #EBEBEB;
+            color: #999999;
+            font-size: 15px;
+            line-height: 35px;
+            height: 35x;
+        }
+        
+        button.active {
+            background: rgba(255, 205, 31, 1);
+            box-shadow: 0px 4px 12px 0px rgba(255, 205, 31, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0);
+            color: hsl(0, 0%, 20%);
+        }
+        
+        .go::after {
+            width: 90px;
+            height: 8px;
+            background-color: #FFCD1F;
+            position: absolute;
+            left: 50%;
+            bottom: -5px;
+            margin-left: -45px;
+            z-index: 1;
+            content: '';
+        }
+        
+        .go .colorc7 {
+            color: #333;
+        }
+        
+        #category button {
+            width: calc((100% - 20px)/3);
+        }
+        
+        #category button:nth-child(3n-1) {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar hide">
+            <div class="navBackIcon" onclick="androidback()"></div>
+        </div>
+    </header>
+    <section>
+
+    </section>
+</body>
+
+<script id="sectionTpl" type="text/html">
+    <div class="f25 center {{resoue?'mart30':'mart70'}}" style="font-weight: 500;">您感兴趣的商品类型？</div>
+    <div class="color999 center mart15 lh20" style="width: 70%;margin-left: 15%;">您的选择将便于我们为您提供合适您的行程、 单品以及内容</div>
+    <div class="mart70 paddl30 paddr30" id="category">
+        <div class="category flex_wrap mart40" style="flex-grow: 3;">
+            {{each $data v k }}
+            <button class="{{comper(v.category_id)}}" id="{{v.category_id}}" onclick="model.cl(this)">{{v.category_name}}</button> {{if(k%3==2)}}
+        </div>
+        <div class="category flex_wrap mart40" style="flex-grow: 3;">
+            {{/if}} {{/each}}
+        </div>
+    </div>
+    <div class="center mart30" id="sut" style="position:relative;">
+        <div>
+            {{if(resoue==1)}}
+            <span class="colorc7 f24" style="position: relative;z-index: 2;" onclick="model.set(this)">选好了</span> {{else}}
+            <span class="colorc7 f24" style="position: relative;z-index: 2;" onclick="model.set(this)">立即体验</span>
+            <span class="color999 inblock" style="position:absolute;right: 10%; bottom: -6px;" onclick="androidback()">跳过</span> {{/if}}
+        </div>
+    </div>
+</script>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript">
+    function pageload() {
+        model.init();
+        model.hobbyList();
+    }
+
+    function androidback() {
+        if (model.resoue == 1) {
+            Comm.close();
+        } else {
+            Comm.gotop('index.html');
+        }
+    }
+
+    var model = {
+        resoue: Comm.query('resoue'),
+        num: 0,
+        init: function() {
+            if (model.resoue == 1) {
+                $('.navBar').removeClass('hide');
+                Comm.resizeSection();
+            }
+        },
+        cl: function(a) {
+            if ($(a).hasClass('active')) {
+                model.num--;
+                $(a).removeClass('active')
+                if (model.num == 0) {
+                    $('#sut').removeClass('go');
+                }
+            } else {
+                $('#sut').addClass('go');
+                if (model.num == 3) {
+                    Comm.message('最多选择3个')
+                    return
+                }
+                model.num++;
+                $(a).addClass('active')
+            }
+        },
+        myph: [],
+        hobbyList: function() {
+            //我的偏好列表
+            AJAX.POST('/api/customer/myHobby', {}, function(a) {
+                if (a.code == 1) {
+                    model.myph = a.data;
+                    model.num = a.data.length;
+                } else {
+                    Comm.message(a.msg);
+                }
+                model.categoryList();
+            });
+        },
+        categoryList: function() {
+            AJAX.POST('/api/goods/categoryList', {
+                pageno: 1,
+                pagesize: 100,
+                level: 1
+            }, function(a) {
+                if (a.code == 1) {
+                    a.data.resoue = model.resoue;
+                    a.data.myph = model.myph;
+                    $('section').html(template('sectionTpl', a.data));
+                    if (model.num > 0) {
+                        $('#sut').addClass('go');
+                    }
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        set: function() {
+            var hobby = [];
+            $('button.active').each(function(i, e) {
+                hobby.push($(e).attr('id'));
+            })
+            if (hobby.length == 0) {
+                Comm.message('请选择您感兴趣的商品类型');
+                return
+            }
+            AJAX.POST('/api/customer/saveHobby', {
+                hobby: hobby.join(',')
+            }, function(d) {
+                if (d.code == 1) {
+                    Comm.message('设置成功！')
+                    androidback()
+                } else {
+                    Comm.message(d.msg);
+                }
+            })
+        }
+    }
+
+
+    //隐藏部分姓名或者电话号码
+    template.defaults.imports.comper = function(id) {
+        for (var i = 0; i < model.myph.length; i++) {
+            if (model.myph[i].category_id == id) {
+                return 'active'
+            }
+        }
+        return '';
+    }
+</script>
+
+</html>

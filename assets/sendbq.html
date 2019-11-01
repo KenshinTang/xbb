@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>选择出行地</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+        
+        .bgF5F5F5 {
+            background-color: #F5F5F5;
+        }
+        
+        .hot {
+            width: auto;
+            height: 30px;
+            line-height: 30px;
+            line-break: 28px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #666;
+            border: 1px solid #EBEBEB;
+            background-color: #fff;
+            min-width: 64px;
+            margin-top: 20px;
+            padding: 0px 10px;
+        }
+        
+        .hot.active {
+            box-shadow: 0px 4px 12px 0px rgba(255, 205, 31, 0.5);
+            background-color: #FFCD1F;
+            border: 1px solid transparent;
+        }
+        
+        .flex_wrap {
+            flex-grow: 4;
+        }
+        
+        .flex_wrap div {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="model.back()"></div>
+            <div class="navTitle">添加商品标签</div>
+        </div>
+    </header>
+    <section>
+        <div class="main">
+
+        </div>
+    </section>
+    <footer class="center paddb10">
+        <button class="no" style="border-radius: 4px;" onclick="model.ok()">确定</button>
+    </footer>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        labels: Comm.query('labels') ? Comm.query('labels') : '',
+        data: [],
+        init: function() {
+            AJAX.GET('/api/goods/categoryList?level=1&pagesize=100', function(d) {
+                if (d.code == 1) {
+                    model.data = d.data;
+                    if (model.labels) {
+                        var labels = model.labels.split(',');
+                        for (var i = 0; i < model.data.length; i++) {
+                            if (labels.indexOf(model.data[i].category_id) >= 0) {
+                                model.data[i].active = true;
+                                $('footer button').removeClass('no');
+                            }
+                        }
+                    }
+                    $('.main').html(template('mainTpl', model.data));
+                }
+            })
+        },
+        sel: function(a, k) {
+            if (!$(a).hasClass('active')) {
+                if ($('.flex_wrap').find('.active').length == 3) {
+                    Comm.message('最多只能选择3个');
+                    return;
+                }
+                $('footer button').removeClass('no');
+                $(a).addClass('active');
+            } else {
+                $(a).removeClass('active');
+                if ($('.flex_wrap').find('.active').length == 0) {
+                    $('footer button').addClass('no');
+                }
+            }
+        },
+        back: function() {
+            var r = [];
+            $('.flex_wrap').find('.active').each(function(i, e) {
+                var k = $(e).attr('k') * 1;
+                r.push(model.data[k]);
+            });
+            Comm.db('bqcategory', r);
+            Comm.close();
+        },
+        ok: function() {
+            if ($('.flex_wrap').find('.active').length == 0) {
+                Comm.message('请添加商品标签')
+            }
+            model.back();
+        }
+    }
+</script>
+
+<script id="mainTpl" type="text/html">
+    <div class="flex_wrap" id="">
+        {{each $data v k}}
+        <div>
+            <button class="hot {{v.active?'active':''}}" k="{{k}}" onclick="model.sel(this,{{k}})">{{v.category_name}}</button></div> {{/each}}
+    </div>
+</script>
+
+</html>

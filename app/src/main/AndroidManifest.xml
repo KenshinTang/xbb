@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.yunlinker.xbb"
+    android:versionCode="2"
+    android:versionName="1.2.4">
+    <!-- <uses-sdk android:minSdkVersion="19"></uses-sdk> -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 这个权限用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 这个权限用于访问GPS定位 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位 -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" /> <!-- 用于读取手机当前的状态 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- SD卡读取权限，用户写入离线定位数据 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!--如果是Android 8.0，应用编译配置的 targetSdkVersion>=26，请务必添加以下权限 -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+
+<!--    <permission-->
+<!--        android:name="com.yunlinker.xbb.permission.PROCESS_PUSH_MSG"-->
+<!--        android:protectionLevel="signatureOrSystem"/>-->
+<!--    <uses-permission android:name="com.yunlinker.xbb.permission.PROCESS_PUSH_MSG" />-->
+
+
+    <application
+        android:name="com.yunlinker.myApp"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
+        tools:replace="android:allowBackup">
+
+
+
+        <activity android:name=".ChatListActivity"/>
+
+        <activity android:name=".ImActivity" /> <!-- 全面屏 -->
+
+
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
+
+        <activity
+            android:name=".HomeActivity"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme"
+            android:windowSoftInputMode="stateHidden|adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" /> <!-- 微信 -->
+        <activity
+            android:name=".wxapi.WXEntryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".wxapi.WXPayEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTop" /> <!-- QQ -->
+        <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent100424468" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.tencent.connect.common.AssistActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.alipay.sdk.app.H5PayActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name="com.alipay.sdk.app.H5AuthActivity"
+            android:configChanges="orientation|keyboardHidden|navigation"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize|stateHidden" /> <!-- 微博 -->
+        <activity
+            android:name="com.umeng.socialize.media.WBShareCallBackActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.sina.weibo.sdk.web.WeiboSdkWebActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.sina.weibo.sdk.share.WbShareTransActivity"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <uses-library
+            android:name="com.google.android.maps"
+            android:required="false" />
+        <uses-library android:name="android.test.runner" />
+
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" />
+
+        <activity android:name=".TestScanActivity" />
+
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="DmEKzf0GsTvL1PlOb8kkGWoye5NUAo51" />
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="5d75f7f9570df39a6a001228" />
+        <meta-data
+            android:name="UMENG_MESSAGE_SECRET"
+            android:value="e0fbafe16b2c9d7d6cf1f6f1a7b39fa4" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="OnlineApp" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <!--华为推送-->
+<!--        <meta-data-->
+<!--            android:name="com.huawei.hms.client.appid"-->
+<!--            android:value="appid=101148195"/> &lt;!&ndash;这里的 appid 值修改为您的华为推送 App ID&ndash;&gt;-->
+<!--        <provider-->
+<!--            android:name="com.huawei.hms.update.provider.UpdateProvider"-->
+<!--            android:authorities="com.tencent.qcloud.tim.tuikit.hms.update.provider"-->
+<!--            android:exported="false"-->
+<!--            android:grantUriPermissions="true"/>-->
+<!--        <provider-->
+<!--            android:name="com.huawei.updatesdk.fileprovider.UpdateSdkFileProvider"-->
+<!--            android:authorities="com.tencent.qcloud.tim.tuikit.updateSdk.fileProvider"-->
+<!--            android:exported="false"-->
+<!--            android:grantUriPermissions="true">-->
+<!--        </provider>-->
+<!--        <activity-->
+<!--            android:name="com.huawei.android.hms.agent.common.HMSAgentActivity"-->
+<!--            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"-->
+<!--            android:excludeFromRecents="true"-->
+<!--            android:exported="false"-->
+<!--            android:hardwareAccelerated="true"-->
+<!--            android:theme="@android:style/Theme.Translucent" >-->
+<!--            <meta-data-->
+<!--                android:name="hwc-theme"-->
+<!--                android:value="androidhwext:style/Theme.Emui.Translucent" />-->
+<!--        </activity>-->
+<!--        <activity-->
+<!--            android:name="com.huawei.hms.activity.BridgeActivity"-->
+<!--            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"-->
+<!--            android:excludeFromRecents="true"-->
+<!--            android:exported="false"-->
+<!--            android:hardwareAccelerated="true"-->
+<!--            android:theme="@android:style/Theme.Translucent" >-->
+<!--            <meta-data-->
+<!--                android:name="hwc-theme"-->
+<!--                android:value="androidhwext:style/Theme.Emui.Translucent" />-->
+<!--        </activity>-->
+
+<!--        <service-->
+<!--            android:name="com.huawei.hms.support.api.push.service.HmsMsgService"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="true"-->
+<!--            android:process=":pushservice">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.huawei.push.msg.NOTIFY_MSG" />-->
+<!--                <action android:name="com.huawei.push.msg.PASSBY_MSG" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
+
+<!--        &lt;!&ndash;这里的 com.tencent.qcloud.tim.demo.thirdpush.HUAWEIPushReceiver 修改成您 App 中的完整类名&ndash;&gt;-->
+<!--        <receiver android:name="com.yunlinker.push.HUAWEIPushReceiver"-->
+<!--            android:permission="com.tencent.qcloud.tim.tuikit.permission.PROCESS_PUSH_MSG">-->
+<!--            <intent-filter>-->
+<!--                &lt;!&ndash; 必须,用于接收 token &ndash;&gt;-->
+<!--                <action android:name="com.huawei.android.push.intent.REGISTRATION" />-->
+<!--                &lt;!&ndash; 必须, 用于接收透传消息 &ndash;&gt;-->
+<!--                <action android:name="com.huawei.android.push.intent.RECEIVE" />-->
+<!--                &lt;!&ndash; 必须, 用于接收通知栏消息点击事件 此事件不需要开发者处理，只需注册就可以&ndash;&gt;-->
+<!--                <action android:name="com.huawei.intent.action.PUSH_DELAY_NOTIFY"/>-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
+
+
+
+    </application>
+
+</manifest>

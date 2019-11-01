@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>帮助与反馈</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        footer {
+            line-height: 30px;
+            background-color: #fff;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17">帮助与反馈</div>
+        </div>
+    </header>
+    <section>
+        <div class="center">
+            <img src="img/my/bg_QA.png" class="mart15" height="65" />
+        </div>
+        <div class="paddr20 paddl20 mart15" onclick="Comm.go('qaseach.html')">
+            <div class="center bg_white lh30" style="border-radius: 15px;">
+                <img src="img/send/ic_search.png" height="18" />
+                <span class="colorc7 f15">搜索问题</span>
+            </div>
+        </div>
+        <div class="question">
+
+        </div>
+    </section>
+    <footer class="dflex">
+        <div><a id="pdkh" class="f15 colorprice">联系客服</a></div>
+        <div class="f15 borderl" onclick="Comm.go('faceback.html')"> 意见反馈</div>
+    </footer>
+</body>
+
+<script id="questionList" type="text/html">
+    <div class=" bg_white paddr20 paddl20 mart15 paddb20">
+        {{each $data v k }}
+        <div class="list">
+            <div class="flex-between lh50" onclick="model.open(this)">
+                <div class="f15 wordW">Q：{{v.ArticleName}}</div>
+                <div>
+                    <img src="img/need/ic_drop_collapse.png" height="14" />
+                </div>
+            </div>
+            <div class="f15 color999 lh25 item" onclick="Comm.go('ab.html?id={{v.ArticleID}}')">
+                {{mj(k)}}：{{covert(v.Section)}}
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</script>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script>
+    function pageload() {
+        model.questionList();
+    }
+
+    function pageresume() {}
+
+    var model = {
+        questionList: function() {
+            AJAX.GET('/api/sysconfig/getconfig?key=khphone', function(d) {
+                if (d.code == 1) {
+                    $("#pdkh").attr('href', 'tel:' + d.data); //.html(d.data);
+                }
+            })
+            AJAX.POST('/api/article/articleList', {
+                pageno: 1,
+                pagesize: 100,
+                articleType: 2
+            }, function(a) { //问题
+                if (a.code == 1) {
+                    $('.question').html(template('questionList', a.data));
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        open: function(a) {
+            if ($(a).parent().find('.item').hasClass('hide')) {
+                $(a).parent().find('.item').removeClass('hide');
+            } else {
+                $(a).parent().find('.item').addClass('hide');
+            }
+        }
+    };
+    //隐藏部分姓名或者电话号码
+    template.defaults.imports.covert = function(v) {
+        v = v.replace(/\s+/g, "").replace(/[ ]|&nbsp;/g, '').replace(/<\/?.+?>/g, "").replace(/ /g, "");
+        return v.length > 100 ? v.substring(0, 100) : v;
+    };
+    //隐藏部分姓名或者电话号码
+    template.defaults.imports.mj = function(k) {
+        return String.fromCharCode((65 + k));
+    }
+</script>
+
+</html>

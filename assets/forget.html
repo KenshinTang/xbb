@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>忘记密码</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .mart70 {
+            margin-top: 70px;
+        }
+        
+        #phone,
+        #pwd,
+        #pwd1 {
+            font-size: 17px;
+            line-height: 40px;
+            border-bottom: 1px solid #F1F1F1;
+            width: 75%;
+        }
+        
+        button {
+            width: 75%;
+            background: #D8D8D8;
+            color: #fff;
+            font-size: 15px;
+            border-radius: 4px;
+        }
+        
+        button.active {
+            background: #FFCD1F;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+        </div>
+    </header>
+    <section>
+        <div class="f25 center mart70" style="font-weight: 500;">重置密码</div>
+        <div class="mart30 center" style="position: relative;">
+            <input type="password" number name="pwd" id="pwd" placeholder="请输入新的密码" oninput="model.oninput(this)" maxlength="20" data-reg='p' />
+            <img src="img/ic_delete_g.png" style="position: absolute;top:10px;right: 15%;" height="20" class="hide ic_delete_g" onclick="model.clear(this)" />
+        </div>
+        <div class="mart10 center" style="position: relative;">
+            <input type="password" number name="pwd1" id="pwd1" placeholder="再次输入密码" oninput="model.oninput(this)" maxlength="20" data-reg='p' />
+            <img src="img/ic_delete_g.png" style="position: absolute;top:10px;right: 15%;" height="20" class="hide ic_delete_g" onclick="model.clear(this)" />
+        </div>
+        <div class="mart30" style="width: 75%;margin: 0 auto;">
+            <div class="mart20 color666">密码为6-16位数字或者字母</div>
+        </div>
+        <div class="mart30 center">
+            <button id="sub" onclick="model.sub()">确定</button>
+        </div>
+    </section>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript">
+    function pageload() {}
+
+    var model = {
+        code: Comm.query('code'),
+        phone: Comm.query('phone'),
+        clear: function(a) {
+            $(a).parent().find('input').val('')
+            $(a).addClass('hide');
+            $('#sub').removeClass('active');
+        },
+        oninput: function(a) {
+            if ($(a).val()) {
+                $(a).parent().find('.ic_delete_g').removeClass('hide');
+            } else {
+                $(a).parent().find('.ic_delete_g').addClass('hide');
+            }
+            var reg = /^[a-zA-Z0-9]{6,16}$/;
+            if (!reg.test($("#pwd").val()) || !reg.test($("#pwd1").val())) {
+                $('#sub').removeClass('active');
+                return;
+            }
+            $('#sub').addClass('active');
+        },
+        sub: function(a) {
+            var data = Check.submit('POST');
+            if (!data) {
+                return false;
+            }
+            if (data.pwd != data.pwd1) {
+                Comm.message('两次输入密码不一致，请重新输入!');
+                return false;
+            }
+
+            data.code = model.code;
+            data.phone = model.phone;
+            data.password = data.pwd;
+            AJAX.POST('/api/customer/findPassword', data, function(a) { //注册
+                if (a.code == 1) {
+                    Comm.message('重置成功,去登录!');
+                    setTimeout(function() {
+                        Comm.close(2);
+                    }, 600);
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        }
+    }
+</script>
+
+</html>

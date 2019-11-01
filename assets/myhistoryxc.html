@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>我的行程</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+        
+        .posb {
+            position: absolute;
+            top: 7px;
+            width: 1px;
+            border-left: 1px dashed #E0E0E0;
+            left: 50%;
+            margin-left: -0.5px;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .bodk {
+            border: 2px solid rgba(51, 51, 51, 1);
+            height: 10px;
+            width: 10px;
+            border-radius: 10px;
+            background-color: #fff;
+            position: absolute;
+            top: 7px;
+            left: 50%;
+            margin-left: -5px;
+            z-index: 2;
+        }
+        
+        .year {
+            height: 15px;
+            line-height: 13px;
+            width: 33px;
+            background-color: #333;
+            border-radius: 2px;
+            color: #fff;
+            display: inline-block;
+            text-align: center;
+            position: absolute;
+            z-index: 3;
+            top: -20px;
+            left: -5px;
+        }
+        
+        .list {
+            box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.07);
+            position: relative;
+            border-radius: 4px;
+        }
+        
+        .list.ysx {
+            background-image: url('img/xc/no.png');
+        }
+        
+        .list.ysx span {
+            color: #999;
+        }
+        
+        .list.ysx .color999,
+        .list.ysx .color666 {
+            color: #D1D1D1;
+        }
+        
+        .list.ysx .bodk {
+            border: 2px solid #D1D1D1;
+        }
+        
+        .list.ysx .year {
+            background-color: #999;
+            color: #fff;
+        }
+        
+        .status1 {
+            height: 4px;
+            width: 4px;
+            border-radius: 4px;
+            background-color: #FF2424;
+        }
+        
+        .status3 {
+            height: 4px;
+            width: 4px;
+            border-radius: 4px;
+            background-color: #2BBA87;
+        }
+        
+        .status5 {
+            height: 4px;
+            width: 4px;
+            border-radius: 4px;
+            background-color: #D1D1D1;
+        }
+        /*侧滑*/
+        
+        .r0 {
+            right: 0;
+        }
+        
+        .subListCon {
+            padding: 15px 15px;
+            margin-bottom: 25px;
+            background-image: url('img/xc/yes.png');
+            background-size: 100% 100%;
+            height: 100%;
+            width: 100%;
+            z-index: 999;
+            transform: translate3d(0px, 0px, 0px);
+            /*规定应用过渡的CSS属性*/
+            transition-property: transform;
+            /*规定应用过渡所花费的时间*/
+            transition-duration: 0s;
+            /*规定过渡效果从何开始，默认是0*/
+            transition-delay: 0;
+            /*规定过渡的时间曲线*/
+            transition-timing-function: linear;
+            position: relative;
+        }
+        
+        .subListTitle {
+            position: absolute;
+            line-height: 157px;
+            height: 157px;
+            top: 0px;
+            z-index: 10;
+            background-color: #FF2424;
+            border-radius: 0px 4px 4px 0px;
+        }
+        
+        .r0>.subRight {
+            display: block;
+            float: left;
+            width: 70px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">历史行程</div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main" id="list">
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script type="text/javascript" src="inc/sideslipMob.js"></script>
+
+<script>
+    function pageload() {
+        model.search();
+    }
+
+    function pageresume() {
+
+    }
+    var model = {
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/ptravel/historylist',
+                    refreshTypeGet: true
+                });
+
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('listTpl', d.data);
+                    refresh.appendHtml(h);
+                    loadtoch();
+                };
+            } else {
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        },
+        del: function(a, id) {
+            event.stopPropagation();
+            Comm.confirm('确认删除？', function(d) {
+                if (d) {
+                    AJAX.POST('/api/ptravel/del', {
+                        travelId: id
+                    }, function(d) {
+                        if (d.code == 1) {
+                            Comm.message('删除成功')
+                            $('#' + id).remove()
+                        } else {
+                            Comm.message(d.msg);
+                        }
+                    })
+                }
+            })
+        }
+    }
+</script>
+
+<script id="listTpl" type="text/html">
+    {{each $data v k }}
+    <div class="list" id="{{v.travelId}}" onclick="Comm.go('tripdetail.html?id={{v.travelId}}&bbk=1')">
+        <div class="subListCon">
+            <div class="flex-between">
+                <div>
+                    <!--PUB(1,"发布成功(未认证)"),UPLOAD(2,"已上传凭证未审核"),AGREE(3,"审核通过"),FINISH(4,"正常结束"),REFUSE(5,"审核不通过"),TIMEOUT(6,"认证超时"),CANCEL(7,"取消"),-->
+
+                    <span class="f15">已认证</span>
+                    <span class="inblock status3"></span>
+                    <div class="f12 color999">{{formatDate(v.creatime,'Y年m月d日')}}创建</div>
+                </div>
+                <div><img src="img/ic_more_g.png" height="12" /></div>
+            </div>
+            <div class="mart20">
+                <div class="flex_wrap" style="height: 50px;">
+                    <div style="width: 20px;position: relative;">
+                        <div class="posb"></div>
+                        <span class="bodk">&nbsp;</span>
+                    </div>
+                    <div>
+                        <span class="f15">{{formatDate(v.destinationTime,'m月d日')}}</span>
+                        <span class="f13 color666 marl15 marr20">前往</span>
+                        <img src="{{OSS(v.dimg)}}" class="countryLogo" onerror="app.errorimg(this)" />
+                        <span class="f13 color666">{{v.destinationName}}</span>
+                    </div>
+                </div>
+                <div class="flex_wrap" style="height: 20px;">
+                    <div style="width: 20px;position: relative;">
+                        <span class="bodk">&nbsp;</span> {{if(0>v.destinationTime.indexOf(formatDate(v.fromTime,'Y')))}}
+                        <span class="year f10">{{formatDate(v.fromTime,'Y')}}</span> {{/if}}
+                    </div>
+                    <div>
+                        <span class="f15">{{formatDate(v.fromTime,'m月d日')}}</span>
+                        <span class="f13 color666 marl15 marr20">返回</span>
+                        <img src="{{OSS(v.fimg)}}" class="countryLogo" onerror="app.errorimg(this)" />
+                        <span class="f13 color666">{{v.fromName}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="subListTitle r0">
+            <a class="subRight  colorfff" onclick="model.del(this,'{{v.travelId}}')">删除</a>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

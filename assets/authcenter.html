@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>认证中心</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">认证中心</div>
+        </div>
+    </header>
+    <section>
+        <div class="paddl20 paddr20 bg_white">
+            <div class="lh65 flex-between  borderb" onclick="Comm.go('certificationsucc.html?close=1')">
+                <div>
+                    <img src="img/xc/ic_verified.png" height="15" />
+                    <span class="f15">实名认证</span>
+                </div>
+                <div>
+                    <span class="f13 color999">已认证</span>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+            <div class="lh65 flex-between borderb hide" onclick="Comm.go('certificationsucc.html')">
+                <div>
+                    <img src="img/xc/ic_sesame.png" height="15" />
+                    <span class="f15">芝麻信用</span>
+                </div>
+                <div>
+                    <span class="f13 color999">信用极好</span>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+            <div class="lh65 flex-between" onclick="Comm.go('certificationsucc.html?close=1&hzsucc=1')">
+                <div>
+                    <img src="img/xc/ic_passport.png" height="15" />
+                    <span class="f15">护照认证</span>
+                </div>
+                <div>
+                    <span class="f13 color999">已认证</span>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+
+    }
+
+    function pageresume() {}
+</script>
+
+</html>

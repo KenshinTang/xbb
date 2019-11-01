@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>上传登机牌</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+        
+        button {
+            border-radius: 4px;
+        }
+        
+        button.rg {
+            color: #fff;
+            background-color: #333;
+        }
+        
+        #box {
+            height: 200px;
+            position: relative;
+            border-radius: 4px;
+        }
+        
+        .pos {
+            position: absolute;
+            height: 200px;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            left: 0px;
+            top: 0px;
+            z-index: 2;
+            text-align: center;
+            border-radius: 4px;
+        }
+        
+        .pos img {
+            margin-top: 25px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">上传登机牌</div>
+        </div>
+    </header>
+    <section>
+
+    </section>
+    <footer class="center mart10 marb10">
+    </footer>
+</body>
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        id: Comm.query('id'),
+        boardingCheck: 24,
+        init: function() {
+            var url = "/api/ptravel/detail";
+            Comm.resizeSection();
+            AJAX.GET(url + "?travelId=" + model.id, function(d) {
+                if (d.code == 1) {
+                    $('section').html(template('mainTpl', d.data));
+                    model.upimg();
+                }
+            });
+
+        },
+        upimg: function() {
+            var upimg = new imgUploader('upimg');
+            upimg.success = function() {
+                var cimgUrl = this.imgList.length > 0 ? this.imgList[0] : 'img/error.png';
+                model.uploadImg = cimgUrl;
+                $('#box').html('<img height="200" style="position: relative;z-index:1;" width="100%" src="' + Comm.OSS.getImgUrl(model.uploadImg, 'd') + '"/>');
+                $('#box').append('<div class="pos" ><img width="100" src="img/xc/ic_succ.png"/><div class="center f15 colorfff mart10">上传成功</div></div>');
+                $('button.no').removeClass('no');
+                $('#upimg').html('重新上传').addClass('rg');
+            }
+
+        },
+        sub: function(a) {
+            if ($(a).hasClass('no')) {
+                Comm.message('请上传登机牌');
+                return
+            }
+            AJAX.POST('/api/ptravel/uploadImg', {
+                travelId: model.id,
+                uploadImg: model.uploadImg
+            }, function(d) {
+                if (d.code == 1) {
+                    Comm.message('上传成功，待审核');
+                    Comm.close();
+                } else {
+                    Comm.message(d.msg);
+                }
+            })
+        }
+    }
+</script>
+
+<script id="mainTpl" type="text/html">
+    <div class="main">
+        <div id="box">
+
+        </div>
+        <div class="dflex mart10">
+            <div>
+                <button id="upimg">上传登机牌</button>
+            </div>
+            <div>
+                <button class="no" onclick="model.sub(this)">确定</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+</html>

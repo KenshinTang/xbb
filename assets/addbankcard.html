@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>添加银行卡</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section{
+            background-color: #F5F5F5;
+        }
+        .main {
+         background-color: #fff; 
+         padding:0px 20px;  
+        }
+        button.no{
+            background:rgba(216,216,216,1);
+            box-shadow:0px -2px 12px 0px rgba(103,103,103,0.09);
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">添加银行卡</div>
+        </div>
+    </header>
+    <section>
+        <div class="lh30 f13 paddl20" style="background-color: #FFCD1F;">请绑定持卡人本人的银行卡，仅支持储蓄卡</div>
+        <div class="main">
+            <div class="flex_wrap paddt20 paddb20 borderb">
+                <div>
+                    <span class="f15">持卡人</span>
+                </div>
+                <div class="marl30">
+                    <input style="width:100%;" type="text" placeholder="请输入持卡人姓名" class="colorc7"/>
+                </div>
+            </div>
+            <div class="flex_wrap paddt20 paddb20 borderb">
+                <div>
+                    <span class="f15">身份证</span>
+                </div>
+                <div class="marl30">
+                    <input style="width:100%;" type="text" placeholder="请输入您的有效身份证号码" class="colorc7"/>
+                </div>
+            </div>
+            <div class="flex_wrap paddt20 paddb20 borderb">
+                <div>
+                    <span class="f15">卡号</span>
+                </div>
+                <div class="marl30">
+                    <input style="width:100%;" type="text" placeholder="请输入持卡人姓名" class="colorc7"/>
+                </div>
+            </div>
+            <div class="flex_wrap paddt20 paddb20 borderb">
+                <div>
+                    <span class="f15">持类型</span>
+                </div>
+                <div class="marl30">
+                    <span class="f15">储蓄卡／华夏银行</span>
+                </div>
+            </div>
+            <div class="flex_wrap paddt20 paddb20 borderb">
+                <div>
+                    <span class="f15">手机号</span>
+                </div>
+                <div class="marl30">
+                    <input style="width:100%;" type="text" placeholder="请输入银行卡预留手机号" class="colorc7"/>
+                </div>
+            </div>
+        </div>
+        <div class="lh40 paddl20">
+            <img src="img/pay/ic_check_n.png" height="13"/>
+            <span class="f13 color666">同意</span>
+            <span class="f13" style="color: #007AFF;">《服务协议》</span>
+            <span class="f13 color666">内容</span>
+        </div>
+        <div class="center paddb10 paddt10 mart20">
+            <button style="border-radius: 4px; " class="no">绑定银行卡</button>
+        </div>
+    </section>
+</body>
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {}
+
+    function pageresume() {
+
+    }
+</script>
+
+</html>

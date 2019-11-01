@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>绑定手机</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17">验证</div>
+        </div>
+    </header>
+    <section>
+        <div class="paddl20 paddr20 bg_white" onclick="model.send();">
+            <div class="lh65 flex-between">
+                <div class="f15">验证绑定手机</div>
+                <div>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+        </div>
+        <div class="lh20 f12 color999 paddl20 paddr20 mart10">
+            你正在设置6位数字密码，请用以上验证方式完成身份验证
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+        ShortMsg.init(function(code) {
+            model.sub(code);
+        });
+
+    }
+
+    function pageresume() {
+
+    }
+    var model = {
+        send: function() {
+            var phone = Comm.db('userinfo').phone;
+            ShortMsg.show(phone, 4);
+        },
+        sub: function(code) {
+            //验证验证码是否正确
+            AJAX.POST('/api/customer/checkMsgByOnly', {
+                phone: Comm.db('userinfo').phone,
+                code: code.join(''),
+                bo: 4
+            }, function(a) { //注册
+                if (a.code == 1) {
+                    Comm.go('setpaypwd.html?code=' + code.join(''));
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        }
+    }
+</script>
+
+</html>

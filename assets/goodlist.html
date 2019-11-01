@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Apple</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+
+    <style>
+        .navItemIcon {
+            background: inherit;
+        }
+        
+        .main {
+            padding: 20px;
+        }
+        
+        .listgoods {
+            width: calc(50% - 10px);
+            margin-right: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .listgoods:nth-child(2n) {
+            margin-right: 0px;
+            margin-left: 10px;
+        }
+        
+        #WTDBOX {
+            top: 44px;
+        }
+        
+        #WTDBOX .query {
+            background-color: #fff;
+            padding: 20px;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+        }
+        
+        #MainBg {
+            top: 44px;
+            height: calc(100% - 44px);
+        }
+        
+        #WTDBOX button {
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+        }
+        
+        #WTDBOX .nth258 button {
+            height: 30px;
+            line-height: 30px;
+            color: #333;
+            width: 100%;
+        }
+        
+        #WTDBOX button.no {
+            background-color: #fff;
+            border: 1px solid #F1F1F1;
+        }
+        
+        #WTDBOX .dflex div:nth-child(2) {
+            margin-left: 13px;
+            margin-right: 13px;
+        }
+        
+        button.cz {
+            color: #fff;
+            background: linear-gradient(45deg, rgba(81, 81, 81, 1) 0%, rgba(51, 51, 51, 1) 100%);
+        }
+        
+        #WTDBOX .nth258 {
+            flex-grow: 3;
+        }
+        
+        #WTDBOX .nth258 div {
+            width: calc((100% - 20px)/3);
+        }
+        
+        #WTDBOX .nth258 div:nth-child(3n-1) {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navItemIcon marl5 marr10 color666 hide" onclick="model.query()">筛选</div>
+            <div class="navTitle">Apple</div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main">
+            <div class="flex_wrap" id="list">
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+
+    <div wtd="queryWinTemp" class="query" id="category">
+
+    </div>
+</body>
+<script id="categoryTpl" type="text/html">
+    <div class="flex_wrap nth258">
+        {{each $data v k }}
+        <div style="">
+            <button class="{{ids.indexOf(v.category_id)>=0?'':'no'}}" onclick="model.sel(this,'{{v.category_id}}')">{{v.category_name}}</button>
+        </div>
+        {{/each}}
+    </div>
+    <div class="flex_wrap">
+        <button style="width:25%; margin-bottom: 0px;" class="cz" onclick="model.resetting()">重置</button>
+        <button style="width:calc(75% - 10px); margin-bottom: 0px; margin-left: 10px;" onclick="model.search()">确定</button>
+    </div>
+</script>
+<script id="goodsList" type="text/html">
+    {{each $data v k }}
+    <div class="listgoods" onclick="Comm.go('gooddetail.html?spuId={{v.spu_id}}')">
+        <div class="borderdus center">
+            <img src="{{OSS(v.master_image_local,'d')}}" width="100%" height="158" style="object-fit: contain;" onerror="app.errorimg(this)" />
+        </div>
+        <div class="lh20 wordW2 mart10" style="height: 40px;">
+            {{v.name}}
+        </div>
+    </div>
+    {{/each}}
+</script>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+
+<script>
+    function pageload() {
+        $(".navTitle").html(model.brandId);
+        model.categoryListByBrandId();
+        model.search();
+    }
+
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        brandId: Comm.query('brandId'),
+        categoryIds: [],
+        sel: function(a, categoryId) {
+            if ($(a).hasClass('no')) {
+                $(a).removeClass('no');
+                model.categoryIds.push(categoryId);
+            } else {
+                $(a).addClass('no');
+                var i = model.categoryIds.indexOf(categoryId);
+                if (i >= 0) {
+                    model.categoryIds = model.categoryIds.del(i);
+                }
+            }
+        },
+        resetting: function() {
+            $('#WTDBOX .nth258').find('button').addClass('no');
+            model.categoryIds = [];
+        },
+        query: function(a, id) {
+            Comm.showWindow();
+            Comm.showWindow('queryWinTemp', true);
+            $('#WTDBOX,#MainBg').css('top', $('header').height() + "px");
+            $('#WTDBOX').css('height', 'calc(100% - ' + $('header').height() + 'px)')
+            model.category.ids = model.categoryIds;
+            $("#WTDBOX #category").html(template('categoryTpl', model.category));
+        },
+        categoryListByBrandId: function() {
+            //热门品牌
+            AJAX.POST('/api/goods/brandListByCategory', {
+                brandId: model.brandId
+            }, function(a) {
+                if (a.code == 1) {
+                    model.category = a.data;
+                    $('.navItemIcon').removeClass('hide');
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/goods/goodsList',
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+                    categoryIds: model.categoryIds.join(','),
+                    brandId: model.brandId,
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('goodsList', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+                Comm.showWindow();
+                model.mere.refreshOption.refreshParm = {
+                    categoryIds: model.categoryIds.join(','),
+                    brandId: model.brandId
+                };
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        }
+    }
+</script>
+
+</html>

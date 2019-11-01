@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>意见反馈</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .navItem {
+            color: #999;
+        }
+        
+        .navItem.colorprice {
+            color: #FF5B1F;
+        }
+        
+        textarea {
+            padding: 20px;
+            height: 220px;
+            background-color: #fff;
+            border: 0px;
+            width: 100%;
+        }
+        
+        .pos {
+            position: absolute;
+            top: 220px;
+            right: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navItem f13" onclick="model.send()">发送</div>
+            <div class="navTitle f17">意见反馈</div>
+        </div>
+    </header>
+    <section>
+        <textarea class="f15 lh15" placeholder="我们的成长离不开您的建议和吐槽" oninput="model.oninput(this)"></textarea>
+        <span class="pos colorc7">0/140</span>
+    </section>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {
+
+    }
+
+    function pageresume() {}
+    var isckick = true;
+    var model = {
+        oninput: function(a) {
+            if ($(a).val().length > 140) {
+                var v = $(a).val().substr(0, 140)
+                $(a).val(v);
+            }
+            $('.pos').html($(a).val().length + "/140");
+            if ($(a).val()) {
+                $('.navItem').addClass('colorprice');
+            } else {
+                $('.navItem').removeClass('colorprice');
+            }
+        },
+        send: function() {
+            if (!isckick) {
+                return false;
+            }
+            isckick = false;
+            var content = $('textarea').val();
+            if (!content) {
+                Comm.message('请输入您的宝贵意见');
+                return
+            }
+            AJAX.POST('/api/complain/add', {
+                content: content
+            }, function(d) {
+                isckick = true;
+                if (d) {
+                    Comm.message('我们已收到你的意见反馈');
+                    $('textarea').val('');
+                    Comm.close();
+                } else {
+                    Comm.message(d.msg);
+                }
+            })
+        }
+    }
+</script>
+
+</html>

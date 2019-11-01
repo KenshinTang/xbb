@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .mart70 {
+            margin-top: 70px;
+        }
+        
+        #phone {
+            font-size: 17px;
+            line-height: 40px;
+            border-bottom: 1px solid #F1F1F1;
+            width: 75%;
+        }
+        
+        button {
+            width: 75%;
+            background: #D8D8D8;
+            color: #fff;
+            font-size: 15px;
+            border-radius: 4px;
+        }
+        
+        button.active {
+            background: #FFCD1F;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+    </header>
+    <section>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+        </div>
+        <div class="paddb20">
+            <div class="f25 center mart70" style="font-weight: 500;">输入手机号</div>
+            <div class="mart30 center" style="position: relative;">
+                <input type="tel" number name="phone" id="phone" placeholder="请输入手机号" oninput="model.oninput(this)" data-reg='m' maxlength="11" />
+                <img src="img/ic_delete_g.png" style="position: absolute;top:10px;right: 15%;" height="20" class="hide ic_delete_g" onclick="model.clear(this)" />
+                <div class="mart20 tright" style="width: 87.5%;" onclick="Comm.go('loginpwd.html')">
+                    <span class="color666">有账号？ </span>
+                    <span class="colorc007AFF">去登录</span>
+                </div>
+            </div>
+            <div class="mart20 center">
+                <button id="sub" onclick="model.sub(this)">确定</button>
+                <div class="mart10" style="">
+                    <span class="color666">注册代表你已同意</span>
+                    <span class="colorc007AFF" onclick="Comm.go('ab.html?id=2')">注册协议</span>
+                    <span class="color666">和</span>
+                    <span class="colorc007AFF" onclick="Comm.go('ab.html?id=3')"> 隐私政策</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="center paddb20 paddb20" onclick="openLogin.login()">
+            <div><img src="img/open/wechat-h.png" width="30" /></div>
+            <div class="colorc7 f12 mart10">微信快捷登录</div>
+        </div>
+    </footer>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript">
+    function pageload() {
+        ShortMsg.init(function(code) {
+            model.reg(code);
+        });
+    }
+
+    function androidback() {
+        Comm.gotop('index.html');
+    }
+
+    var model = {
+        clear: function(a) {
+            $(a).parent().find('input').val('');
+            $(a).addClass('hide');
+            $('#sub').removeClass('active');
+        },
+        oninput: function(a) {
+            if ($(a).val()) {
+                $(a).parent().find('.ic_delete_g').removeClass('hide');
+            } else {
+                $(a).parent().find('.ic_delete_g').addClass('hide');
+            }
+            var reg = /^1\d{10}$/;
+            if (!reg.test($(a).val())) {
+                $('#sub').removeClass('active');
+                return;
+            }
+            $('#sub').addClass('active');
+        },
+        sub: function(a) {
+            if ($(a).hasClass('active')) {
+                var data = Check.submit('POST');
+                if (!data) {
+                    return false;
+                }
+                ShortMsg.show(data.phone, 1);
+            }
+        },
+        reg: function(code) {
+            var data = Check.submit('POST');
+            if (!data) {
+                return false;
+            }
+            data.code = code.join('');
+            //验证验证码是否正确
+            AJAX.POST('/api/customer/checkMsgByOnly', {
+                phone: data.phone,
+                code: code.join(''),
+                bo: 1
+            }, function(a) { //注册
+                if (a.code == 1) {
+                    Comm.go('setpwd.html?code=' + code.join('') + '&phone=' + data.phone);
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        }
+    }
+</script>
+
+</html>

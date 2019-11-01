@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ChatListActivity"
+    android:background="#ffffff">
+
+    <RelativeLayout
+        android:id="@+id/chat_re"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="#ffffff">
+        
+        <ImageView
+            android:id="@+id/chat_list_back"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/back_im_it"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="消息"
+            android:textSize="18sp"
+            android:textColor="#333333"
+            />
+
+        <TextView
+            android:id="@+id/chat_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:text="设置"
+            android:layout_marginEnd="20dp"
+            android:textSize="17sp"
+            android:textColor="#666666"
+            />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/xxxx"
+        android:layout_below="@+id/chat_re"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#F1F1F1"/>
+    
+    <RelativeLayout
+        android:id="@+id/xitong"
+        android:layout_below="@+id/xxxx"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:background="#ffffff"
+        >
+        <ImageView
+            android:id="@+id/xitong_img"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/msg"
+            />
+
+        <TextView
+            android:id="@+id/xitong_text"
+            android:layout_toRightOf="@+id/xitong_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:layout_marginStart="20dp"
+            android:text="系统消息"
+            android:textColor="#333333"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/xitong_mess"
+            android:layout_width="234dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/xitong_img"
+            android:layout_below="@id/xitong_text"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="12dp"
+            android:text="新版本上线啦，快来看看有什么新功能吧"
+            android:maxLines="1"
+            android:ellipsize="end"
+            />
+
+        <ImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginTop="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/ic_more_g"
+            />
+
+        <TextView
+            android:id="@+id/messred"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="20dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="22dp"
+            android:background="@drawable/text_circle_white"
+            />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/xxxx2"
+        android:layout_below="@+id/xitong"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="#F5F5F5"/>
+
+
+    <com.tencent.qcloud.tim.uikit.modules.conversation.ConversationLayout
+        android:id="@+id/conversation_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/xxxx2"
+        android:background="#ffffff"/>
+
+</RelativeLayout>

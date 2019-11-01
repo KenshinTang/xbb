@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>选择银行卡</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section,
+        footer {
+            background-color: #F5F5F5;
+        }
+        
+        .main {
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">选择银行卡</div>
+        </div>
+    </header>
+    <section>
+        <div class="main">
+            <div class="flex-between paddt20 paddb20 borderb paddl20 paddr20">
+                <div>
+                    <img src="img/pay/ic_bank_card.png" height="40" />
+                    <span class="f17">华夏银行（尾号3848）</span>
+                </div>
+                <div>
+                    <img src="img/pay/ic_check_n.png" height="20" />
+                </div>
+            </div>
+            <div class="flex-between paddt20 paddb20 borderb paddl20 paddr20">
+                <div>
+                    <img src="img/pay/ic_bank_card.png" height="40" />
+                    <span class="f17">华夏银行（尾号3848）</span>
+                </div>
+                <div>
+                    <img src="img/pay/ic_check_n.png" height="20" />
+                </div>
+            </div>
+            <div class="paddt20 paddb20 borderb paddl20 paddr20" onclick="Comm.go('addbankcard.html')">
+                <img src="img/pay/ic_add_trip.png" height="14" class="marl15" />
+                <span class="f17">使用新卡提现</span>
+            </div>
+        </div>
+    </section>
+    <footer class="center paddb10 paddt10">
+        <input type="hidden" id="paydata" value="" />
+        <button style="border-radius: 4px;" onclick="model.pay()">确定</button>
+    </footer>
+</body>
+
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    function pageload() {}
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        pay: function() {
+            var data = {
+                price: 99,
+                mark: '支付',
+                name: '请输入支付密码'
+            };
+            $('#paydata').val(JSON.stringify(data));
+            showpayinput('pay', Comm.g('paydata'));
+        }
+    }
+
+    function nextbc() {
+        Comm.go('paysucc.html');
+    }
+</script>
+
+</html>

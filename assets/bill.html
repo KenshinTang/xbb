@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>账单详情</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .price {
+            padding: 50px 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">账单详情</div>
+        </div>
+    </header>
+    <section>
+        <div class="bg_white" id="content">
+            
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script id="contentTpl" type="text/html">
+	<div class="f24 center price">{{if isPay==1}}-{{else}}+{{/if}} {{priceTp(account)}}</div>
+            <div class="paddr20 paddl20">
+                <div class="flex-between lh50">
+                    <div class="f15 color999">
+                        付款方式
+                    </div>
+                    <div class="f15 color666">
+                        {{if payType==1}}
+                        余额
+                        {{else if payType==2}}
+                        微信
+                        {{else}}
+                        支付宝
+                        {{/if}}
+                    </div>
+                </div>
+                <div class="flex-between lh50">
+                    <div class="f15 color999">
+                        账单说明
+                    </div>
+                    <div class="f15 color666">
+                        {{remark}}
+                    </div>
+                </div>
+                <div class="flex-between lh50">
+                    <div class="f15 color999">
+                        创建时间
+                    </div>
+                    <div class="f15 color666">
+                        {{addTime}}
+                    </div>
+                </div>
+                <div class="flex-between lh50">
+                    <div class="f15 color999">
+                        订单号
+                    </div>
+                    <div class="f15 color666">
+                        {{orderNum}}
+                    </div>
+                </div>
+            </div>
+</script>
+<script>
+	var id = Comm.query('id');
+    function pageload() {
+		model.init();
+    }
+
+    function pageresume() {}
+    var model={
+    	init:function(){
+    		AJAX.GET('/api/customer/balanceInfo?balanceInfoId='+id,function(d){
+    			if(d&&d.code==1){
+    				$('#content').html(template('contentTpl',d.data));
+    			}
+    		})
+    	}
+    }
+</script>
+
+</html>

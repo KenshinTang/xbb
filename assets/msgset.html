@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>消息设置</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17">消息设置</div>
+        </div>
+    </header>
+    <section>
+
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {}
+    var model = {
+        user: Comm.db('userinfo'),
+        init: function() {
+            model.msgSend = model.user.msgSend
+                //msgSend// 0 接收全部 1 只接受系统消息 2 只接受IM消息,3 都不接受
+            $('section').html(template('sectionTpl', model.user));
+        },
+        sub: function(a, i) {
+            var open = false;
+            if ($(a).find("img").attr('src').indexOf('btn_switch_y') > 0) { //关闭
+                if (model.msgSend == 1 || model.msgSend == 2) {
+                    model.msgSend = 3;
+                } else {
+                    model.msgSend = i == 1 ? 2 : 1;
+                }
+            } else { //开启
+                if (model.msgSend == 1 || model.msgSend == 2) {
+                    model.msgSend = 0;
+                } else {
+                    model.msgSend = i;
+                }
+                open = true;
+            }
+            AJAX.POST('/api/customer/msgSend', {
+                msgSend: model.msgSend
+            }, function(d) {
+                if (d.code == 1) {
+                    Comm.message('设置成功');
+                    if (open) {
+                        $(a).find('img').attr('src', 'img/my/btn_switch_y.png');
+                    } else {
+                        $(a).find('img').attr('src', 'img/my/btn_switch_g.png');
+                    }
+                    model.user.msgSend = model.msgSend;
+                    Comm.db('userinfo', model.user);
+                } else {
+                    Comm.message(d.msg);
+                }
+            })
+        }
+    }
+</script>
+
+<script id="sectionTpl" type="text/html">
+    <div class="paddl20 paddr20 bg_white">
+        <div class="lh65 flex-between borderb" onclick="model.sub(this,2)">
+            <div class="f15">即时消息</div>
+            <div>
+                {{if(msgSend==0||msgSend==2)}}
+                <img src="img/my/btn_switch_y.png" height="34" /> {{else}}
+                <img src="img/my/btn_switch_g.png" height="34" /> {{/if}}
+            </div>
+        </div>
+        <div class="lh65 flex-between" onclick="model.sub(this,1)">
+            <div class="f15">系统消息</div>
+            <div>
+                {{if(msgSend==0||msgSend==1)}}
+                <img src="img/my/btn_switch_y.png" height="34" /> {{else}}
+                <img src="img/my/btn_switch_g.png" height="34" /> {{/if}}
+            </div>
+        </div>
+    </div>
+</script>
+
+</html>

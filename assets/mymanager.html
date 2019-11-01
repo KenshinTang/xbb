@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>个人管理</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17">个人管理</div>
+        </div>
+    </header>
+    <section>
+        <div class="paddl20 paddr20 bg_white">
+            <div class="lh65 flex-between borderb">
+                <div class="f15">头像</div>
+                <div class="flex-between">
+                    <div id="upface"></div>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+            <div class="lh65 flex-between borderb" onclick="Comm.go('upname.html?type=1')">
+                <div class="f15">昵称</div>
+                <div>
+                    <span id="nickName" class="f13">张三</span>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+            <div class="lh65 flex-between" onclick="Comm.go('upname.html?type=2')">
+                <div class="f15">个性签名</div>
+                <div>
+                    <span id="autograph" class="f13 color999">简单介绍下自己~</span>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+        </div>
+        <div style="background-color: #F5F5F5;height: 10px;">
+        </div>
+        <div class="paddl20 paddr20 bg_white">
+            <div class="lh65 flex-between borderb hide nobbk" onclick="Comm.go('addrsel.html')">
+                <div class="f15">我的收货地址</div>
+                <div>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+            <div class="lh65 flex-between hide nobbk" onclick="Comm.go('safe.html')">
+                <div class="f15">安全中心</div>
+                <div>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+            <div class="lh65 flex-between hide country" onclick="Comm.go('country.html?resouce=djd')">
+                <div class="f15">定居地</div>
+                <div>
+                    <span class="f13" id="chinese_name">未设置</span>
+                    <img src="img/ic_more_g.png" height="13" class="marl5" />
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script>
+    var customer = Comm.db('userinfo');
+
+    function pageload() {
+        $("#upface").html('<img id="face" src="' + Comm.OSS.getImgUrl(customer.face, 's') + '" height="40" width="40" style="border-radius: 40px;" onerror="app.herrorimg(this)" />');
+        $("#nickName").html(customer.nickName);
+        $("#autograph").html(customer.autograph ? customer.autograph : '简单介绍下自己~');
+        model.init();
+        if (customer.settlement) {
+            $('#chinese_name').html(customer.settlement);
+        }
+    }
+
+    function pageresume() {
+        customer = Comm.db('userinfo');
+        $("#nickName").html(customer.nickName);
+        $("#autograph").html(customer.autograph ? customer.autograph : '简单介绍下自己~');
+        model.updateSettlement();
+    }
+    var model = {
+        bbk: Comm.query('bbk'),
+        init: function() {
+            if (model.bbk == 1) {
+                $(".country").removeClass('hide');
+            } else {
+                $(".nobbk").removeClass('hide');
+            }
+            var upface = new imgUploader("upface");
+            upface.success = function() {
+                var cimgUrl = this.imgList.length > 0 ? this.imgList[0] : 'img/error.png';
+                model.face = cimgUrl;
+
+                AJAX.POST('/api/customer/updateFace', {
+                    face: cimgUrl
+                }, function(d) {
+                    if (d.code == 1) {
+                        customer.face = cimgUrl;
+                        $('#face').attr('src', Comm.OSS.getImgUrl(customer.face, 's'))
+                        Comm.db('userinfo', customer);
+                        Comm.message('设置成功！')
+                    }
+                })
+            }
+        },
+        updateSettlement: function() {
+            var djd = Comm.db('countrydjd');
+            if (djd) {
+                //定居地
+                AJAX.POST('/api/customer/updateSettlement', {
+                    countryId: djd.country_id
+                }, function(d) {
+                    if (d.code == 1) {
+                        customer.settlement = djd.chinese_name
+                        Comm.db('userinfo', customer);
+                        $('#chinese_name').html(djd.chinese_name);
+                        Comm.message('设置成功！')
+                    }
+                })
+            }
+        }
+    }
+</script>
+
+</html>

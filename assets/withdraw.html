@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>选择提现方式</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">选择提现方式</div>
+        </div>
+    </header>
+    <section>
+        <div class="bg_white paddr20 paddl20" id="content">
+
+        </div>
+        <div class="paddr20 paddl20 lh20 mart10 color999">
+            请确保填写正确的微信号和支付宝账号，如填写错误导致提现失败，平台概不负责；
+        </div>
+        <div class="center mart30 paddr20 paddl20">
+            <button class="no" onclick="model.sub()" style="border-radius: 4px;width: 100%;">下一步</button>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script id="contentTpl" type="text/html">
+    <div class="flex-between lh65 borderb hide">
+        <div class="flex_wrap">
+            <div>
+                <img class="chenge" src="img/pay/ic_check_n.png" onclick="model.chenge(this,3)" height="20" />
+                <img src="img/pay/weixin.png" height="40" class="marl10" />
+            </div>
+            <div class="lh20 mart15 marl10">
+                <div class="f15">微信</div>
+                <div class="f13 color999" id="wxpay">{{wxpayName?wxpayName:'请添绑定微信账号'}}</div>
+            </div>
+        </div>
+        <div class="f15 colorprice" onclick="model.opwx()">
+            {{if wxpay==""}}添加{{else}}修改{{/if}}
+        </div>
+    </div>
+    <div class="flex-between lh65">
+        <div class="flex_wrap">
+            <div>
+                <img class="chenge" src="img/pay/ic_check_n.png" onclick="model.chenge(this,1)" height="20" />
+                <img src="img/pay/zfb.png" height="40" class="marl10" />
+            </div>
+            <div class="lh20 mart15 marl10">
+                <div class="f15">支付宝</div>
+                <div class="f13 color999" id="alipay">{{alipay?alipay:'请添加支付宝账号'}}</div>
+            </div>
+        </div>
+        <div class="f15 colorprice" onclick="Comm.go('zfb.html')">
+            {{if alipay==""}}添加{{else}}修改{{/if}}
+        </div>
+    </div>
+</script>
+<script>
+    function pageload() {
+        model.init()
+    }
+
+    function pageresume() {
+        model.init();
+    }
+    var model = {
+        data: null,
+        init: function() {
+            AJAX.GET('/api/customer/accountInfo', function(d) {
+                if (d && d.code == 1) {
+                    model.data = d.data;
+                    $('#content').html(template('contentTpl', d.data));
+                }
+            })
+        },
+        pay: 1,
+        chenge: function(e, p) {
+            if ($(e).attr('src') == 'img/pay/ic_check_n.png') {
+                $('.chenge').attr('src', 'img/pay/ic_check_n.png');
+                $(e).attr('src', 'img/pay/ic_check_y.png');
+                model.pay = p;
+                $('button').removeClass('no');
+            }
+        },
+        sub: function() {
+            if (!$('button').hasClass('no')) {
+                if (model.pay == 1 && !model.data.alipay) {
+                    Comm.message('请添加支付宝账号')
+                    return
+                }
+                if (model.pay == 3 && !model.data.wxpay) {
+                    Comm.message('请添绑定微信账号')
+                    return
+                }
+
+                if (model.pay == 1) {
+                    var num = model.data.alipay;
+                } else {
+                    var num = model.data.wxpay;
+                }
+                Comm.go('withdrawnext.html?pay=' + model.pay + '&num=' + num + "&name=" + model.data.wxpayName);
+            }
+        },
+        opwx: function() {
+            openLogin.login(1, function(d) {
+                AJAX.POST("/api/customer/saveWxPay", {
+                    wxPay: d.openid,
+                    wxPayName: d.nickname,
+                }, function(a) {
+                    model.data.wxpayName = d.nickname;
+                    model.data.wxpay = d.openid;
+                    $('#wxpay').html(model.data.wxpayName);
+                })
+            });
+        }
+    }
+</script>
+
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>行程信息</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        input {
+            background-color: #fff;
+            font-size: 15px;
+        }
+        
+        .border4 {
+            border-left: 4px solid #FFCD1F;
+        }
+        
+        #WTDBOXTD {
+            display: block;
+            padding: 20px;
+        }
+        
+        .succ,
+        .error {
+            background-color: #fff;
+            width: 100%;
+            border-radius: 4px;
+        }
+        
+        .colorc7 {
+            color: #C7C7C7;
+        }
+        
+        .btn.bqspan {
+            width: auto;
+            height: 18px;
+            line-height: 18px;
+            margin-right: 3px;
+            text-align: center;
+            padding: 0 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="model.back()"></div>
+            <div class="navTitle f17">行程信息</div>
+        </div>
+    </header>
+    <section>
+        <div class="bg_white paddl20 paddr20 paddt20">
+            <div class="f17 border4 paddl5" style="font-weight:500;">添加出行线路</div>
+            <div class="paddl10 paddr10 lh65 flex_wrap borderb" onclick="Comm.go('xcsel.html?resouce=Start')">
+                <div style="width: 130px;">
+                    <img src="img/xc/ic_positioning.png" height="24" width="24">
+                    <span class="f15 color666">出行地</span>
+                </div>
+                <div class="flex-between" style="width: calc(100% - 130px);">
+                    <span class="f15 colorc7" id="countryStart">选择出行地</span>
+                    <img src="img/ic_more_g.png" height="12" />
+                </div>
+            </div>
+            <div class="paddl10 paddr10 lh65 flex_wrap " onclick="model.startPicker.show()">
+                <div style="width: 130px;">
+                    <img src="img/xc/ic_time.png" height="24" width="24">
+                    <span class="f15 color666">出行时间</span>
+                </div>
+                <div class="flex-between" style="width: calc(100% - 130px);">
+                    <span class="f15 colorc7" id="startDate">选择出行时间</span>
+                    <img src="img/ic_more_g.png" height="12" />
+                </div>
+            </div>
+        </div>
+        <div class="bg_white paddl20 paddr20 paddt20 mart10">
+            <div class="f17 border4 paddl5" style="font-weight:500;">添加返程线路</div>
+            <div class="paddl10 paddr10 lh65 flex_wrap borderb">
+                <div style="width: 130px;">
+                    <img src="img/xc/ic_positioning.png" height="24" width="24">
+                    <span class="f15 color666">返程地</span>
+                </div>
+                <div class="flex-between" style="width: calc(100% - 130px);">
+                    <span class="f17" id="">中国</span>
+                    <img src="img/ic_more_g.png" height="12" class="hide" />
+                </div>
+            </div>
+            <div class="paddl10 paddr10 lh65 flex_wrap " onclick="model.endPicker.show()">
+                <div style="width: 130px;">
+                    <img src="img/xc/ic_time.png" height="24" width="24">
+                    <span class="f15 color666">返程时间</span>
+                </div>
+                <div class="flex-between" style="width: calc(100% - 130px);">
+                    <span class="f15 colorc7" id="endDate">选择返程时间</span>
+                    <img src="img/ic_more_g.png" height="12" />
+                </div>
+            </div>
+        </div>
+        <div class="bg_white paddl20 paddr20 paddt20 mart10">
+            <div class="f17 border4 paddl5" style="font-weight:500;">添加可带商品类型与发货地</div>
+            <div class="paddl10 paddr10 lh65 flex_wrap borderb" onclick="model.sendbq()">
+                <div style="width: 130px;">
+                    <img src="img/xc/ic_daihuo.png" height="24" width="24">
+                    <span class="f15 color666">我能带</span>
+                </div>
+                <div class="flex-between" style="width: calc(100% - 130px);">
+                    <span class="f15 colorc7 wordW" id="goodType">选择行程能带商品类型</span>
+                    <img src="img/ic_more_g.png" height="12" />
+                </div>
+            </div>
+            <div class="paddl10 paddr10 lh65 flex_wrap ">
+                <div style="width: 130px;">
+                    <img src="img/xc/ic_shipaddress.png" height="24" width="24">
+                    <span class="f15 color666">发货地</span>
+                </div>
+                <div class="tright wordW flex-between" style="width: calc(100% - 130px);" onclick="model.areapicker.show();">
+                    <span class="f15 colorc7" id="backCity">选择行程返回后发货城市</span>
+                    <img src="img/ic_more_g.png" height="12" />
+                </div>
+            </div>
+        </div>
+        <div class="paddl20 paddr20 center mart30">
+            <button id="sub" style="border-radius: 4px;width: 100%;" class="no" onclick="model.succ()">确定发布</button>
+        </div>
+    </section>
+    <footer>
+    </footer>
+    <div wtd="succWinTemp" class="succ">
+        <div class="paddl20 paddr20 paddt20">
+            <div class="center">
+                <img src="img/pay/ic_pay_success.png" height="85" />
+            </div>
+            <div class="f24 mart10">发布成功</div>
+            <div class="mart20">
+                <span class="color666 f13">行程提交成功。请您出行</span> <span class="f13 bold" id="boardingCheck">当天36小时</span> <span class="color666 f13">内拍摄登机牌上传认证，以免造成行程失效。</span>
+            </div>
+            <div class="f15 mart30">
+                <button style="border-radius: 4px;width: 100%;" onclick="model.gotripdetail()">去上传</button>
+            </div>
+            <div class="f15 mart10 paddb20">
+                <button style="border-radius: 4px;width: 100%;background-color: #fff;color: #999999;" onclick="Comm.showWindow();Comm.close();">知道了</button>
+            </div>
+        </div>
+    </div>
+    <div wtd="errorWinTemp" class="error">
+        <div class="paddl20 paddr20 paddt20">
+            <div class="center">
+                <img src="img/xc/ic_xingcheng_fail.png" height="85" />
+            </div>
+            <div class="f24 mart10">发布失败</div>
+            <div class="lh25" style="width:60%;margin:0 auto;margin-top: 20px;">
+                <span class="color666 f13">行程上传失败，行程时间与现有行程时间冲突</span>
+            </div>
+            <div class="f15 mart30 paddb20">
+                <button style="border-radius: 4px;width: 100%;" onclick="Comm.showWindow()">知道了</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/picker.min.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script>
+    var now = new Date();
+
+    function pageload() {
+        Area.init(function() {
+            model.init();
+        });
+    }
+
+    function pageresume() {
+        model.countryStart = Comm.db('countryStart');
+        model.bqcategory = Comm.db('bqcategory');
+        model.db();
+    }
+
+    function androidback() {
+        model.back();
+    }
+    var model = {
+        id: Comm.query('id'),
+        countryStart: Comm.db('countryStart'),
+        bqcategory: Comm.db('bqcategory'),
+        tripLongDay: 14,
+        boardingCheck: 36,
+        startDate: '',
+        endDate: '',
+        labels: [],
+        qkdate: function(b, tit) {
+            b = b.replace(/-/g, "/").replace(/\.0/g, "")
+            var date = new Date(b);
+            var now1 = new Date(app.formatDate(now.getTime(), 'Y/m/d'));
+            if (date.getTime() - now1.getTime() < 0) {
+                Comm.message(tit + '时间必须大于等于今天')
+                return false
+            }
+            return true
+        },
+        qkdate1: function() {
+            if (model.startDate && model.endDate) {
+                var a = model.startDate.replace(/-/g, "/").replace(/\.0/g, "")
+                var aa = new Date(a);
+
+                var b = model.endDate.replace(/-/g, "/").replace(/\.0/g, "")
+                var bb = new Date(b);
+                if (aa.getTime() - bb.getTime() > 0) {
+                    Comm.message('出行时间必须小于等于返程时间')
+                    return false
+                }
+
+                if ((bb.getTime() - aa.getTime()) / 1000 > model.tripLongDay * 24 * 60 * 60) {
+                    Comm.message('出行和返程时间间隔不能超过' + model.tripLongDay + '天');
+                    return false
+                }
+
+            }
+            return true
+        },
+        init: function() {
+            model.startPicker = new Datepicker('', function(a, b, c) {
+                model.startDate = b;
+                if (model.qkdate(b, '出行') && model.qkdate1()) {
+                    $('span#startDate').html(b).addClass('f17').removeClass('colorc7');
+                    model.qksucc();
+                } else {
+                    model.startDate = '';
+                }
+            })
+            model.endPicker = new Datepicker('', function(a, b, c) {
+                model.endDate = b;
+                if (model.qkdate(b, '返程') && model.qkdate1()) {
+                    $('span#endDate').html(b).addClass('f17').removeClass('colorc7');
+                    model.qksucc();
+                } else {
+                    model.endDate = '';
+                }
+            })
+            model.areapicker = new Areapicker('', function(a, b, c) {
+                $('span#backCity').html(b).addClass('f17').removeClass('colorc7');
+                model.deliverId = c;
+                model.deliverName = b;
+                model.qksucc();
+            });
+            model.db();
+            if (model.id) {
+                model.getinfo();
+            }
+            AJAX.GET('/api/sysconfig/getlist?key=boardingCheck,tripLongDay', function(d) {
+                if (d.code == 1) {
+                    model.boardingCheck = d.data.boardingCheck.sysvalue;
+                    model.tripLongDay = d.data.tripLongDay.sysvalue;
+                    $('#boardingCheck').html('当天' + model.boardingCheck + '小时');
+                }
+            })
+        },
+        getinfo: function() {
+            AJAX.GET("/api/ptravel/detail?travelId=" + model.id, function(d) {
+                if (d.code == 1) {
+                    model.countryStart = {
+                        country_id: d.data.destinationId,
+                        category_name: d.data.destinationName
+                    }
+                    $('span#countryStart').html(d.data.destinationName).addClass('f17').removeClass('colorc7');
+                    model.deliverId = d.data.deliverId;
+                    model.deliverName = d.data.deliverName;
+                    $('span#backCity').html(model.deliverName).addClass('f17').removeClass('colorc7');
+
+                    model.labels = [];
+                    $('#goodType').html('');
+                    model.labels = d.data.labels.split(',');
+                    d.data.labelsName = d.data.labelsName.split(',');
+                    for (var i = 0; i < d.data.labelsName.length; i++) {
+                        $('#goodType').append('<span class="btn inblock bqspan f10">' + d.data.labelsName[i] + '</span>').addClass('f17').removeClass('colorc7');
+                    }
+                }
+            });
+        },
+        db: function() {
+            if (model.countryStart) {
+                $('span#countryStart').html(model.countryStart.chinese_name).addClass('f17').removeClass('colorc7');
+            }
+            if (model.bqcategory && model.bqcategory.length) {
+                model.labels = [];
+                $('#goodType').html('');
+                for (var i = 0; i < model.bqcategory.length; i++) {
+                    model.labels.push(model.bqcategory[i].category_id);
+                    $('#goodType').append('<span class="btn inblock bqspan f10">' + model.bqcategory[i].category_name + '</span>').addClass('f17').removeClass('colorc7');
+
+                }
+            }
+            model.qksucc();
+        },
+        qksucc: function() {
+            if (model.startDate && model.endDate && model.countryStart && model.labels && model.labels.length && model.deliverId) {
+                $("#sub").removeClass('no');
+            }
+        },
+        succ: function() {
+            if ($("#sub").hasClass('no')) {
+                Comm.message('行程信息不完整')
+            } else {
+                var data = {
+                    deliverId: model.deliverId,
+                    deliverName: model.deliverName,
+                    fromId: '5d4bcf5a17520cd6d0a9e3fa', //默认中国
+                    fromTime: model.endDate,
+                    labels: model.labels.join(','),
+                    destinationTime: model.startDate,
+                    destinationId: model.countryStart.country_id, //默认中国
+                }
+                Comm.loading('发布中...');
+                AJAX.POST('/api/ptravel/submitTravel', data, function(d) {
+                    Comm.loading(false);
+                    if (d.code == 1) {
+                        model.travelId = d.msg;
+                        Comm.showWindow('succWinTemp', true);
+                    } else if (d.code == 2) {
+                        Comm.showWindow('errorWinTemp', true);
+                    } else {
+                        Comm.message(d.msg);
+                    }
+                })
+            }
+
+        },
+        back: function() {
+            var div = "<div class='f17'>确定要退出吗？</div><div class='f13 color666 mart10'>退出后本页信息将会丢失</div>"
+            Comm.confirm(div, function(d) {
+                if (!d) {
+                    Comm.db('bqcategory', '');
+                    Comm.close();
+                }
+            }, {
+                y: '继续编辑',
+                c: '确认退出',
+            })
+        },
+        gotripdetail: function() {
+            Comm.db('bqcategory', '');
+            Comm.go('tripdetail.html?id=' + model.travelId + "&bbk=1&close=2");
+        },
+        sendbq: function() {
+            Comm.go('sendbq.html?labels=' + model.labels.join(','))
+        }
+    };
+
+    //地区选择器
+    function Areapicker(title, cb) {
+        this.instance = new Picker({
+            title: title,
+            data: Area.getPickerDatatwo()
+        });
+        this.instance.on('picker.select', function() {
+            var obj = {};
+            var names = [];
+            var sid = -1;
+            for (var i = 0; i < 3; i++) {
+                if (this.data[i]) {
+                    var a = this.data[i][this.selectedIndex[i]];
+                    if (a) {
+                        obj[i] = a;
+                        names.push(a.text);
+                        sid = a.i;
+                    }
+                }
+            }
+            cb && cb(obj, names.join(" "), sid);
+        });
+
+        this.instance.on('picker.change', function(index) {
+            if (index != 2) {
+                var s = Area.getPickerDatatwo(this.selectedIndex[0]);
+                this.refillColumn(index + 1, s[index + 1]);
+                this.scrollColumn(index + 1, 0);
+                if (index == 0) {
+                    this.refillColumn(index + 2, s[index + 2]);
+                    this.scrollColumn(index + 2, 0);
+                }
+            }
+        });
+    }
+    var open_translates = 0;
+    Areapicker.prototype.instance = null;
+    Areapicker.prototype.show = function() {
+        open_translate = 0;
+        open_translates = 1;
+        this.instance.show();
+    };
+</script>
+
+</html>

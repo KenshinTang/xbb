@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>消息</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link href="css/g.css" type="text/css" rel="stylesheet">
+    <link href="css/comm.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        section {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .pad20 {
+            padding: 20px;
+        }
+        /*侧滑*/
+        
+        .r0 {
+            right: 0;
+        }
+        
+        .subListCon {
+            background-color: transparent !important;
+            margin-bottom: 25px;
+            background-size: 100% 100%;
+            height: 100%;
+            width: 100%;
+            z-index: 999;
+            transform: translate3d(0px, 0px, 0px);
+            /*规定应用过渡的CSS属性*/
+            transition-property: transform;
+            /*规定应用过渡所花费的时间*/
+            transition-duration: 0s;
+            /*规定过渡效果从何开始，默认是0*/
+            transition-delay: 0;
+            /*规定过渡的时间曲线*/
+            transition-timing-function: linear;
+            position: relative;
+        }
+        
+        .subListTitle {
+            position: absolute;
+            line-height: 100%;
+            top: 50px;
+            bottom: 1px;
+            z-index: 10;
+            background-color: #FF2424;
+            border-radius: 0px 4px 4px 0px;
+        }
+        
+        .r0>.subRight {
+            display: block;
+            float: left;
+            width: 70px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar bottomShadow">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle">系统消息</div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="main" id="list">
+        </div>
+    </section>
+    <footer></footer>
+</body>
+
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/area.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script type="text/javascript" src="inc/sideslipMob.js"></script>
+<script type="text/javascript">
+    function pageload() {
+        model.search();
+    }
+
+    function pageresume() {}
+    var model = {
+        search: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,list', {
+                    pagesize: 10,
+                    refreshUrl: '/api/mess/list',
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+                    haveTag: 1
+                };
+
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    for (var i = 0; i < d.data.length; i++) {
+                        if (d.data[i].messType == 1) {
+                            var div = document.createElement('div');
+                            div.innerHTML = d.data[i].content;
+                            var img = $(div).find("img");
+                            if (img && img.length > 0) {
+                                d.data[i].img = $('img[0]').attr('src');
+                            }
+                            d.data[i].content = div.innerText;
+                        }
+                    }
+                    var h = template('listTpl', d.data);
+                    refresh.appendHtml(h);
+                    loadtoch();
+                };
+            } else {
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        },
+        go: function(isread, messType, userType, messId, itemId, itemType) {
+            if (isread == 0) {
+                AJAX.POST('/api/mess/read', {
+                    messId: messId,
+                    userType: userType
+                }, function(d) {
+                    $('#' + messId).find('.msgred').remove();
+                    go();
+                })
+            } else {
+                go();
+            }
+
+            function go() {
+                if (itemType != 5) {
+                    //1：订单 、3：行程，4：售后（售后ID），5：消息（消息ID）
+                    if (itemType == 1 || itemType == 4) {
+                        Comm.go('orderdetail.html?id=' + itemId + "&bbk=" + (userType == 2 ? '1' : '0') + "&sale=" + (itemType == 4 ? 1 : 0));
+                    } else if (itemType == 3) {
+                        Comm.go('tripdetail.html?id=' + itemId + "&bbk=1");
+                    }
+                } else {
+                    Comm.go('msginfo.html?id=' + messId);
+                }
+            }
+        },
+        del: function(messId, userType) {
+            event.stopPropagation();
+            Comm.confirm('确认删除消息?', function(d) {
+                if (d) {
+                    AJAX.POST('/api/mess/del', {
+                        messid: messId,
+                        userType: userType,
+                    }, function(d) {
+                        if (d.code == 1) {
+                            Comm.message('删除成功');
+                            $('#' + messId).remove();
+                        } else {
+                            Comm.message(d.msg);
+                        }
+                    })
+                }
+            })
+        }
+    }
+</script>
+
+<script id="listTpl" type="text/html">
+    {{each $data v k}}
+    <div style="position:relative;" class="list" id="{{v.messId}}">
+        <div class="subListCon">
+            <div class="lh50 center">{{formatDate(v.addTime,'m月d日 H:i')}}</div>
+            {{if(v.itemType==5)}}
+            <div class="bg_white pad20" style="border-radius: 4px;" onclick="model.go({{v.isread}},{{v.messType}},{{v.userType}},{{v.messId}},{{v.itemId}},{{v.itemType}})">
+                <div class="f17 flex-between">
+                    <div>{{v.messTitle}}</div>
+                    <div>
+                        {{if(v.isread=="0")}}
+                        <span class="msgred" style="position: relative;top:0px;"></span> {{/if}}</div>
+                </div>
+                <div class="">
+                    {{if(v.img)}}
+                    <img src="{{OSS(v.img)}}" width="100%" class="mart20" style="border-radius: 4px;" /> {{/if}}
+                </div>
+                <div class="color666 f13 mart15 wordW2">{{v.content}}</div>
+                <div class="flex-between mart30">
+                    <div class="f15">阅读全文</div>
+                    <div><img src="img/ic_more_g.png" height="12" /></div>
+                </div>
+            </div>
+            {{else}}
+            <div class="bg_white pad20 " style="border-radius: 4px;" onclick="model.go({{v.isread}},{{v.messType}},{{v.userType}},{{v.messId}},{{v.itemId}},{{v.itemType}})">
+                <div class="flex-between">
+                    <div>
+                        {{if(v.userType==1)}}
+                        <img src="img/msgt.png" height="17" /> {{else}}
+                        <img src="img/msgbbk.png" height="17" /> {{/if}}
+                        <span class="f17">{{v.messTitle}}</span>
+                    </div>
+                    <div>
+                        {{if(v.isread=="0")}}
+                        <span class="msgred" style="position: relative;top:0px;"></span> {{/if}}
+                    </div>
+                </div>
+                <div class="color666 f13 mart15 wordW2">{{v.content}}</div>
+                {{if(5>v.itemType)}}
+                <div class="flex-between mart15 bordert paddt15">
+                    <div class="f15">查看详情</div>
+                    <div><img src="img/ic_more_g.png" height="12" /></div>
+                </div>
+                {{/if}}
+            </div>
+            {{/if}}
+        </div>
+        <div class="subListTitle r0 flex-center" onclick="model.del('{{v.messId}}',{{v.userType}})">
+            <a class="subRight  colorfff">删除</a>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

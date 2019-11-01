@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>新建收货地址</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link href="css/g.css" type="text/css" rel="stylesheet">
+    <link href="css/comm.css" type="text/css" rel="stylesheet">
+    <style>
+        section {
+            background: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        textarea {
+            border: 0px solid white;
+        }
+        
+        textarea,
+        input {
+            font-size: 15px;
+        }
+        
+        input {
+            margin: 15px 0px;
+            line-height: 38px;
+            width: 90%;
+            color: #333;
+        }
+        
+        input[disabled] {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar bottomShadow">
+            <div class="navBackIcon" onclick="model.back()"></div>
+            <div class="navItem f13 colorprice" onclick="model.save()">保存并使用</div>
+            <div class="navTitle"></div>
+        </div>
+    </header>
+    <section>
+
+    </section>
+    <footer></footer>
+</body>
+
+<script type="text/html" id="mainTpl">
+    <div class="bg_white">
+        <div class="marl20">
+            <div class="flex_wrap lh65 borderb">
+                <div style="width:85px;"><span class="f15">收货人</span></div>
+                <div style="width:calc(100% - 85px);">
+                    <input onblur="model.blur()" type="text" id="concatName" name="concatName" value="{{concatName?concatName:''}}" placeholder="姓名" data-reg='empty' />
+                </div>
+            </div>
+
+            <div class="flex_wrap lh65 borderb">
+                <div style="width:85px;"><span class="f15">手机号</span></div>
+                <div style="width:calc(100% - 85px);">
+                    <input onblur="model.blur()" type="tel" name="concatPhone" id="concatPhone" maxlength="11" value="{{concatPhone?concatPhone:''}}" placeholder="收货人电话" data-reg='m' />
+                </div>
+            </div>
+
+            <div class="flex_wrap lh65 borderb">
+                <div style="width:85px;"><span class="f15">所在地区</span></div>
+                <div style="width:calc(100% - 85px);" onclick="model.areapicker.show();">
+                    <input type="text" class="bg_white" id="cusArea" name="cusArea" disabled readonly="readonly" placeholder="请选择地区" value="{{cusArea?cusArea:''}}" data-reg='empty' />
+                    <img class="" src="img/ic_more_g.png" height="12" />
+                </div>
+            </div>
+            <div class="borderb">
+                <textarea onblur="model.blur()" data-reg='empty' placeholder="请填写详细地址，不少于5个字" name="cusAddress" id="cusAddress" class="f15 paddr20 paddt10" placeholder="" style="height: 70px;width:100%;">{{cusAddress?cusAddress:''}}</textarea>
+            </div>
+            <div class="flex-between lh50 paddr20" onclick="model.setdefault(this)">
+                <div class="f15">设为默认收货地址</div>
+                <div>
+                    {{if(isDefault)}}
+                    <img src="img/pay/ic_check_y.png" height="18" /> {{else}}
+                    <img src="img/pay/ic_check_n.png" height="18" /> {{/if}}
+                </div>
+            </div>
+        </div>
+        <div class="linebod" style="background: #F5F5F5;"></div>
+    </div>
+</script>
+<script src="inc/g.js"></script>
+<script src="inc/z.js"></script>
+<script src="inc/comm.js"></script>
+<script src="inc/area.js"></script>
+<script src="inc/art-template.js"></script>
+<script src="inc/picker.min.js"></script>
+<script type="text/javascript">
+    function pageload() {
+        Area.init(function() {
+            model.init();
+        });
+    }
+
+    function pageresume() {}
+
+    var model = {
+        user: Comm.db('userinfo'),
+        id: Comm.query('id'),
+        areapicker: null,
+        init: function() {
+            if (model.id) {
+                $(".navTitle").html('编辑收货地址');
+                model.get();
+            } else {
+                $(".navTitle").html('新建收货地址');
+                $('section').html(template('mainTpl', {}));
+                model.areapicker = new Areapicker('', function(a, b, c) {
+                    $('#cusArea').val(b);
+                    model.cusAreaId = c;
+                })
+            }
+        },
+        cusAreaId: 0,
+        get: function() {
+            AJAX.GET('/api/customer/address/info?addrId=' + model.id, function(d) {
+                if (d.code == 1) {
+                    model.isDefault = d.data.isDefault;
+                    $('section').html(template('mainTpl', d.data));
+                    model.areapicker = new Areapicker('', function(a, b) {
+                        $('#cusArea').val(b);
+                        model.cusAreaId = c;
+                    })
+                }
+            })
+        },
+        isDefault: 0,
+        setdefault: function(a) {
+            if (!model.isDefault) {
+                model.isDefault = 1
+                $(a).find('img').attr('src', 'img/pay/ic_check_y.png');
+            } else {
+                model.isDefault = 0
+                $(a).find('img').attr('src', 'img/pay/ic_check_n.png');
+            }
+        },
+        save: function() {
+            var data = Check.submit('POST')
+            if (!data) {
+                return false;
+            }
+            data.isDefault = model.isDefault;
+            data.cusAreaId = model.cusAreaId;
+            data.cusAddrId = model.id;
+            data.longitude = 0;
+            data.latitude = 0;
+            data.customerId = model.user.customerId;
+            data.cusAddressInfo = data.cusArea + " " + data.cusAddress;
+
+            if (data.cusAddress.length < 5) {
+                Comm.message('详细地址，不少于5个字')
+                return
+            }
+            Comm.loading(1);
+            //新增、修改地址
+            var url = model.id ? '/api/customer/address/edit' : '/api/customer/address/add'
+            AJAX.POST(url, data, function(a) {
+                Comm.loading(0);
+                if (a.code == 1) {
+                    Comm.message('保存成功!');
+                    Comm.close();
+                } else {
+                    Comm.message(a.msg);
+                }
+            });
+        },
+        back: function() {
+            Comm.close();
+        },
+        blur: function() {
+            window.scrollTo(0, 0);
+        },
+    }
+</script>
+
+</html>

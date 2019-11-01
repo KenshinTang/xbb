@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .main {
+            padding: 20px;
+        }
+        
+        input {
+            width: 100%;
+            padding-left: 50px;
+            line-height: 28px;
+            height: 28px;
+            font-size: 14px;
+            background-color: #F5F5F5;
+            border-radius: 14px;
+            background-image: url('img/send/ic_search.png');
+            background-repeat: no-repeat;
+            background-size: 21px;
+            background-position: 20px center;
+            margin: 0 auto;
+        }
+        
+        .posr {
+            position: fixed;
+            right: 10px;
+            top: 100px;
+            font-size: 12px;
+            text-align: center;
+            z-index: 2;
+        }
+        
+        .bgF5F5F5 {
+            background-color: #F5F5F5;
+        }
+        
+        .hot {
+            width: auto;
+            height: 30px;
+            line-height: 30px;
+            line-break: 30px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #999;
+            background-color: #F5F5F5;
+            min-width: 64px;
+            margin-top: 20px;
+            margin-right: 20px;
+            padding: 0px 10px;
+        }
+        
+        #MainBg {
+            top: 100px;
+        }
+        
+        #WTDBOX {
+            top: 100px;
+        }
+        
+        #WTDBOX .search {
+            position: absolute;
+            top: 0px;
+            height: calc(100% - 100px);
+            width: 100%;
+            left: 0px;
+            background-color: #fff;
+            overflow: hidden;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body style="position: relative">
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle"></div>
+        </div>
+    </header>
+    <section>
+        <div class="main">
+            <form action="javascript:return true;" onsubmit="model.search()">
+                <input id="id_searchInput" type="search" placeholder="搜索" oninput="model.search()" />
+            </form>
+            <div class="hotP hide">
+                <div class="f15" style="margin-top: 35px;" id="brandHotList">热门出行地</div>
+                <div class="flex_wrap" id="hot">
+
+                </div>
+            </div>
+            <div class="djd hide">
+                <div class="f15" style="margin-top: 35px;" id="branddjdList">已选</div>
+            </div>
+        </div>
+        <div>
+            <div class="item">
+
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+    <div class="posr hide">
+        <ul>
+            <li>
+                <a id="abrandHotList" class="hide" href="#brandHotList">热门</a>
+            </li>
+            <li>
+                <a href="#A">A</a>
+            </li>
+            <li>
+                <a href="#B">B</a>
+            </li>
+            <li>
+                <a href="#C">C</a>
+            </li>
+            <li>
+                <a href="#D">D</a>
+            </li>
+            <li>
+                <a href="#E">E</a>
+            </li>
+            <li>
+                <a href="#F">F</a>
+            </li>
+            <li>
+                <a href="#G">G</a>
+            </li>
+            <li>
+                <a href="#H">H</a>
+            </li>
+            <li>
+                <a href="#J">J</a>
+            </li>
+            <li>
+                <a href="#K">K</a>
+            </li>
+            <li>
+                <a href="#L">L</a>
+            </li>
+            <li>
+                <a href="#M">M</a>
+            </li>
+            <li>
+                <a href="#n">N</a>
+            </li>
+            <li>
+                <a href="#P">P</a>
+            </li>
+            <li>
+                <a href="#Q">Q</a>
+            </li>
+            <li>
+                <a href="#R">R</a>
+            </li>
+            <li>
+                <a href="#S">S</a>
+            </li>
+            <li>
+                <a href="#T">T</a>
+            </li>
+            <li>
+                <a href="#W">W</a>
+            </li>
+            <li>
+                <a href="#X">X</a>
+            </li>
+            <li>
+                <a href="#Y">Y</a>
+            </li>
+            <li>
+                <a href="#Z">Z</a>
+            </li>
+        </ul>
+    </div>
+    <div wtd="searchWinTemp" class="search">
+
+    </div>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script>
+    var customer = Comm.db('userinfo');
+
+    function pageload() {
+        if (model.resouce == 'djd') {
+            document.title = '选择定居地';
+            $('.djd').removeClass('hide');
+            if (customer.settlement) {
+                $('#branddjdList').html('已选(' + customer.settlement + ')')
+            } else {
+                $('#branddjdList').html('')
+            }
+            $('#branddjdList').remove();
+            $('.navTitle').html(document.title)
+        } else {
+            document.title = '选择出行地';
+            $('.navTitle').html(document.title);
+            $('.hotP').removeClass('hide');
+            $('#abrandHotList').removeClass('hide')
+        }
+        model.listByLetter();
+        model.listByHot();
+    }
+
+    function pageresume() {
+
+    }
+
+    var model = {
+        data: null,
+        resouce: Comm.query('resouce') ? Comm.query('resouce') : '',
+        listByLetter: function() {
+            AJAX.GET('/api/country/listAllByLetter', function(a) {
+                if (a.code) {
+                    model.alllist = a.data;
+                    var r = {};
+                    for (var i = 0; i < a.data.length; i++) {
+                        if (a.data[i].chinese_name.indexOf('香港') >= 0 || a.data[i].chinese_name.indexOf('澳门') >= 0) {
+                            continue;
+                        }
+                        if (r[a.data[i].index_words]) {
+                            r[a.data[i].index_words].push(a.data[i]);
+                        } else {
+                            r[a.data[i].index_words] = [a.data[i]];
+                        }
+                    }
+                    for (var v in r) {
+                        r.key = v;
+                        r[v].key = v;
+                        $('.item').append(template('ALists', r[v]));
+                    }
+                    model.data = r;
+                    console.log(r);
+                }
+            })
+        },
+        hot: [],
+        listByHot: function() {
+            AJAX.GET('/api/country/listByHot?pageno=1&pagesize=20', function(d) {
+                if (d.code == 1) {
+                    model.hot = d.data;
+                    $('#hot').html(template('hotTpl', d.data))
+                }
+            })
+        },
+        sel: function(key, i) {
+            Comm.db('country' + model.resouce, model.data[key][i]);
+            if (model.resouce == "djd") {
+                Comm.close();
+            } else {
+                Comm.close(2);
+            }
+        },
+        sel1: function(i) {
+            Comm.db('country' + model.resouce, model.hot[i]);
+            if (model.resouce == "djd") {
+                Comm.close();
+            } else {
+                Comm.close(2);
+            }
+        },
+        sel2: function(i) {
+            Comm.db('country' + model.resouce, model.tdata[i]);
+            if (model.resouce == "djd") {
+                Comm.close();
+            } else {
+                Comm.close(2);
+            }
+        },
+        tdata: [],
+        search: function() {
+            var keyword = $('#id_searchInput').val();
+            if (keyword) {
+                model.tdata = [];
+                for (var i = 0; i < model.alllist.length; i++) {
+                    if (model.alllist[i].chinese_name.indexOf(keyword) >= 0 || model.alllist[i].english_name.indexOf(keyword) >= 0) {
+                        model.tdata.push(model.alllist[i]);
+                    }
+                }
+                if (model.tdata.length > 0) {
+                    Comm.showWindow(false);
+                    Comm.showWindow('searchWinTemp', false);
+                    $("#WTDBOX .search").html(template('searchTpl', model.tdata));
+                } else {
+                    Comm.message('无信息')
+                    model.tdata = [];
+                    Comm.showWindow(false);
+                }
+            } else {
+                model.tdata = [];
+                Comm.showWindow(false);
+            }
+        }
+    }
+</script>
+<script id="hotTpl" type="text/html">
+    {{each $data v k}}
+    <button class="hot" onclick="model.sel1({{k}})">{{v.chinese_name}}</button> {{/each}}
+</script>
+<script id="ALists" type="text/html">
+    <div class="bgF5F5F5 paddl20 lh30" id="{{key}}">
+        {{key}}
+    </div>
+    <div class="lists">
+        {{each $data v k }}
+        <div class="list lh50 borderb paddl20">
+            <span class="f15" onclick="model.sel('{{key}}',{{k}})">{{v.english_name}}{{v.chinese_name}} </span>
+        </div>
+        {{/each}}
+    </div>
+</script>
+
+<script id="searchTpl" type="text/html">
+    {{each $data v k }}
+    <div class="list lh50 borderb paddl20 tleft">
+        <span class="f15" onclick="model.sel2({{k}})">{{v.english_name}}{{v.chinese_name}} </span>
+    </div>
+    {{/each}}
+</script>
+
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        .mart70 {
+            margin-top: 70px;
+        }
+        
+        #phone,
+        #password {
+            font-size: 17px;
+            line-height: 40px;
+            border-bottom: 1px solid #F1F1F1;
+            width: 75%;
+        }
+        
+        button {
+            width: 75%;
+            background: #D8D8D8;
+            color: #fff;
+            font-size: 15px;
+            border-radius: 4px;
+        }
+        
+        button.active {
+            background: #FFCD1F;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+    </header>
+    <section>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+        </div>
+        <div class="paddb20">
+            <div class="f25 center mart70" style="font-weight: 500;">手机密码登录</div>
+            <div class="mart30 center" style="position: relative;">
+                <input type="tel" number name="phone" value="" id="phone" placeholder="请输入手机号" oninput="model.oninput(this)" data-reg='m' maxlength="11" />
+                <img src="img/ic_delete_g.png" style="position: absolute;top:10px;right: 15%;" height="20" class="hide ic_delete_g" onclick="model.clear(this)" />
+            </div>
+            <div class="mart30 center" style="position: relative;">
+                <input type="password" name="password" value="" id="password" placeholder="请输入密码" oninput="model.oninput(this)" data-reg='p' maxlength="20" />
+                <img src="img/ic_delete_g.png" style="position: absolute;top:10px;right: 15%;" height="20" class="hide ic_delete_g" onclick="model.clear(this)" />
+            </div>
+            <div class="mart30 center">
+                <button id="sub" onclick="model.sub()">确定</button>
+                <div class="mart20 color666" onclick="Comm.go('forgetp.html')">忘记密码</div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="center paddb20 paddb20" onclick="openLogin.login()">
+            <div><img src="img/open/wechat-h.png" width="30" /></div>
+            <div class="colorc7 f12 mart10">微信快捷登录</div>
+        </div>
+    </footer>
+</body>
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript">
+    function pageload() {
+
+    }
+
+    var model = {
+        clear: function(a) {
+            $(a).parent().find('input').val('');
+            $(a).addClass('hide');
+            $('#sub').removeClass('active');
+        },
+        oninput: function(a) {
+            if ($(a).val()) {
+                $(a).parent().find('.ic_delete_g').removeClass('hide');
+            } else {
+                $(a).parent().find('.ic_delete_g').addClass('hide');
+            }
+            var reg = /^1\d{10}$/;
+            var reg1 = /^[a-zA-Z0-9]{6,20}$/;
+            if (!reg.test($("#phone").val()) || !reg1.test($("#password").val())) {
+                $('#sub').removeClass('active');
+                return;
+            }
+            $('#sub').addClass('active');
+        },
+        sub: function(a) {
+            var data = Check.submit('POST');
+            if (!data) {
+                return false;
+            }
+            Comm.loading('正在登录...');
+            AJAX.POST('/api/customer/login', data, function(a) {
+                console.log(a)
+                Comm.loading();
+                if (a.code == 1 || a.code == 2) {
+                    AJAX.setTag(a.data.token);
+                    Comm.db('userinfo', a.data);
+                    if (Comm.w9()) {
+                        IM_.Login(function(d) {
+                            if (d == 1) {
+                                //注册推送
+                                Comm.registerPush({
+                                    state: 1,
+                                    token: a.data.token,
+                                    url: config.root + '/api/customer/deviceToken'
+                                });
+                                Comm.message('登录成功');
+                            } else {
+                                //Comm.message('IM登录失败');
+                            }
+                            setTimeout(function() {
+                                Comm.gotop("index.html")
+                            }, 600);
+                        });
+                    } else {
+                        Comm.message('登录成功');
+                        setTimeout(function() {
+                            Comm.gotop("index.html")
+                        }, 600);
+                    }
+                } else {
+                    Comm.message('用户名或者密码错误');
+                }
+            });
+        }
+    }
+</script>
+
+</html>

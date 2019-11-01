@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>实名认证</title>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <link rel="stylesheet" href="css/g.css" />
+    <link rel="stylesheet" href="css/comm.css" />
+    <style>
+        section {
+            background-color: #F5F5F5;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="model.close();"></div>
+            <div class="navTitle"></div>
+        </div>
+    </header>
+    <section>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+
+<script>
+    function pageload() {
+        model.init();
+    }
+
+    function pageresume() {}
+
+    var model = {
+        closei: Comm.query('close'),
+        hzsucc: Comm.query('hzsucc') ? Comm.query('hzsucc') : '',
+        init: function() {
+            AJAX.GET('/api/customer/authInfo', function(d) {
+                if (d.code == 1) {
+                    d.data.hzsucc = model.hzsucc;
+                    $('section').html(template('sectionTpl', d.data));
+                    if (model.hzsucc == 1) {
+                        $('.navTitle').html('护照认证')
+                    } else {
+                        $('.navTitle').html('实名认证');
+                    }
+                }
+            })
+        },
+        close: function() {
+            if (model.closei == 1) {
+                Comm.close()
+            } else {
+                Comm.close(2);
+            }
+        }
+    }
+
+    function androidback() {
+        model.close();
+    }
+</script>
+
+<script id="sectionTpl" type="text/html">
+    <div class="bg_white paddt20 paddb20">
+        <div class="center">
+            <img src="img/my/csucc{{hzsucc}}.png" height="90" />
+        </div>
+        <div class="center f17 color666 paddb20 paddt20" id="message">
+            {{hzsucc==1?'已完成护照认证':'已完成实名认证'}}
+        </div>
+    </div>
+    <div style="background-color: #F5F5F5; height: 10px;"></div>
+    <div class="bg_white paddl20 paddr20">
+        <div style="line-height: 65px;" class="flex-between borderb">
+            <div class="f15">真实姓名</div>
+            <div class="f15 color999">{{strhide(idCardName)}}</div>
+        </div>
+        <div style="line-height: 65px;" class="flex-between">
+            <div class="f15">身份证号</div>
+            <div class="f15 color999">{{strhide(idCardNum)}}</div>
+        </div>
+    </div>
+</script>
+
+</html>

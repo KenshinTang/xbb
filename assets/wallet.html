@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>我的钱包</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <link rel="stylesheet" href="inc/mescroll/mescroll.min.css" />
+    <style>
+        body {
+            background-color: #fff;
+        }
+        
+        body>header {
+            background-image: url('img/my/img_bg_moneyba.png');
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            height: 220px;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        .navBackIcon {
+            background-image: url('css/stIconfile/back_w.png');
+        }
+        
+        .mart40 {
+            margin-top: 40px;
+        }
+        
+        section {
+            padding: 20px;
+        }
+        
+        .pos {
+            position: fixed;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 14px 0px rgba(231, 231, 231, 1);
+            border-radius: 23px;
+            width: 90%;
+            left: 5%;
+            bottom: 10px;
+            line-height: 45px;
+            height: 45px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navItem f13 colorfff" onclick="Comm.go('ab.html?id=24')">常见问题</div>
+            <div class="navTitle" style="color: #fff;">我的钱包</div>
+        </div>
+        <div class="paddl20 paddr20">
+            <div class="colorfff f15 mart40">余额（元）</div>
+            <div class="flex-between mart20">
+                <div><span style="font-size: 45px;" class="colorfff" id="balance">0</span></div>
+                <div>
+                    <button style="width: 100px;" onclick="Comm.go('withdraw.html')">提现</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section id="box" class="mescroll">
+        <div class="f15">交易明细</div>
+        <div class="lists" id="walletList">
+
+        </div>
+        <div class="pos flex-between hide">
+            <div class="paddl20" onclick="Comm.go('phonecode.html')">
+                <img src="img/ic_news.png" height="24" />
+                <span class="f13 color666">为了您的资金安全，请先设置支付密码。</span>
+            </div>
+            <div class="paddr20" onclick="model.closeSet()">
+                <img src="img/cl.png" height="20" />
+            </div>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script type="text/javascript" src="inc/mescroll/mescroll.min.js"></script>
+<script>
+    function pageload() {
+        model.init();
+        model.isPayPassword();
+        model.getBalance();
+    }
+
+    function pageresume() {
+        pageload()
+    }
+    var model = {
+        init: function() {
+            if (!model.mere) {
+                model.mere = new MERefresh('box,walletList', {
+                    pagesize: 10,
+                    refreshUrl: '/api/customer/balanceList',
+                    refreshTypeGet: true
+                });
+
+                model.mere.refreshOption.refreshParm = {
+
+                };
+                //页面 <刷新> 的回调
+                model.mere.refreshOption.refresh_cb = function(refresh, d) {
+                    refresh.successEndRef(d.data.length, d.totalCount);
+                    var h = template('walleltListTpl', d.data);
+                    refresh.appendHtml(h);
+                };
+            } else {
+
+                model.mere.refreshOption.refreshParm = {
+
+                };
+                if (model.nav1 && model.nav1.curchild) {
+                    model.mere.refreshOption.refreshParm.countryId = model.nav1.curchild.id
+                }
+                if (model.nav2) {
+                    model.mere.refreshOption.refreshParm.deliverId = model.nav2.id
+                }
+                if (model.nav3) {
+                    model.mere.refreshOption.refreshParm.flag = model.nav3.i
+                }
+
+                //重置列表数据
+                model.mere.MeRefScroll.resetUpScroll();
+                //model.mere.MeRefScroll.triggerDownScroll();
+                //隐藏回到顶部按钮
+                model.mere.MeRefScroll.hideTopBtn();
+            }
+        },
+        //隐藏提示
+        closeSet: function() {
+            $('.pos').addClass('hide');
+        },
+        //是否有支付密码
+        isPayPassword: function() {
+            AJAX.GET('/api/customer/havePayPsw', function(d) {
+                if (d && d.code == 1) {
+                    if (!d.data) {
+                        $('.pos').removeClass('hide');
+                    }
+                }
+            })
+        },
+        //获取账户余额
+        getBalance: function() {
+            AJAX.GET('/api/customer/balance', function(d) {
+                if (d && d.code == 1) {
+                    $('#balance').html(app.price(d.data));
+                }
+            })
+        }
+    }
+</script>
+
+<script id="walleltListTpl" type="text/html">
+    {{each $data v k}}
+    <div class="list flex-between lh65 borderb paddb20 paddt20" onclick="Comm.go('bill.html?id={{v.balanceInfoId}}')">
+        <div class="lh25">
+            <div class="f17">{{v.remark}}</div>
+            <div class="f13 color999">{{v.addTime}}</div>
+        </div>
+        <div class="colorprice f24" {{if v.isPay==1}}style="color: #2FB373;" {{/if}}>{{if v.isPay==1}}-{{else}}+{{/if}}{{priceTp(v.account)}}</div>
+    </div>
+    {{/each}}
+</script>
+
+</html>

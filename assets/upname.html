@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=no" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no,adress=no" />
+    <title>昵称</title>
+    <link rel="stylesheet" href="css/g.css">
+    <link rel="stylesheet" href="css/comm.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+        }
+        
+        .lh65 {
+            line-height: 65px;
+        }
+        
+        input {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="navBar">
+            <div class="navBackIcon" onclick="Comm.close()"></div>
+            <div class="navTitle f17"></div>
+        </div>
+    </header>
+    <section>
+        <div class="paddl20 paddr20 bg_white hide tyle1">
+            <div class="lh65">
+                <input id="nickName" class="lh50" type="text" placeholder="请输入昵称" />
+            </div>
+        </div>
+        <div class="paddl20 paddr20 bg_white hide tyle2">
+            <div class="lh65">
+                <input id="autograph" class="lh50" type="text" placeholder="简单介绍下自己~" />
+            </div>
+        </div>
+        <div class="paddl20 paddr20 center mart30">
+            <button style="border-radius: 4px;width: 100%;" onclick="model.save()">保存</button>
+        </div>
+    </section>
+    <footer>
+    </footer>
+</body>
+
+<script type="text/javascript" src="inc/z.js"></script>
+<script type="text/javascript" src="inc/g.js"></script>
+<script type="text/javascript" src="inc/comm.js"></script>
+<script type="text/javascript" src="inc/art-template.js"></script>
+<script type="text/javascript" src="inc/upimg/upload.js"></script>
+<script type="text/javascript" src="inc/dict.js"></script>
+<script>
+    var customer = Comm.db('userinfo');
+
+    function pageload() {
+        model.init();
+
+    }
+
+    function pageresume() {}
+    var model = {
+        type: Comm.query('type'),
+        init: function() {
+            if (model.type == 1) {
+                $('.navTitle').html('昵称');
+                $("#nickName").val(customer.nickName);
+            } else {
+                $('.navTitle').html('个性签名');
+                $("#autograph").val(customer.autograph);
+            }
+            $('.tyle' + model.type).removeClass('hide');
+        },
+        save: function() {
+            if (model.type == 1) {
+                var nickName = $("#nickName").val();
+                if (!nickName) {
+                    Comm.message('昵称不能为空');
+                    return;
+                }
+                if (nickName.length > 20) {
+                    Comm.message('昵称过长');
+                    return;
+                }
+                AJAX.POST('/api/customer/updateNickName', {
+                    nickName: nickName
+                }, function(a) { //精选内容
+                    if (a.code == 1) {
+                        customer.nickName = nickName;
+                        Comm.db('userinfo', customer);
+                        Comm.close();
+                    } else {
+                        Comm.message(a.msg);
+                    }
+                });
+            } else {
+                var autograph = $("#autograph").val();
+                if (autograph && autograph.length > 200) {
+                    Comm.message('个性签名过长');
+                    return;
+                }
+                AJAX.POST('/api/customer/updateAutograph', {
+                    autograph: autograph
+                }, function(a) { //精选内容
+                    if (a.code == 1) {
+                        customer.autograph = autograph;
+                        Comm.db('userinfo', customer);
+                        Comm.close();
+                    } else {
+                        Comm.message(a.msg);
+                    }
+                });
+            }
+        }
+    }
+</script>
+
+</html>
