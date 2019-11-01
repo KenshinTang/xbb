@@ -276,7 +276,7 @@ public class myApp extends Application {
 
     private void showForceOffLineDialog() {
         final CustomDialog dialog = new CustomDialog(ActivityManager.getInstance().getFirst(),
-                ScreenUtils.getScreenWidth(mContext) * 3 / 4,
+                ScreenUtils.getScreenWidth(mContext) * 4 / 5,
                 ScreenUtils.getScreenHeight(mContext) / 5,
                 com.luck.picture.lib.R.layout.dialog_force_offline, com.luck.picture.lib.R.style.Theme_dialog);
         Button btn_commit = dialog.findViewById(com.luck.picture.lib.R.id.btn_ok);

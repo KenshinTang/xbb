@@ -32,6 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:paddingTop="5dp"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:text="@string/tip_force_offline"
@@ -49,23 +50,18 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="1dip"
+                android:layout_height="2dip"
                 android:background="@color/line_color" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btn_ok"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
                 android:layout_height="60dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_ok"
-                    android:layout_width="0dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/btn_right_bottom_selector"
-                    android:text="@string/picture_confirm"
-                    android:textColor="#529BeA" />
-            </LinearLayout>
+                android:background="@drawable/btn_right_bottom_selector"
+                android:text="@string/picture_confirm"
+                android:textColor="#529BeA"
+                android:textSize="19sp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
