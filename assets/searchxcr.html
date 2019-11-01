@@ -42,6 +42,20 @@
             margin: 0 auto;
         }
         
+        button.lookbut {
+            width: 80px;
+            padding-right: 10px;
+            border: 1px solid #C7C7C7;
+            height: auto;
+            line-height: 23px;
+            font-size: 12px;
+            background-color: #fff;
+            background-image: url('img/bbk/ic_more.png');
+            background-size: auto 11px;
+            background-repeat: no-repeat;
+            background-position: 90% center;
+        }
+        
         .pad10ed {
             padding: 10px 10px 0px 10px;
         }
@@ -184,6 +198,13 @@
 <script>
     function pageload() {
         $("#id_searchInput").val(model.keyword);
+
+        if (app.isLogin()) {
+            var tauth = app.auth();
+            if (tauth.usertype == 2) {
+                model.bbk = 1;
+            }
+        }
         model.search();
         model.categoryList();
     }
@@ -193,6 +214,7 @@
     }
 
     var model = {
+        bbk: 0,
         keyword: Comm.query('keyword') ? Comm.query('keyword') : '',
         price: '', //1 正序 2降序
         category: [],
@@ -294,6 +316,7 @@
                 //页面 <刷新> 的回调
                 model.mere.refreshOption.refresh_cb = function(refresh, d) {
                     refresh.successEndRef(d.data.length, d.totalCount);
+                    d.data.bbk = model.bbk;
                     var h = template('needList', d.data);
                     refresh.appendHtml(h);
                 };
@@ -317,7 +340,7 @@
 
 <script id="needList" type="text/html">
     {{each $data v k }}
-    <div class="list bg_white marb20" onclick="Comm.go('needdetail.html?orderDetailId={{v.orderDetailId}}')">
+    <div class="list bg_white marb20" onclick="Comm.go('needdetail.html?orderDetailId={{v.orderDetailId}}&bbk={{bbk}}')">
         <div class="imgc">
             <img src="{{OSS(v.skuImg)}}" width="100%" onerror="app.errorimg(this)" />
             <div class="pos">
@@ -334,7 +357,8 @@
                 <span class="f19 colorprice">{{priceTp(v.sellPrice)}}</span>
             </div>
             <div>
-                <button onclick="model.gobuy('')">我也想要</button>
+                {{if(bbk==1)}}<button class="lookbut">查看需求</button> {{else}}
+                <button>我也想要</button> {{/if}}
             </div>
         </div>
     </div>

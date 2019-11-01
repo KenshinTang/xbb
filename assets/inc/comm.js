@@ -3,7 +3,7 @@ var config = {
     //root: 'http://192.168.0.96:8080/', //扶摇
     //root: 'http://192.168.0.25:8080/', //刘林
     /*测试环境*/
-    //root: 'https://app-test.xiaobeibao.com:644/xbb/',
+    root: 'https://app-test.xiaobeibao.com:644/xbb/',
     //webroot: "https://app-test.xiaobeibao.com:644/app/",
 
     /*开发环境*/
@@ -11,8 +11,8 @@ var config = {
     //webroot: "https://app-dev.xiaobeibao.com:544/app/",
 
     /*正式环境*/
-    root: 'https://app.xiaobeibao.com:444/xbb/',
-    webroot: "https://app.xiaobeibao.com:444/app/",
+    //root: 'https://app.xiaobeibao.com:444/xbb/',
+    //webroot: "https://app.xiaobeibao.com:444/app/",
 
     // base: '/chuanhui/',//本地
     // baseimg: '/',//本地

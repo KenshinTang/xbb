@@ -1082,7 +1082,6 @@ var Comm = new function() {
     z.showWindow = function(wtdid, cancel) {
         if (wtdid) {
             WTD.show(wtdid, cancel);
-            Comm.iosInput();
         } else WTD.hide();
     };
     /*s相当于localStorage,如果用于原生page之间共享数据，请storate*/
@@ -1269,36 +1268,6 @@ var Comm = new function() {
         }
         return false;
     };
-    z.iosInput = function() {
-        if (Comm.ios() || Comm.isweixin()) {
-            var inputs = document.querySelectorAll("input");
-            for (var i = 0; i < inputs.length; i++) {
-                var item = inputs[i];
-                item.onblur = function() {
-                    setTimeout(function() {
-                        if (document.activeElement.tagName == 'INPUT') {
-                            return;
-                        } else {
-                            document.activeElement.scrollIntoViewIfNeeded(true);
-                        }
-                    }, 100);
-                }
-            }
-            var textareas = document.querySelectorAll("TEXTAREA");
-            for (var i = 0; i < textareas.length; i++) {
-                var item = textareas[i];
-                item.onblur = function() {
-                    setTimeout(function() {
-                        if (document.activeElement.tagName == 'TEXTAREA') {
-                            return;
-                        } else {
-                            document.activeElement.scrollIntoViewIfNeeded(true);
-                        }
-                    }, 100);
-                }
-            }
-        }
-    }
 };
 
 
@@ -1361,12 +1330,11 @@ window.onload = function() {
             //Comm.message('脚本错误:' + e)
         }
     }
-    Comm.exec("pageload");
-    if (Comm.ios() || Comm.isweixin()) {
-        setInterval(function() {
-            //Comm.iosInput();
-        }, 300)
+    if (!navigator.onLine) {
+        Comm.message('请检查您的网络')
+        return;
     }
+    Comm.exec("pageload");
 };
 //解决弹出键盘遮挡输入框
 window.addEventListener("resize", function() {

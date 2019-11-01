@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.yunlinker.xbb"
     android:versionCode="2"
-    android:versionName="1.2.4">
+    android:versionName="1.4.0">
     <!-- <uses-sdk android:minSdkVersion="19"></uses-sdk> -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
