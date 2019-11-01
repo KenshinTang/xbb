@@ -9,12 +9,12 @@ android {
             storeFile file('C:\\Users\\yunlinker\\Desktop\\android\\android_xbb')
             storePassword '20160516'
         }
-        debug {
-            storeFile file('C:\\Users\\yunlinker\\Desktop\\android\\android_xbb')
-            storePassword '20160516'
-            keyAlias = 'yunlinker'
-            keyPassword '20160516'
-        }
+//        debug {
+//            storeFile file('C:\\Users\\yunlinker\\Desktop\\android\\android_xbb')
+//            storePassword '20160516'
+//            keyAlias = 'yunlinker'
+//            keyPassword '20160516'
+//        }
     }
     compileSdkVersion 28
     buildToolsVersion "28.0.0"

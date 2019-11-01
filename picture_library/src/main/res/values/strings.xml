@@ -40,4 +40,5 @@
     <string name="picture_video_error">视频已损坏</string>
     <string name="picture_audio_error">音频已损坏</string>
     <string name="picture_confirm">确定</string>
+    <string name="tip_force_offline" translatable="false">您的账号已在其他地方登陆</string>
 </resources>

@@ -18,6 +18,9 @@ import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.security.rp.RPSDK;
@@ -29,6 +32,12 @@ import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialog.util.DialogSettings;
 import com.kongzue.dialog.util.TextInfo;
+import com.luck.picture.lib.PictureExternalPreviewActivity;
+import com.luck.picture.lib.config.PictureMimeType;
+import com.luck.picture.lib.dialog.CustomDialog;
+import com.luck.picture.lib.tools.PictureFileUtils;
+import com.luck.picture.lib.tools.ScreenUtils;
+import com.luck.picture.lib.tools.ToastManage;
 import com.qiyukf.unicorn.api.ImageLoaderListener;
 import com.qiyukf.unicorn.api.SavePowerConfig;
 import com.qiyukf.unicorn.api.StatusBarNotificationConfig;
@@ -69,12 +78,14 @@ import com.yunlinker.baseclass.BaseActivity;
 //import com.yunlinker.image.GlideApp;
 import com.yunlinker.manager.ActivityManager;
 import com.yunlinker.xbb.BuildConfig;
+import com.yunlinker.xbb.ChatListActivity;
 import com.yunlinker.xbb.MainActivity;
 import com.yunlinker.xbb.R;
 
 
 import org.xutils.x;
 
+import java.io.IOException;
 import java.util.List;
 
 import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil;
@@ -203,17 +214,19 @@ public class myApp extends Application {
                     @Override
                     public void onForceOffline() {
                         //被其他终端踢下线
-                        //Log.i(tag, "onForceOffline");
-                        Log.e("1111111111", "onSuccess: "+"走走走走走" );
+                        // 问题1 我们使用一个账号去多个手机上登录 这时候 另一个手机的IM 就应该掉线
+                        // 需要安卓做掉线处理，处理方式就是 安卓弹出提示 去登录界面
+                        // 登录界面 open.html
+                        Log.e("kenshin", "onForceOffline, your are kicked off, please login." );
+                        showForceOffLineDialog();
                     }
 
                     @Override
                     public void onUserSigExpired() {
                         //用户签名过期了，需要刷新 userSig 重新登录 IM SDK
-                        //Log.i(tag, "onUserSigExpired");
-                        Log.e("1111111111", "onSuccess: "+"走走走走走" );
-
-
+                        // 问题2 没有登录其他手机 出现的IM登录过期 两种处理方式
+                        // 1，提示用户去跳转登录，2：自动登录（自动登录需要调用js的一个方法 IM_Refsing）
+                        Log.e("kenshin", "onUserSigExpired, your account is expired, auto login." );
                     }
                 })
                 //设置连接状态事件监听器
@@ -259,6 +272,28 @@ public class myApp extends Application {
 
         //将用户配置与通讯管理器进行绑定
         TIMManager.getInstance().setUserConfig(userConfig);
+    }
+
+    private void showForceOffLineDialog() {
+        final CustomDialog dialog = new CustomDialog(ActivityManager.getInstance().getFirst(),
+                ScreenUtils.getScreenWidth(mContext) * 3 / 4,
+                ScreenUtils.getScreenHeight(mContext) / 5,
+                com.luck.picture.lib.R.layout.dialog_force_offline, com.luck.picture.lib.R.style.Theme_dialog);
+        Button btn_commit = dialog.findViewById(com.luck.picture.lib.R.id.btn_ok);
+        TextView tv_title = dialog.findViewById(com.luck.picture.lib.R.id.tv_title);
+        TextView tv_content = dialog.findViewById(com.luck.picture.lib.R.id.tv_content);
+        tv_title.setText(getString(com.luck.picture.lib.R.string.picture_prompt));
+        tv_content.setText(getString(com.luck.picture.lib.R.string.tip_force_offline));
+        btn_commit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(myApp.this, MainActivity.class);
+                intent.putExtra("sendUrl", "open.html");
+                startActivity(intent);
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
 
